@@ -746,6 +746,21 @@
         initDelegation();
         initFilters();
         initBoasVindas();
+
+        // Abre modal de login automaticamente se redirecionado da área restrita
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('login') === '1') {
+            setTimeout(() => {
+                modal.open('login');
+                showToast({
+                    type: 'info',
+                    title: 'Acesso restrito',
+                    message: 'Faça login para acessar sua área.'
+                });
+                // Limpa o parâmetro da URL sem recarregar a página
+                window.history.replaceState({}, '', window.location.pathname);
+            }, 400);
+        }
     }
 
     // Aguarda DOM pronto
