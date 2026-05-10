@@ -216,8 +216,8 @@ tbody td { padding: 11px 14px; font-size: 13px; color: var(--navy); vertical-ali
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <script>
-const SUPABASE_URL = 'https://zxigimbhdzwhsxvjkzhx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4aWdpbWJoZHp3aHN4dmpremh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MjE1OTIsImV4cCI6MjA5Mzk5NzU5Mn0.8gEJwKv2OPgLyb1M4v7W5opye9EH--x5pXxQ4jK8IHU';
+const SUPABASE_URL = 'https://irkwrupzfrazvthlsejy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_stmwg_VqNUihgFMThh746w_3xSdvOWQ';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 </script>
@@ -398,12 +398,9 @@ let data = [];
 let editId = null;
 let currentUser = null;
 
-// ===== INIT — usa getSession() para leitura instantânea do localStorage =====
 async function init() {
-  // Primeira tentativa: getSession (localStorage, instantâneo)
   let { data: { session } } = await db.auth.getSession();
 
-  // Se não encontrou, aguarda um tick e tenta getUser como fallback
   if (!session) {
     await new Promise(r => setTimeout(r, 500));
     const { data: { session: s2 } } = await db.auth.getSession();
@@ -419,7 +416,6 @@ async function init() {
   atualizarHeader(currentUser);
   await loadData();
 
-  // Listener para mudanças de sessão (ex: logout em outra aba)
   db.auth.onAuthStateChange((_event, newSession) => {
     if (!newSession) window.location.href = 'index.html';
   });
@@ -450,7 +446,6 @@ function atualizarHeader(user) {
   };
 }
 
-// ===== DROPDOWN =====
 function toggleDropdown() {
   document.getElementById('userDropdown').classList.toggle('open');
 }
@@ -462,7 +457,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ===== PERFIL =====
 function openPerfil() {
   document.getElementById('userDropdown').classList.remove('open');
   const meta = currentUser.user_metadata || {};
@@ -528,7 +522,6 @@ function handleFotoUpload(event) {
   reader.readAsDataURL(file);
 }
 
-// ===== DADOS =====
 async function loadData() {
   const { data: rows, error } = await db
     .from('controle_concursos')
@@ -622,7 +615,6 @@ function renderTable(rows) {
   }).join('');
 }
 
-// ===== MODAL CONCURSO =====
 function openModal(entry) {
   editId = entry ? entry.id : null;
   document.getElementById('modalTitle').textContent   = entry ? 'Editar concurso' : 'Adicionar concurso';
@@ -699,7 +691,6 @@ async function deleteEntry(id) {
   await loadData();
 }
 
-// ===== EVENT DELEGATION =====
 document.getElementById('tableBody').addEventListener('click', function(e) {
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
@@ -708,7 +699,6 @@ document.getElementById('tableBody').addEventListener('click', function(e) {
   if (btn.dataset.action === 'delete') deleteEntry(id);
 });
 
-// ===== START =====
 init();
 </script>
 </body>
