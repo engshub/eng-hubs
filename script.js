@@ -503,25 +503,49 @@
             });
 
             // Submissão de formulários (simulada)
-            $('#form-login').addEventListener('submit', (e) => {
+            $('#form-login').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
                 const email = e.target.email.value;
+                const senha = e.target.senha.value;
+                btn.textContent = 'Entrando...';
+                btn.disabled = true;
+                const { error } = await db.auth.signInWithPassword({ email, password: senha });
+                btn.textContent = 'Entrar';
+                btn.disabled = false;
+                if (error) {
+                    showToast({ type: 'error', title: 'Erro ao entrar', message: 'E-mail ou senha incorretos.' });
+                    return;
+                }
                 this.close();
-                showToast({
-                    type: 'success',
-                    title: 'Bem-vindo de volta!',
-                    message: `Login realizado com ${email}.`
-                });
+                showToast({ type: 'success', title: 'Bem-vindo de volta!', message: 'Login realizado com sucesso.' });
+                setTimeout(() => { window.location.href = 'controle.html'; }, 1200);
             });
 
-            $('#form-cadastro').addEventListener('submit', (e) => {
+            $('#form-cadastro').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const nome = e.target.nome.value.split(' ')[0];
+                const btn = e.target.querySelector('button[type="submit"]');
+                const nome = e.target.nome.value.trim();
+                const email = e.target.email.value;
+                const senha = e.target.senha.value;
+                btn.textContent = 'Criando conta...';
+                btn.disabled = true;
+                const { error } = await db.auth.signUp({
+                    email,
+                    password: senha,
+                    options: { data: { nome_completo: nome } }
+                });
+                btn.textContent = 'Criar conta gratuita';
+                btn.disabled = false;
+                if (error) {
+                    showToast({ type: 'error', title: 'Erro ao criar conta', message: error.message });
+                    return;
+                }
                 this.close();
                 showToast({
                     type: 'success',
-                    title: `Conta criada, ${nome}!`,
-                    message: 'Você já pode acompanhar concursos e receber notificações.'
+                    title: `Conta criada, ${nome.split(' ')[0]}!`,
+                    message: 'Verifique seu e-mail para confirmar o cadastro.'
                 });
             });
         },
@@ -729,6 +753,28 @@
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
+    }
+
+    // Atualiza UI conforme estado de login
+    if (typeof onAuthChange === 'function') {
+        onAuthChange((user) => {
+            const btnEntrar   = document.querySelector('[data-modal-open="login"]');
+            const btnCadastro = document.querySelector('[data-modal-open="cadastro"]');
+            const navMinhaArea = document.querySelector('.nav-minha-area');
+            if (user) {
+                if (btnEntrar)   btnEntrar.textContent = 'Sair';
+                if (btnEntrar)   btnEntrar.onclick = async (e) => {
+                    e.preventDefault();
+                    await db.auth.signOut();
+                    showToast({ type: 'info', title: 'Até logo!', message: 'Você saiu da sua conta.' });
+                };
+                if (btnCadastro) btnCadastro.style.display = 'none';
+                if (navMinhaArea) navMinhaArea.style.fontWeight = '700';
+            } else {
+                if (btnEntrar)   btnEntrar.textContent = 'Entrar';
+                if (btnCadastro) btnCadastro.style.display = '';
+            }
+        });
     }
 
 })();
