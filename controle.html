@@ -817,13 +817,18 @@ tbody td {
 
 <!-- TOPBAR -->
 <header class="topbar">
-  <a href="index.html" class="brand">
-    <img src="logo1.jpeg" alt="Engs Hub" class="brand-logo" style="width:36px;height:36px;object-fit:contain;">
-    <div class="brand-text">
-      <span class="brand-name">Engs Hub</span>
-      <span class="brand-tagline">Concursos</span>
-    </div>
-  </a>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <a href="index.html" title="Voltar para a página inicial" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;transition:background 0.15s;text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <a href="index.html" class="brand">
+      <img src="logo1.jpeg" alt="Engs Hub" class="brand-logo" style="width:36px;height:36px;object-fit:contain;">
+      <div class="brand-text">
+        <span class="brand-name">Engs Hub</span>
+        <span class="brand-tagline">Concursos</span>
+      </div>
+    </a>
+  </div>
   <div class="topbar-right">
     <a href="index.html" class="topbar-link">Editais</a>
     <div class="user-menu-wrap" id="userMenuWrap">
@@ -857,11 +862,7 @@ tbody td {
 
 <!-- SUBNAV -->
 <nav class="subnav">
-  <a href="#" class="subnav-tab">Visão geral</a>
   <a href="#" class="subnav-tab active">Meu controle de concursos</a>
-  <a href="#" class="subnav-tab">Concursos salvos</a>
-  <a href="#" class="subnav-tab">Notificações</a>
-  <a href="#" class="subnav-tab">Perfil</a>
 </nav>
 
 <!-- MAIN -->
@@ -1278,13 +1279,13 @@ function renderTable(rows) {
       <td class="td-muted">${gabTxt}</td>
       <td>
         <div class="actions">
-          <button class="btn-icon edit" onclick="editEntry(${r.id})" title="Editar" aria-label="Editar concurso">
+          <button class="btn-icon edit" data-action="edit" data-id="${r.id}" title="Editar" aria-label="Editar concurso">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
             </svg>
           </button>
-          <button class="btn-icon del" onclick="deleteEntry(${r.id})" title="Excluir" aria-label="Excluir concurso">
+          <button class="btn-icon del" data-action="delete" data-id="${r.id}" title="Excluir" aria-label="Excluir concurso">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
               <path d="M10 11v6"/><path d="M14 11v6"/>
@@ -1601,6 +1602,16 @@ function handleFotoUpload(event) {
   };
   reader.readAsDataURL(file);
 }
+
+// ===== EVENT DELEGATION PARA TABELA =====
+document.getElementById('tableBody').addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+  if (action === 'edit') editEntry(id);
+  if (action === 'delete') deleteEntry(id);
+});
 
 // ===== INIT =====
 init();
