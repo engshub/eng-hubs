@@ -503,26 +503,45 @@
             });
 
             // Submissão de formulários (simulada)
-            $('#form-login').addEventListener('submit', (e) => {
+            $('#form-login').addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const btn = e.target.querySelector('button[type="submit"]');
                 const email = e.target.email.value;
+                const senha = e.target.senha.value;
+                btn.textContent = 'Entrando...';
+                btn.disabled = true;
+                const { error } = await db.auth.signInWithPassword({ email, password: senha });
+                btn.textContent = 'Entrar';
+                btn.disabled = false;
+                if (error) {
+                    showToast({ type: 'error', title: 'Erro ao entrar', message: 'E-mail ou senha incorretos.' });
+                    return;
+                }
                 this.close();
-                showToast({
-                    type: 'success',
-                    title: 'Bem-vindo de volta!',
-                    message: `Login realizado com ${email}.`
-                });
+                showToast({ type: 'success', title: 'Bem-vindo de volta!', message: 'Login realizado com sucesso.' });
+                setTimeout(() => { window.location.href = 'controle.html'; }, 1200);
             });
 
-            $('#form-cadastro').addEventListener('submit', (e) => {
+            $('#form-cadastro').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const nome = e.target.nome.value.split(' ')[0];
-                this.close();
-                showToast({
-                    type: 'success',
-                    title: `Conta criada, ${nome}!`,
-                    message: 'Você já pode acompanhar concursos e receber notificações.'
+                const btn = e.target.querySelector('button[type="submit"]');
+                const nome = e.target.nome.value.trim();
+                const email = e.target.email.value;
+                const senha = e.target.senha.value;
+                btn.textContent = 'Criando conta...';
+                btn.disabled = true;
+                const { error } = await db.auth.signUp({
+                    email, password: senha,
+                    options: { data: { nome_completo: nome } }
                 });
+                btn.textContent = 'Criar conta gratuita';
+                btn.disabled = false;
+                if (error) {
+                    showToast({ type: 'error', title: 'Erro ao criar conta', message: error.message });
+                    return;
+                }
+                this.close();
+                showToast({ type: 'success', title: `Conta criada, ${nome.split(' ')[0]}!`, message: 'Verifique seu e-mail para confirmar o cadastro.' });
             });
         },
 
@@ -733,149 +752,105 @@
 
 
     /* ============================================================
-       11-B. AUTENTICAÇÃO SUPABASE
+       SUPABASE AUTH — Session check + dropdown
        ============================================================ */
 
-    function buildDropdown(user) {
-        const greetingWrap = document.getElementById('user-greeting-wrap');
-        if (!greetingWrap || greetingWrap.hasChildNodes()) return;
+    function buildUserDropdown(user) {
+        const wrap = document.getElementById('user-greeting-wrap');
+        if (!wrap || wrap.hasChildNodes()) return;
 
-        const btnEntrar   = document.querySelector('[data-modal-open="login"]');
-        const btnCadastro = document.querySelector('[data-modal-open="cadastro"]');
+        const btnEntrar    = document.querySelector('[data-modal-open="login"]');
+        const btnCadastro  = document.querySelector('[data-modal-open="cadastro"]');
         const navMinhaArea = document.querySelector('.nav-minha-area');
-
-        const meta = user.user_metadata || {};
+        const meta         = user.user_metadata || {};
         const nomeCompleto = meta.nome_completo || user.email;
-        const primeiro = nomeCompleto.split(' ')[0];
-        const iniciais = nomeCompleto.split(' ').map(function(n){ return n[0]; }).join('').toUpperCase().slice(0,2);
-        const fotoUrl = meta.foto_url || null;
+        const primeiro     = nomeCompleto.split(' ')[0];
+        const iniciais     = nomeCompleto.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const fotoUrl      = meta.foto_url || null;
 
-        if (btnEntrar)   btnEntrar.style.display = 'none';
-        if (btnCadastro) btnCadastro.style.display = 'none';
+        if (btnEntrar)    btnEntrar.style.display  = 'none';
+        if (btnCadastro)  btnCadastro.style.display = 'none';
         if (navMinhaArea) navMinhaArea.style.fontWeight = '700';
 
-        const avatarHtml = fotoUrl
-            ? '<img src="' + fotoUrl + '" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt="Foto">'
-            : '<span style="width:28px;height:28px;border-radius:50%;background:#F4801A;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;font-family:Montserrat,sans-serif;">' + iniciais + '</span>';
+        const av = fotoUrl
+            ? `<img src="${fotoUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
+            : `<span style="width:28px;height:28px;border-radius:50%;background:#F4801A;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;">${iniciais}</span>`;
 
-        greetingWrap.innerHTML = '<div id="indexUserMenu" style="position:relative;">'
-            + '<div id="indexUserBadge" style="display:flex;align-items:center;gap:8px;background:rgba(26,46,74,0.06);border:1px solid #e2e8f0;border-radius:20px;padding:4px 12px 4px 4px;cursor:pointer;">'
-            + avatarHtml
-            + '<span style="font-size:13px;font-weight:500;color:#1A2E4A;">Ol\u00e1, ' + primeiro + ' \u{1F44B}</span>'
-            + '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>'
-            + '</div>'
-            + '<div id="indexDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);width:220px;z-index:1000;overflow:hidden;">'
-            + '<div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;background:#f8fafc;">'
-            + '<div style="font-weight:600;font-size:13px;color:#1A2E4A;">' + nomeCompleto + '</div>'
-            + '<div style="font-size:11px;color:#64748b;margin-top:2px;overflow:hidden;text-overflow:ellipsis;">' + user.email + '</div>'
-            + '</div>'
-            + '<a href="controle.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#1A2E4A;text-decoration:none;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">'
-            + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Minha \u00e1rea</a>'
-            + '<hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0;">'
-            + '<button id="indexBtnSair" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#b91c1c;background:none;border:none;width:100%;cursor:pointer;" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background='transparent'">'
-            + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sair</button>'
-            + '</div></div>';
+        wrap.innerHTML = `
+        <div style="position:relative;">
+          <div id="ub" style="display:flex;align-items:center;gap:8px;background:rgba(26,46,74,0.06);border:1px solid #e2e8f0;border-radius:20px;padding:4px 12px 4px 6px;cursor:pointer;">
+            ${av}
+            <span style="font-size:13px;font-weight:500;color:#1A2E4A;">Olá, ${primeiro} 👋</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div id="ud" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);width:220px;z-index:9999;overflow:hidden;">
+            <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;background:#f8fafc;">
+              <div style="font-weight:600;font-size:13px;color:#1A2E4A;">${nomeCompleto}</div>
+              <div style="font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;">${user.email}</div>
+            </div>
+            <a href="controle.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#1A2E4A;text-decoration:none;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Minha área
+            </a>
+            <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0;">
+            <button id="btnSairIndex" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#b91c1c;background:none;border:none;width:100%;cursor:pointer;" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background=''">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Sair
+            </button>
+          </div>
+        </div>`;
 
-        greetingWrap.style.display = 'flex';
+        wrap.style.display = 'flex';
 
-        document.getElementById('indexUserBadge').addEventListener('click', function(e) {
+        document.getElementById('ub').addEventListener('click', e => {
             e.stopPropagation();
-            var dd = document.getElementById('indexDropdown');
+            const dd = document.getElementById('ud');
             dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
         });
 
-        document.addEventListener('click', function() {
-            var dd = document.getElementById('indexDropdown');
+        document.addEventListener('click', () => {
+            const dd = document.getElementById('ud');
             if (dd) dd.style.display = 'none';
-        });
+        }, { once: false });
 
-        document.getElementById('indexBtnSair').addEventListener('click', async function() {
+        document.getElementById('btnSairIndex').addEventListener('click', async () => {
             if (typeof db !== 'undefined') await db.auth.signOut();
             window.location.reload();
         });
     }
 
-    function clearUserUI() {
-        var btnEntrar   = document.querySelector('[data-modal-open="login"]');
-        var btnCadastro = document.querySelector('[data-modal-open="cadastro"]');
-        var greetingWrap = document.getElementById('user-greeting-wrap');
-        if (btnEntrar)   { btnEntrar.style.display = ''; btnEntrar.textContent = 'Entrar'; }
-        if (btnCadastro) btnCadastro.style.display = '';
-        if (greetingWrap) { greetingWrap.innerHTML = ''; greetingWrap.style.display = 'none'; }
+    function clearUserDropdown() {
+        const wrap       = document.getElementById('user-greeting-wrap');
+        const btnEntrar  = document.querySelector('[data-modal-open="login"]');
+        const btnCadastro= document.querySelector('[data-modal-open="cadastro"]');
+        if (btnEntrar)  { btnEntrar.style.display = ''; btnEntrar.textContent = 'Entrar'; }
+        if (btnCadastro)  btnCadastro.style.display = '';
+        if (wrap)       { wrap.innerHTML = ''; wrap.style.display = 'none'; }
     }
 
-    // Verifica sessão imediatamente ao carregar
+    // Check session immediately on load
     if (typeof getUser === 'function') {
-        getUser().then(function(user) {
-            if (user) buildDropdown(user);
-        });
+        getUser().then(user => { if (user) buildUserDropdown(user); });
     }
 
-    // Escuta mudanças de auth (login/logout)
+    // Also listen for auth state changes
     if (typeof onAuthChange === 'function') {
-        onAuthChange(function(user) {
-            if (user) {
-                buildDropdown(user);
-            } else {
-                clearUserUI();
-            }
+        onAuthChange(user => {
+            if (user) buildUserDropdown(user);
+            else clearUserDropdown();
         });
     }
 
-    // Login form
-    var formLogin = document.getElementById('form-login');
-    if (formLogin) {
-        formLogin.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            var btn = formLogin.querySelector('button[type="submit"]');
-            var email = formLogin.querySelector('[name="email"]').value;
-            var senha = formLogin.querySelector('[name="senha"]').value;
-            btn.textContent = 'Entrando...';
-            btn.disabled = true;
-            var result = await db.auth.signInWithPassword({ email: email, password: senha });
-            btn.textContent = 'Entrar';
-            btn.disabled = false;
-            if (result.error) {
-                showToast({ type: 'error', title: 'Erro ao entrar', message: 'E-mail ou senha incorretos.' });
-                return;
-            }
-            if (typeof modal !== 'undefined') modal.close();
-            showToast({ type: 'success', title: 'Bem-vindo de volta!', message: 'Login realizado com sucesso.' });
-            setTimeout(function() { window.location.href = 'controle.html'; }, 1200);
-        });
-    }
-
-    // Cadastro form
-    var formCadastro = document.getElementById('form-cadastro');
-    if (formCadastro) {
-        formCadastro.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            var btn = formCadastro.querySelector('button[type="submit"]');
-            var nome = formCadastro.querySelector('[name="nome"]').value.trim();
-            var email = formCadastro.querySelector('[name="email"]').value;
-            var senha = formCadastro.querySelector('[name="senha"]').value;
-            btn.textContent = 'Criando conta...';
-            btn.disabled = true;
-            var result = await db.auth.signUp({ email: email, password: senha, options: { data: { nome_completo: nome } } });
-            btn.textContent = 'Criar conta gratuita';
-            btn.disabled = false;
-            if (result.error) {
-                showToast({ type: 'error', title: 'Erro ao criar conta', message: result.error.message });
-                return;
-            }
-            if (typeof modal !== 'undefined') modal.close();
-            showToast({ type: 'success', title: 'Conta criada, ' + nome.split(' ')[0] + '!', message: 'Verifique seu e-mail para confirmar o cadastro.' });
-        });
-    }
-
-    // Abre modal de login se redirecionado da área restrita
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('login') === '1') {
-        setTimeout(function() {
-            if (typeof modal !== 'undefined') modal.open('login');
-            showToast({ type: 'info', title: 'Acesso restrito', message: 'Faça login para acessar sua área.' });
-            window.history.replaceState({}, '', window.location.pathname);
-        }, 400);
-    }
+    // Auto-open login modal if redirected from restricted area
+    (function() {
+        const p = new URLSearchParams(window.location.search);
+        if (p.get('login') === '1') {
+            setTimeout(() => {
+                modal.open('login');
+                showToast({ type: 'info', title: 'Acesso restrito', message: 'Faça login para acessar sua área.' });
+                window.history.replaceState({}, '', window.location.pathname);
+            }, 400);
+        }
+    })();
 
 })();
