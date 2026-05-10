@@ -13,6 +13,7 @@
  
     <!-- Ícones (Lucide via CDN) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
  
     <link rel="icon" type="image/jpeg" href="logo1.jpeg">
     <link rel="stylesheet" href="style.css">
@@ -85,6 +86,7 @@
                 <a href="#previstos">Previstos</a>
                 <a href="#noticias">Notícias</a>
                 <a href="#sobre">Sobre</a>
+                <a href="#contato">Contato</a>
                 <!-- Link para a Área do Usuário -->
                 <a href="controle.html" class="nav-minha-area">
                     <i data-lucide="layout-dashboard"></i> Minha área
@@ -115,6 +117,7 @@
             <a href="#previstos">Previstos</a>
             <a href="#noticias">Notícias</a>
             <a href="#sobre">Sobre</a>
+            <a href="#contato">Contato</a>
             <!-- Link para a Área do Usuário no mobile -->
             <a href="controle.html" class="nav-minha-area-mobile">
                 <i data-lucide="layout-dashboard"></i> Minha área
@@ -464,5 +467,39 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-client.js"></script>
     <script src="script.js"></script>
+
+    <script>
+        // ===== EMAILJS — Formulário de contato =====
+        emailjs.init('BMAYYHY62IGL2pJey');
+
+        document.getElementById('form-contato').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-contato-submit');
+            btn.textContent = 'Enviando...';
+            btn.disabled = true;
+            btn.style.background = '#94a3b8';
+
+            const params = {
+                name:     document.getElementById('contato-nome').value,
+                email:    document.getElementById('contato-email').value,
+                title:    document.getElementById('contato-assunto').value,
+                mensagem: document.getElementById('contato-mensagem').value,
+            };
+
+            try {
+                await emailjs.send('service_fwes61k', 'template_rbhnsuf', params);
+                document.getElementById('form-contato').style.display = 'none';
+                document.getElementById('contato-sucesso').style.display = 'block';
+                if (window.lucide) window.lucide.createIcons();
+            } catch (err) {
+                btn.innerHTML = '<i data-lucide="send"></i> Enviar mensagem';
+                btn.disabled = false;
+                btn.style.background = '#F4801A';
+                if (window.lucide) window.lucide.createIcons();
+                alert('Erro ao enviar. Tente novamente.');
+            }
+        });
+    </script>
+
 </body>
 </html>
