@@ -776,32 +776,80 @@
             const btnEntrar    = document.querySelector('[data-modal-open="login"]');
             const btnCadastro  = document.querySelector('[data-modal-open="cadastro"]');
             const navMinhaArea = document.querySelector('.nav-minha-area');
-            const greeting     = document.getElementById('user-greeting');
+            const greetingWrap = document.getElementById('user-greeting-wrap');
 
             if (user) {
-                // Monta saudação com primeiro nome
                 const meta = user.user_metadata;
                 const nomeCompleto = meta?.nome_completo || user.email;
                 const primeiro = nomeCompleto.split(' ')[0];
+                const iniciais = nomeCompleto.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+                const fotoUrl = meta?.foto_url || null;
 
-                if (greeting) {
-                    greeting.textContent = 'Olá, ' + primeiro + ' 👋';
-                    greeting.style.display = 'inline';
-                }
-                if (btnEntrar) {
-                    btnEntrar.textContent = 'Sair';
-                    btnEntrar.onclick = async (e) => {
-                        e.preventDefault();
-                        await db.auth.signOut();
-                        showToast({ type: 'info', title: 'Até logo, ' + primeiro + '!', message: 'Você saiu da sua conta.' });
-                    };
-                }
+                // Esconde botões Entrar/Cadastrar
+                if (btnEntrar)   btnEntrar.style.display = 'none';
                 if (btnCadastro) btnCadastro.style.display = 'none';
                 if (navMinhaArea) navMinhaArea.style.fontWeight = '700';
+
+                // Monta dropdown no lugar do greeting
+                if (greetingWrap) {
+                    const avatarHtml = fotoUrl
+                        ? `<img src="${fotoUrl}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;" alt="Foto">`
+                        : `<span style="width:28px;height:28px;border-radius:50%;background:#F4801A;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;font-family:Montserrat,sans-serif;">${iniciais}</span>`;
+
+                    greetingWrap.innerHTML = `
+                        <div id="indexUserMenu" style="position:relative;">
+                            <div id="indexUserBadge" style="display:flex;align-items:center;gap:8px;background:rgba(26,46,74,0.06);border:1px solid #e2e8f0;border-radius:20px;padding:4px 12px 4px 4px;cursor:pointer;transition:background 0.15s;">
+                                ${avatarHtml}
+                                <span style="font-size:13px;font-weight:500;color:#1A2E4A;">Olá, ${primeiro} 👋</span>
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                            </div>
+                            <div id="indexDropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);width:220px;z-index:100;overflow:hidden;">
+                                <div style="padding:12px 16px;border-bottom:1px solid #e2e8f0;background:#f8fafc;">
+                                    <div style="font-weight:600;font-size:13px;color:#1A2E4A;">${nomeCompleto}</div>
+                                    <div style="font-size:11px;color:#64748b;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${user.email}</div>
+                                </div>
+                                <a href="controle.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#1A2E4A;text-decoration:none;transition:background 0.12s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                                    Minha área
+                                </a>
+                                <a href="controle.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#1A2E4A;text-decoration:none;transition:background 0.12s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='transparent'">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+                                    Meu perfil
+                                </a>
+                                <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0;">
+                                <button id="indexBtnSair" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#b91c1c;background:none;border:none;width:100%;cursor:pointer;transition:background 0.12s;" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background='transparent'">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                    Sair
+                                </button>
+                            </div>
+                        </div>`;
+
+                    greetingWrap.style.display = 'flex';
+
+                    // Toggle dropdown
+                    document.getElementById('indexUserBadge').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const dd = document.getElementById('indexDropdown');
+                        dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+                    });
+
+                    // Fecha ao clicar fora
+                    document.addEventListener('click', () => {
+                        const dd = document.getElementById('indexDropdown');
+                        if (dd) dd.style.display = 'none';
+                    });
+
+                    // Botão sair
+                    document.getElementById('indexBtnSair').addEventListener('click', async () => {
+                        await db.auth.signOut();
+                        showToast({ type: 'info', title: 'Até logo, ' + primeiro + '!', message: 'Você saiu da sua conta.' });
+                    });
+                }
+
             } else {
-                if (greeting)    { greeting.style.display = 'none'; greeting.textContent = ''; }
-                if (btnEntrar)   btnEntrar.textContent = 'Entrar';
+                if (btnEntrar)   { btnEntrar.style.display = ''; btnEntrar.textContent = 'Entrar'; }
                 if (btnCadastro) btnCadastro.style.display = '';
+                if (greetingWrap) { greetingWrap.innerHTML = ''; greetingWrap.style.display = 'none'; }
             }
         });
     }
