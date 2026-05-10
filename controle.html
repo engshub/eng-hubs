@@ -615,6 +615,9 @@ tbody td {
   .user-name { display: none; }
 }
 </style>
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
 </head>
 <body>
 
@@ -797,7 +800,7 @@ tbody td {
 <div class="toast" id="toast"></div>
 
 <script>
-// ===== DADOS INICIAIS (substitua por fetch() do Supabase no Sprint 1) =====
+// ===== CONFIGURAÇÃO =====
 const SITUACAO_CONFIG = {
   inscrito:  { label: 'Inscrito',           cls: 'badge-inscrito'  },
   isencao:   { label: 'Aguardando isenção', cls: 'badge-isencao'   },
@@ -805,19 +808,66 @@ const SITUACAO_CONFIG = {
   resultado: { label: 'Resultado saiu',     cls: 'badge-resultado' },
 };
 
-let data = [
-  { id:1, banca:'VUNESP', orgao:'TCE-SP', cargo:'Agente de Fiscalização — Engenharia Civil', dataProva:'2025-10-12', vagas:40, salario:'R$ 23.110', dataInscricao:'2025-07-30', situacao:'inscrito',  dataIsencao:'2025-07-10', gabarito:'' },
-  { id:2, banca:'FCC',    orgao:'Pref. Camboriú/SC', cargo:'Engenheiro Civil', dataProva:'2025-09-07', vagas:5,  salario:'R$ 8.500',  dataInscricao:'2025-06-28', situacao:'isencao',  dataIsencao:'2025-06-18', gabarito:'' },
-  { id:3, banca:'CESPE',  orgao:'IBAMA', cargo:'Analista Ambiental', dataProva:'2025-11-23', vagas:80, salario:'R$ 9.994',  dataInscricao:'2025-08-15', situacao:'nao',      dataIsencao:'', gabarito:'' },
-  { id:4, banca:'FGV',    orgao:'TCM-SP', cargo:'Auditor de Controle Externo — Obras', dataProva:'2026-02-15', vagas:12, salario:'R$ 18.640', dataInscricao:'2025-09-20', situacao:'inscrito',  dataIsencao:'2025-09-05', gabarito:'' },
-  { id:5, banca:'IADES',  orgao:'INCRA', cargo:'Engenheiro Agrônomo', dataProva:'2025-08-03', vagas:30, salario:'R$ 8.047',  dataInscricao:'2025-06-01', situacao:'inscrito',  dataIsencao:'', gabarito:'03/08/2025' },
-  { id:6, banca:'CEBRASPE',orgao:'TJ-RS', cargo:'Engenheiro Civil', dataProva:'2025-12-07', vagas:15, salario:'R$ 14.200', dataInscricao:'2025-10-01', situacao:'nao',      dataIsencao:'', gabarito:'' },
-  { id:7, banca:'VUNESP', orgao:'CAU/BR', cargo:'Analista Técnico — Arquitetura', dataProva:'2026-03-22', vagas:6,  salario:'R$ 7.800',  dataInscricao:'2025-11-10', situacao:'isencao',  dataIsencao:'2025-10-28', gabarito:'' },
-  { id:8, banca:'FCC',    orgao:'Pref. Florianópolis', cargo:'Engenheiro Civil — Obras', dataProva:'2026-01-18', vagas:20, salario:'R$ 12.300', dataInscricao:'2025-10-31', situacao:'nao', dataIsencao:'', gabarito:'' },
-];
-
-let nextId = 9;
+let data = [];
+let nextId = null; // não usado com Supabase, mas mantido para compatibilidade
 let editId = null;
+let currentUser = null;
+
+// ===== INIT: verificar login =====
+async function init() {
+  currentUser = await getUser();
+  if (!currentUser) {
+    // Não está logado — redireciona para home com modal de login
+    alert('Faça login para acessar sua área.');
+    window.location.href = 'index.html';
+    return;
+  }
+  // Atualiza nome do usuário no header
+  const meta = currentUser.user_metadata;
+  const nome = meta?.nome_completo || currentUser.email;
+  const primeiroNome = nome.split(' ')[0];
+  document.querySelector('.user-name').textContent = primeiroNome;
+  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+  document.querySelector('.avatar').textContent = iniciais;
+
+  // Botão sair
+  document.querySelector('.user-badge').addEventListener('click', async () => {
+    if (confirm('Deseja sair da sua conta?')) {
+      await db.auth.signOut();
+      window.location.href = 'index.html';
+    }
+  });
+
+  await loadData();
+}
+
+// ===== CARREGAR dados do Supabase =====
+async function loadData() {
+  const { data: rows, error } = await db
+    .from('controle_concursos')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    showToast('Erro ao carregar dados: ' + error.message);
+    return;
+  }
+  data = rows.map(r => ({
+    id:             r.id,
+    banca:          r.banca,
+    orgao:          r.orgao,
+    cargo:          r.cargo || '',
+    dataProva:      r.data_prova || '',
+    vagas:          r.vagas || 0,
+    salario:        r.salario || '—',
+    dataInscricao:  r.data_inscricao || '',
+    situacao:       r.situacao || 'nao',
+    dataIsencao:    r.data_isencao || '',
+    gabarito:       r.gabarito || '',
+  }));
+  updateStats();
+  filterTable();
+}
 
 // ===== UTILITÁRIOS =====
 function fmt(d) {
@@ -932,56 +982,68 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeModal();
 });
 
-function saveEntry() {
+async function saveEntry() {
   const banca = document.getElementById('fBanca').value.trim();
   const orgao = document.getElementById('fOrgao').value.trim();
   if (!banca || !orgao) {
     showToast('Preencha ao menos a banca e o órgão.');
     return;
   }
-  const entry = {
-    id:             editId || nextId++,
+  const payload = {
+    user_id:        currentUser.id,
     banca,
     orgao,
-    cargo:          document.getElementById('fCargo').value.trim(),
-    dataProva:      document.getElementById('fDataProva').value,
+    cargo:          document.getElementById('fCargo').value.trim() || null,
+    data_prova:     document.getElementById('fDataProva').value || null,
     vagas:          parseInt(document.getElementById('fVagas').value) || 0,
-    salario:        document.getElementById('fSalario').value.trim() || '—',
-    dataInscricao:  document.getElementById('fDataInscricao').value,
+    salario:        document.getElementById('fSalario').value.trim() || null,
+    data_inscricao: document.getElementById('fDataInscricao').value || null,
     situacao:       document.getElementById('fSituacao').value,
-    dataIsencao:    document.getElementById('fDataIsencao').value,
-    gabarito:       document.getElementById('fGabarito').value.trim(),
+    data_isencao:   document.getElementById('fDataIsencao').value || null,
+    gabarito:       document.getElementById('fGabarito').value.trim() || null,
   };
 
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+
+  let error;
   if (editId) {
-    const i = data.findIndex(r => r.id === editId);
-    if (i > -1) data[i] = entry;
-    showToast('Concurso atualizado com sucesso.');
+    ({ error } = await db.from('controle_concursos').update(payload).eq('id', editId));
   } else {
-    data.push(entry);
-    showToast('Concurso adicionado com sucesso.');
+    ({ error } = await db.from('controle_concursos').insert(payload));
   }
 
+  btn.textContent = 'Salvar concurso';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Erro ao salvar: ' + error.message);
+    return;
+  }
+
+  showToast(editId ? 'Concurso atualizado com sucesso.' : 'Concurso adicionado com sucesso.');
   closeModal();
-  updateStats();
-  filterTable();
+  await loadData();
 }
 
 function editEntry(id) {
   openModal(data.find(r => r.id === id));
 }
 
-function deleteEntry(id) {
+async function deleteEntry(id) {
   if (!confirm('Tem certeza que deseja excluir este concurso?')) return;
-  data = data.filter(r => r.id !== id);
+  const { error } = await db.from('controle_concursos').delete().eq('id', id);
+  if (error) {
+    showToast('Erro ao excluir: ' + error.message);
+    return;
+  }
   showToast('Concurso removido.');
-  updateStats();
-  filterTable();
+  await loadData();
 }
 
 // ===== INIT =====
-updateStats();
-renderTable(data);
+init();
 </script>
 </body>
 </html>
