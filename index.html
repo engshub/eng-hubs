@@ -336,6 +336,61 @@
                 </div>
             </div>
         </section>
+
+        <!-- SEÇÃO CONTATO -->
+        <section class="section section-alt" id="contato">
+            <div class="container">
+                <header class="section-header section-header-center">
+                    <div>
+                        <h2 class="section-title">Fale com a gente</h2>
+                        <p class="section-subtitle">Dúvidas, sugestões ou feedback — estamos ouvindo.</p>
+                    </div>
+                </header>
+                <div style="max-width:560px;margin:0 auto;">
+                    <form id="form-contato" style="display:flex;flex-direction:column;gap:16px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div style="display:flex;flex-direction:column;gap:6px;">
+                                <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Nome</label>
+                                <input type="text" name="name" id="contato-nome" placeholder="Seu nome" required
+                                    style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;">
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:6px;">
+                                <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">E-mail</label>
+                                <input type="email" name="email" id="contato-email" placeholder="seu@email.com" required
+                                    style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;">
+                            </div>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Assunto</label>
+                            <select name="title" id="contato-assunto"
+                                style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;background:#fff;cursor:pointer;">
+                                <option value="Dúvida">Dúvida</option>
+                                <option value="Sugestão">Sugestão</option>
+                                <option value="Feedback">Feedback</option>
+                                <option value="Reportar problema">Reportar problema</option>
+                                <option value="Parceria">Parceria</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Mensagem</label>
+                            <textarea name="mensagem" id="contato-mensagem" placeholder="Escreva sua mensagem aqui..." required rows="5"
+                                style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;resize:vertical;"></textarea>
+                        </div>
+                        <button type="submit" id="btn-contato-submit"
+                            style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;background:#F4801A;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;align-self:flex-end;">
+                            <i data-lucide="send"></i> Enviar mensagem
+                        </button>
+                    </form>
+                    <div id="contato-sucesso" style="display:none;text-align:center;padding:32px;background:#EAF3DE;border-radius:12px;">
+                        <i data-lucide="check-circle" style="color:#16a34a;"></i>
+                        <h3 style="color:#15803d;margin:12px 0 6px;font-family:Montserrat,sans-serif;">Mensagem enviada!</h3>
+                        <p style="color:#166534;font-size:14px;">Recebemos sua mensagem e responderemos em breve no e-mail informado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
  
     <!-- ============================================================
