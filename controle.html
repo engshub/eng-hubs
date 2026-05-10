@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Controle de Concursos — Engs Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #F5F5F5;
+  color: #1A2E4A;
+  min-height: 100vh;
+}
+
+/* ===== DESIGN TOKENS ===== */
+:root {
+  --navy: #1A2E4A;
+  --navy-light: #243a5e;
+  --orange: #F4801A;
+  --orange-dark: #d96e12;
+  --bg: #F5F5F5;
+  --white: #ffffff;
+  --border: #e2e8f0;
+  --text-muted: #64748b;
+  --text-secondary: #475569;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+}
+
+/* ===== TOPBAR / HEADER ===== */
+.topbar {
+  background: var(--navy);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.brand-logo {
+  width: 32px;
+  height: 32px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brand-name {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.brand-tagline {
+  font-size: 9px;
+  color: var(--orange);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-link {
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.topbar-link:hover { color: #fff; }
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 4px 12px 4px 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.user-badge:hover { background: rgba(255,255,255,0.14); }
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.user-name {
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+}
+
+/* ===== SUBNAV ===== */
+.subnav {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.subnav::-webkit-scrollbar { display: none; }
+
+.subnav-tab {
+  padding: 14px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  text-decoration: none;
+  display: block;
+}
+.subnav-tab:hover { color: var(--navy); }
+.subnav-tab.active {
+  color: var(--navy);
+  border-bottom-color: var(--orange);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+}
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.page-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ===== STATS CARDS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.stat-card.orange .stat-value { color: var(--orange); }
+.stat-card.green .stat-value { color: #16a34a; }
+.stat-card.blue .stat-value { color: #2563eb; }
+
+/* ===== CARD ===== */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+/* ===== CARD TOOLBAR ===== */
+.card-toolbar {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+.card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  flex: none;
+}
+
+.search-wrap {
+  flex: 1;
+  min-width: 200px;
+  max-width: 360px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 34px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--navy);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(26,46,74,0.08);
+}
+
+.filter-select {
+  padding: 8px 12px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--navy);
+  cursor: pointer;
+  outline: none;
+}
+.filter-select:focus { border-color: var(--navy); }
+
+.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  white-space: nowrap;
+  margin-left: auto;
+}
+.btn-add:hover { background: var(--orange-dark); }
+.btn-add:active { transform: scale(0.98); }
+
+/* ===== TABLE ===== */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 960px;
+}
+
+thead tr {
+  background: var(--navy);
+}
+
+thead th {
+  padding: 11px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  text-align: left;
+  white-space: nowrap;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+thead th:last-child { border-right: none; }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+tbody tr:hover { background: #f0f5fa; }
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+  padding: 11px 14px;
+  font-size: 13px;
+  color: var(--navy);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.td-orgao {
+  font-weight: 500;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.td-muted {
+  color: var(--text-secondary);
+}
+
+.td-bold {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+/* ===== BADGES ===== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-inscrito    { background: #dcfce7; color: #15803d; }
+.badge-isencao     { background: #dbeafe; color: #1d4ed8; }
+.badge-nao         { background: #f1f5f9; color: #475569; }
+.badge-resultado   { background: #fef3c7; color: #b45309; }
+.badge-reprovado   { background: #fee2e2; color: #b91c1c; }
+
+/* ===== ACTION BUTTONS ===== */
+.actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  padding: 0;
+}
+
+.btn-icon.edit:hover {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.btn-icon.del:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 12px;
+  opacity: 0.3;
+  display: block;
+}
+
+.empty-state p {
+  font-size: 14px;
+}
+
+/* ===== MODAL ===== */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+
+.modal {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: var(--shadow-md);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.btn-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 16px;
+  transition: background 0.12s;
+}
+.btn-close:hover { background: #f1f5f9; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group.full { grid-column: 1 / -1; }
+
+.form-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.form-input, .form-select {
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--navy);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(26,46,74,0.08);
+}
+
+.modal-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-cancel {
+  padding: 9px 18px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-cancel:hover { background: #f1f5f9; }
+
+.btn-save {
+  padding: 9px 20px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--orange);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn-save:hover { background: var(--orange-dark); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 300;
+  display: none;
+  border-left: 3px solid var(--orange);
+  box-shadow: var(--shadow-md);
+  max-width: 320px;
+}
+
+/* ===== SCROLLBAR ===== */
+.table-wrap::-webkit-scrollbar { height: 6px; }
+.table-wrap::-webkit-scrollbar-track { background: #f1f5f9; }
+.table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+.table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .main { padding: 16px; }
+  .topbar { padding: 0 16px; }
+  .card-toolbar { padding: 12px 16px; }
+  .search-wrap { min-width: 140px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+  .user-name { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="index.html" class="brand">
+    <svg class="brand-logo" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="16,3 29,10 29,22 16,29 3,22 3,10" fill="none" stroke="#F4801A" stroke-width="1.5"/>
+      <path d="M16 10 L16 18 M16 20.5 L16 22" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <div class="brand-text">
+      <span class="brand-name">Engs Hub</span>
+      <span class="brand-tagline">Concursos</span>
+    </div>
+  </a>
+  <div class="topbar-right">
+    <a href="index.html" class="topbar-link">Editais</a>
+    <div class="user-badge">
+      <div class="avatar">GS</div>
+      <span class="user-name">Gabriel S.</span>
+    </div>
+  </div>
+</header>
+
+<!-- SUBNAV -->
+<nav class="subnav">
+  <a href="#" class="subnav-tab">Visão geral</a>
+  <a href="#" class="subnav-tab active">Meu controle de concursos</a>
+  <a href="#" class="subnav-tab">Concursos salvos</a>
+  <a href="#" class="subnav-tab">Notificações</a>
+  <a href="#" class="subnav-tab">Perfil</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <h1>Meu controle de concursos</h1>
+    <p>Gerencie seus prazos e inscrições em um só lugar.</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+      <span class="stat-label">Total</span>
+      <span class="stat-value" id="statTotal">—</span>
+    </div>
+    <div class="stat-card green">
+      <span class="stat-label">Inscritos</span>
+      <span class="stat-value" id="statInscrito">—</span>
+    </div>
+    <div class="stat-card blue">
+      <span class="stat-label">Aguardando isenção</span>
+      <span class="stat-value" id="statIsencao">—</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Não inscritos</span>
+      <span class="stat-value" id="statNao">—</span>
+    </div>
+    <div class="stat-card orange">
+      <span class="stat-label">Com gabarito</span>
+      <span class="stat-value" id="statGabarito">—</span>
+    </div>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="card">
+    <div class="card-toolbar">
+      <span class="card-title">Meus concursos</span>
+      <div class="search-wrap">
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar por banca ou órgão..." oninput="filterTable()">
+      </div>
+      <select class="filter-select" id="filterSituacao" onchange="filterTable()">
+        <option value="">Todas as situações</option>
+        <option value="inscrito">Inscrito</option>
+        <option value="isencao">Aguardando isenção</option>
+        <option value="nao">Não inscrito</option>
+        <option value="resultado">Resultado saiu</option>
+      </select>
+      <button class="btn-add" onclick="openModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Adicionar concurso
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Banca</th>
+            <th>Órgão / Cargo</th>
+            <th>Data da prova</th>
+            <th>Vagas</th>
+            <th>Salário</th>
+            <th>Inscrição até</th>
+            <th>Situação</th>
+            <th>Isenção até</th>
+            <th>Gabarito</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+        <p>Nenhum concurso encontrado para esse filtro.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Adicionar concurso</span>
+      <button class="btn-close" onclick="closeModal()" aria-label="Fechar">&#x2715;</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Banca</label>
+        <input type="text" class="form-input" id="fBanca" placeholder="Ex: VUNESP">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Órgão</label>
+        <input type="text" class="form-input" id="fOrgao" placeholder="Ex: TCE-SP">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Cargo</label>
+        <input type="text" class="form-input" id="fCargo" placeholder="Ex: Engenheiro Civil">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data da prova</label>
+        <input type="date" class="form-input" id="fDataProva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Vagas</label>
+        <input type="number" class="form-input" id="fVagas" placeholder="Ex: 10" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Salário</label>
+        <input type="text" class="form-input" id="fSalario" placeholder="Ex: R$ 8.500,00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Inscrição até</label>
+        <input type="date" class="form-input" id="fDataInscricao">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Situação</label>
+        <select class="form-select" id="fSituacao">
+          <option value="nao">Não inscrito</option>
+          <option value="inscrito">Inscrito</option>
+          <option value="isencao">Aguardando isenção</option>
+          <option value="resultado">Resultado saiu</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Isenção até</label>
+        <input type="date" class="form-input" id="fDataIsencao">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gabarito preliminar</label>
+        <input type="text" class="form-input" id="fGabarito" placeholder="Ex: 12/07/2025">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveEntry()">Salvar concurso</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DADOS INICIAIS (substitua por fetch() do Supabase no Sprint 1) =====
+const SITUACAO_CONFIG = {
+  inscrito:  { label: 'Inscrito',           cls: 'badge-inscrito'  },
+  isencao:   { label: 'Aguardando isenção', cls: 'badge-isencao'   },
+  nao:       { label: 'Não inscrito',       cls: 'badge-nao'       },
+  resultado: { label: 'Resultado saiu',     cls: 'badge-resultado' },
+};
+
+let data = [
+  { id:1, banca:'VUNESP', orgao:'TCE-SP', cargo:'Agente de Fiscalização — Engenharia Civil', dataProva:'2025-10-12', vagas:40, salario:'R$ 23.110', dataInscricao:'2025-07-30', situacao:'inscrito',  dataIsencao:'2025-07-10', gabarito:'' },
+  { id:2, banca:'FCC',    orgao:'Pref. Camboriú/SC', cargo:'Engenheiro Civil', dataProva:'2025-09-07', vagas:5,  salario:'R$ 8.500',  dataInscricao:'2025-06-28', situacao:'isencao',  dataIsencao:'2025-06-18', gabarito:'' },
+  { id:3, banca:'CESPE',  orgao:'IBAMA', cargo:'Analista Ambiental', dataProva:'2025-11-23', vagas:80, salario:'R$ 9.994',  dataInscricao:'2025-08-15', situacao:'nao',      dataIsencao:'', gabarito:'' },
+  { id:4, banca:'FGV',    orgao:'TCM-SP', cargo:'Auditor de Controle Externo — Obras', dataProva:'2026-02-15', vagas:12, salario:'R$ 18.640', dataInscricao:'2025-09-20', situacao:'inscrito',  dataIsencao:'2025-09-05', gabarito:'' },
+  { id:5, banca:'IADES',  orgao:'INCRA', cargo:'Engenheiro Agrônomo', dataProva:'2025-08-03', vagas:30, salario:'R$ 8.047',  dataInscricao:'2025-06-01', situacao:'inscrito',  dataIsencao:'', gabarito:'03/08/2025' },
+  { id:6, banca:'CEBRASPE',orgao:'TJ-RS', cargo:'Engenheiro Civil', dataProva:'2025-12-07', vagas:15, salario:'R$ 14.200', dataInscricao:'2025-10-01', situacao:'nao',      dataIsencao:'', gabarito:'' },
+  { id:7, banca:'VUNESP', orgao:'CAU/BR', cargo:'Analista Técnico — Arquitetura', dataProva:'2026-03-22', vagas:6,  salario:'R$ 7.800',  dataInscricao:'2025-11-10', situacao:'isencao',  dataIsencao:'2025-10-28', gabarito:'' },
+  { id:8, banca:'FCC',    orgao:'Pref. Florianópolis', cargo:'Engenheiro Civil — Obras', dataProva:'2026-01-18', vagas:20, salario:'R$ 12.300', dataInscricao:'2025-10-31', situacao:'nao', dataIsencao:'', gabarito:'' },
+];
+
+let nextId = 9;
+let editId = null;
+
+// ===== UTILITÁRIOS =====
+function fmt(d) {
+  if (!d) return '—';
+  const [y, m, dd] = d.split('-');
+  return dd + '/' + m + '/' + y;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.display = 'none'; }, 3200);
+}
+
+// ===== RENDER =====
+function renderTable(rows) {
+  const body = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (!rows.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = rows.map(r => {
+    const s = SITUACAO_CONFIG[r.situacao] || SITUACAO_CONFIG['nao'];
+    const gabTxt = r.gabarito ? r.gabarito : '<span style="color:#94a3b8">Aguardando</span>';
+    return `<tr>
+      <td class="td-muted">${r.banca}</td>
+      <td>
+        <span class="td-orgao td-bold">${r.orgao}</span>
+        ${r.cargo ? `<div style="font-size:11px;color:#64748b;margin-top:2px;white-space:normal;max-width:180px;">${r.cargo}</div>` : ''}
+      </td>
+      <td class="td-muted">${fmt(r.dataProva)}</td>
+      <td class="td-bold">${r.vagas}</td>
+      <td class="td-bold">${r.salario}</td>
+      <td class="td-muted">${fmt(r.dataInscricao)}</td>
+      <td><span class="badge ${s.cls}">${s.label}</span></td>
+      <td class="td-muted">${fmt(r.dataIsencao)}</td>
+      <td class="td-muted">${gabTxt}</td>
+      <td>
+        <div class="actions">
+          <button class="btn-icon edit" onclick="editEntry(${r.id})" title="Editar" aria-label="Editar concurso">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </button>
+          <button class="btn-icon del" onclick="deleteEntry(${r.id})" title="Excluir" aria-label="Excluir concurso">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/>
+              <path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent    = data.length;
+  document.getElementById('statInscrito').textContent = data.filter(r => r.situacao === 'inscrito').length;
+  document.getElementById('statIsencao').textContent  = data.filter(r => r.situacao === 'isencao').length;
+  document.getElementById('statNao').textContent      = data.filter(r => r.situacao === 'nao').length;
+  document.getElementById('statGabarito').textContent = data.filter(r => r.gabarito && r.gabarito.trim() !== '').length;
+}
+
+function filterTable() {
+  const q   = document.getElementById('searchInput').value.toLowerCase();
+  const sit = document.getElementById('filterSituacao').value;
+  const rows = data.filter(r => {
+    const matchQ = !q || r.banca.toLowerCase().includes(q) || r.orgao.toLowerCase().includes(q) || (r.cargo || '').toLowerCase().includes(q);
+    const matchS = !sit || r.situacao === sit;
+    return matchQ && matchS;
+  });
+  renderTable(rows);
+}
+
+// ===== MODAL =====
+function openModal(entry) {
+  editId = entry ? entry.id : null;
+  document.getElementById('modalTitle').textContent = entry ? 'Editar concurso' : 'Adicionar concurso';
+  document.getElementById('fBanca').value         = entry ? entry.banca          : '';
+  document.getElementById('fOrgao').value         = entry ? entry.orgao          : '';
+  document.getElementById('fCargo').value         = entry ? (entry.cargo  || '') : '';
+  document.getElementById('fDataProva').value     = entry ? entry.dataProva      : '';
+  document.getElementById('fVagas').value         = entry ? entry.vagas          : '';
+  document.getElementById('fSalario').value       = entry ? entry.salario        : '';
+  document.getElementById('fDataInscricao').value = entry ? entry.dataInscricao  : '';
+  document.getElementById('fSituacao').value      = entry ? entry.situacao       : 'nao';
+  document.getElementById('fDataIsencao').value   = entry ? (entry.dataIsencao || '') : '';
+  document.getElementById('fGabarito').value      = entry ? (entry.gabarito     || '') : '';
+  document.getElementById('modalBackdrop').classList.add('open');
+  setTimeout(() => document.getElementById('fBanca').focus(), 50);
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalBackdrop')) closeModal();
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+function saveEntry() {
+  const banca = document.getElementById('fBanca').value.trim();
+  const orgao = document.getElementById('fOrgao').value.trim();
+  if (!banca || !orgao) {
+    showToast('Preencha ao menos a banca e o órgão.');
+    return;
+  }
+  const entry = {
+    id:             editId || nextId++,
+    banca,
+    orgao,
+    cargo:          document.getElementById('fCargo').value.trim(),
+    dataProva:      document.getElementById('fDataProva').value,
+    vagas:          parseInt(document.getElementById('fVagas').value) || 0,
+    salario:        document.getElementById('fSalario').value.trim() || '—',
+    dataInscricao:  document.getElementById('fDataInscricao').value,
+    situacao:       document.getElementById('fSituacao').value,
+    dataIsencao:    document.getElementById('fDataIsencao').value,
+    gabarito:       document.getElementById('fGabarito').value.trim(),
+  };
+
+  if (editId) {
+    const i = data.findIndex(r => r.id === editId);
+    if (i > -1) data[i] = entry;
+    showToast('Concurso atualizado com sucesso.');
+  } else {
+    data.push(entry);
+    showToast('Concurso adicionado com sucesso.');
+  }
+
+  closeModal();
+  updateStats();
+  filterTable();
+}
+
+function editEntry(id) {
+  openModal(data.find(r => r.id === id));
+}
+
+function deleteEntry(id) {
+  if (!confirm('Tem certeza que deseja excluir este concurso?')) return;
+  data = data.filter(r => r.id !== id);
+  showToast('Concurso removido.');
+  updateStats();
+  filterTable();
+}
+
+// ===== INIT =====
+updateStats();
+renderTable(data);
+</script>
+</body>
+</html>
