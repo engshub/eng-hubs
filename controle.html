@@ -8,17 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ===== RESET & BASE ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
-body {
-  font-family: 'Inter', sans-serif;
-  background: #F5F5F5;
-  color: #1A2E4A;
-  min-height: 100vh;
-}
+body { font-family: 'Inter', sans-serif; background: #F5F5F5; color: #1A2E4A; min-height: 100vh; }
 
-/* ===== DESIGN TOKENS ===== */
 :root {
   --navy: #1A2E4A;
   --navy-light: #243a5e;
@@ -35,7 +28,6 @@ body {
   --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
 }
 
-/* ===== TOPBAR / HEADER ===== */
 .topbar {
   background: var(--navy);
   padding: 0 24px;
@@ -48,563 +40,168 @@ body {
   z-index: 50;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-
-.brand-logo {
-  width: 32px;
-  height: 32px;
-}
-
-.brand-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.brand-name {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  color: #fff;
-  letter-spacing: 0.3px;
-}
-
-.brand-tagline {
-  font-size: 9px;
-  color: var(--orange);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-weight: 500;
-  margin-top: 2px;
-}
-
-.topbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.topbar-link {
-  color: rgba(255,255,255,0.65);
-  font-size: 13px;
-  text-decoration: none;
-  transition: color 0.15s;
-}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand-logo { width: 32px; height: 32px; object-fit: contain; }
+.brand-text { display: flex; flex-direction: column; line-height: 1; }
+.brand-name { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.3px; }
+.brand-tagline { font-size: 9px; color: var(--orange); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; margin-top: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-link { color: rgba(255,255,255,0.65); font-size: 13px; text-decoration: none; transition: color 0.15s; }
 .topbar-link:hover { color: #fff; }
 
+.user-menu-wrap { position: relative; }
 .user-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: flex; align-items: center; gap: 8px;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 20px;
-  padding: 4px 12px 4px 4px;
-  cursor: pointer;
-  transition: background 0.15s;
+  border-radius: 20px; padding: 4px 12px 4px 4px;
+  cursor: pointer; transition: background 0.15s;
 }
 .user-badge:hover { background: rgba(255,255,255,0.14); }
-
 .avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 28px; height: 28px; border-radius: 50%;
   background: var(--orange);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: #fff;
   font-family: 'Montserrat', sans-serif;
+  overflow: hidden;
 }
+.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.user-name { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; }
 
-.user-name {
-  font-size: 13px;
-  color: rgba(255,255,255,0.85);
-  font-weight: 500;
+.user-dropdown {
+  display: none; position: absolute; top: calc(100% + 10px); right: 0;
+  background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12); width: 220px; z-index: 100; overflow: hidden;
 }
+.user-dropdown.open { display: block; }
+.dropdown-header { padding: 14px 16px; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+.dropdown-header-name { font-weight: 600; font-size: 13px; color: #1A2E4A; }
+.dropdown-header-email { font-size: 11px; color: #64748b; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dropdown-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; font-size: 13px; color: #1A2E4A;
+  cursor: pointer; transition: background 0.12s;
+  border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+}
+.dropdown-item:hover { background: #f1f5f9; }
+.dropdown-item svg { flex-shrink: 0; color: #64748b; }
+.dropdown-item.danger { color: #b91c1c; }
+.dropdown-item.danger svg { color: #b91c1c; }
+.dropdown-divider { border: none; border-top: 1px solid #e2e8f0; margin: 4px 0; }
 
-/* ===== SUBNAV ===== */
 .subnav {
-  background: var(--white);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 24px; display: flex; gap: 0;
+  overflow-x: auto; scrollbar-width: none;
 }
 .subnav::-webkit-scrollbar { display: none; }
-
 .subnav-tab {
-  padding: 14px 18px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.15s, border-color 0.15s;
-  text-decoration: none;
-  display: block;
+  padding: 14px 18px; font-size: 13px; font-weight: 500; color: var(--text-muted);
+  border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s; text-decoration: none; display: block;
 }
 .subnav-tab:hover { color: var(--navy); }
-.subnav-tab.active {
-  color: var(--navy);
-  border-bottom-color: var(--orange);
-}
+.subnav-tab.active { color: var(--navy); border-bottom-color: var(--orange); }
 
-/* ===== MAIN CONTENT ===== */
-.main {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 24px 24px 48px;
-}
+.main { max-width: 1280px; margin: 0 auto; padding: 24px 24px 48px; }
+.page-header { margin-bottom: 20px; }
+.page-header h1 { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 700; color: var(--navy); }
+.page-header p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 
-/* ===== PAGE HEADER ===== */
-.page-header {
-  margin-bottom: 20px;
-}
-
-.page-header h1 {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--navy);
-}
-
-.page-header p {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-/* ===== STATS CARDS ===== */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.stat-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-}
-
-.stat-value {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--navy);
-  line-height: 1;
-}
-
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+.stat-value { font-family: 'Montserrat', sans-serif; font-size: 22px; font-weight: 700; color: var(--navy); line-height: 1; }
 .stat-card.orange .stat-value { color: var(--orange); }
 .stat-card.green .stat-value { color: #16a34a; }
 .stat-card.blue .stat-value { color: #2563eb; }
 
-/* ===== CARD ===== */
-.card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-
-/* ===== CARD TOOLBAR ===== */
-.card-toolbar {
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-  border-bottom: 1px solid var(--border);
-  background: #fafafa;
-}
-
-.card-title {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--navy);
-  flex: none;
-}
-
-.search-wrap {
-  flex: 1;
-  min-width: 200px;
-  max-width: 360px;
-  position: relative;
-}
-
-.search-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--text-muted);
-  pointer-events: none;
-}
-
-.search-input {
-  width: 100%;
-  padding: 8px 12px 8px 34px;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--white);
-  color: var(--navy);
-  transition: border-color 0.15s, box-shadow 0.15s;
-  outline: none;
-}
-
-.search-input:focus {
-  border-color: var(--navy);
-  box-shadow: 0 0 0 3px rgba(26,46,74,0.08);
-}
-
-.filter-select {
-  padding: 8px 12px;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--white);
-  color: var(--navy);
-  cursor: pointer;
-  outline: none;
-}
+.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+.card-toolbar { padding: 16px 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--border); background: #fafafa; }
+.card-title { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 700; color: var(--navy); flex: none; }
+.search-wrap { flex: 1; min-width: 200px; max-width: 360px; position: relative; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+.search-input { width: 100%; padding: 8px 12px 8px 34px; font-size: 13px; font-family: 'Inter', sans-serif; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--navy); transition: border-color 0.15s, box-shadow 0.15s; outline: none; }
+.search-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26,46,74,0.08); }
+.filter-select { padding: 8px 12px; font-size: 13px; font-family: 'Inter', sans-serif; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--navy); cursor: pointer; outline: none; }
 .filter-select:focus { border-color: var(--navy); }
-
-.btn-add {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  background: var(--orange);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius);
-  font-size: 13px;
-  font-weight: 600;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  white-space: nowrap;
-  margin-left: auto;
-}
+.btn-add { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--orange); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; transition: background 0.15s, transform 0.1s; white-space: nowrap; margin-left: auto; }
 .btn-add:hover { background: var(--orange-dark); }
 .btn-add:active { transform: scale(0.98); }
 
-/* ===== TABLE ===== */
-.table-wrap {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 960px;
-}
-
-thead tr {
-  background: var(--navy);
-}
-
-thead th {
-  padding: 11px 14px;
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.85);
-  text-align: left;
-  white-space: nowrap;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  border-right: 1px solid rgba(255,255,255,0.06);
-}
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { width: 100%; border-collapse: collapse; min-width: 960px; }
+thead tr { background: var(--navy); }
+thead th { padding: 11px 14px; font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.85); text-align: left; white-space: nowrap; letter-spacing: 0.4px; text-transform: uppercase; border-right: 1px solid rgba(255,255,255,0.06); }
 thead th:last-child { border-right: none; }
-
-tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background 0.12s;
-}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
 tbody tr:hover { background: #f0f5fa; }
 tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 11px 14px; font-size: 13px; color: var(--navy); vertical-align: middle; white-space: nowrap; }
+.td-orgao { font-weight: 500; max-width: 180px; overflow: hidden; text-overflow: ellipsis; }
+.td-muted { color: var(--text-secondary); }
+.td-bold { font-weight: 600; color: var(--navy); }
 
-tbody td {
-  padding: 11px 14px;
-  font-size: 13px;
-  color: var(--navy);
-  vertical-align: middle;
-  white-space: nowrap;
-}
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.badge-inscrito  { background: #dcfce7; color: #15803d; }
+.badge-isencao   { background: #dbeafe; color: #1d4ed8; }
+.badge-nao       { background: #f1f5f9; color: #475569; }
+.badge-resultado { background: #fef3c7; color: #b45309; }
 
-.td-orgao {
-  font-weight: 500;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.actions { display: flex; gap: 6px; align-items: center; }
+.btn-icon { width: 30px; height: 30px; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); transition: background 0.12s, color 0.12s, border-color 0.12s; padding: 0; }
+.btn-icon.edit:hover { background: #dbeafe; color: #1d4ed8; border-color: #bfdbfe; }
+.btn-icon.del:hover { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
 
-.td-muted {
-  color: var(--text-secondary);
-}
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+.empty-state svg { width: 48px; height: 48px; margin: 0 auto 12px; opacity: 0.3; display: block; }
+.empty-state p { font-size: 14px; }
 
-.td-bold {
-  font-weight: 600;
-  color: var(--navy);
-}
-
-/* ===== BADGES ===== */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 9px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.badge-inscrito    { background: #dcfce7; color: #15803d; }
-.badge-isencao     { background: #dbeafe; color: #1d4ed8; }
-.badge-nao         { background: #f1f5f9; color: #475569; }
-.badge-resultado   { background: #fef3c7; color: #b45309; }
-.badge-reprovado   { background: #fee2e2; color: #b91c1c; }
-
-/* ===== ACTION BUTTONS ===== */
-.actions {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-}
-
-.btn-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
-  padding: 0;
-}
-
-.btn-icon.edit:hover {
-  background: #dbeafe;
-  color: #1d4ed8;
-  border-color: #bfdbfe;
-}
-
-.btn-icon.del:hover {
-  background: #fee2e2;
-  color: #b91c1c;
-  border-color: #fecaca;
-}
-
-/* ===== EMPTY STATE ===== */
-.empty-state {
-  text-align: center;
-  padding: 48px 20px;
-  color: var(--text-muted);
-}
-
-.empty-state svg {
-  width: 48px;
-  height: 48px;
-  margin: 0 auto 12px;
-  opacity: 0.3;
-  display: block;
-}
-
-.empty-state p {
-  font-size: 14px;
-}
-
-/* ===== MODAL ===== */
-.modal-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
+.modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 .modal-backdrop.open { display: flex; }
-
-.modal {
-  background: var(--white);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  width: 100%;
-  max-width: 520px;
-  box-shadow: var(--shadow-md);
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.modal-title {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--navy);
-}
-
-.btn-close {
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: 16px;
-  transition: background 0.12s;
-}
+.modal { background: var(--white); border-radius: var(--radius-lg); padding: 24px; width: 100%; max-width: 520px; box-shadow: var(--shadow-md); max-height: 90vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-title { font-family: 'Montserrat', sans-serif; font-size: 15px; font-weight: 700; color: var(--navy); }
+.btn-close { width: 32px; height: 32px; border: 1px solid var(--border); border-radius: var(--radius); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 16px; transition: background 0.12s; }
 .btn-close:hover { background: #f1f5f9; }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
-
-.form-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-.form-input, .form-select {
-  padding: 9px 12px;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--white);
-  color: var(--navy);
-  outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.form-input:focus, .form-select:focus {
-  border-color: var(--navy);
-  box-shadow: 0 0 0 3px rgba(26,46,74,0.08);
-}
-
-.modal-footer {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-.btn-cancel {
-  padding: 9px 18px;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 0.12s;
-}
+.form-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; }
+.form-input, .form-select { padding: 9px 12px; font-size: 13px; font-family: 'Inter', sans-serif; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); color: var(--navy); outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+.form-input:focus, .form-select:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(26,46,74,0.08); }
+.modal-footer { margin-top: 20px; display: flex; justify-content: flex-end; gap: 8px; padding-top: 16px; border-top: 1px solid var(--border); }
+.btn-cancel { padding: 9px 18px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 500; border: 1px solid var(--border); border-radius: var(--radius); background: transparent; color: var(--text-secondary); cursor: pointer; transition: background 0.12s; }
 .btn-cancel:hover { background: #f1f5f9; }
-
-.btn-save {
-  padding: 9px 20px;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  border: none;
-  border-radius: var(--radius);
-  background: var(--orange);
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.15s;
-}
+.btn-save { padding: 9px 20px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 600; border: none; border-radius: var(--radius); background: var(--orange); color: #fff; cursor: pointer; transition: background 0.15s; }
 .btn-save:hover { background: var(--orange-dark); }
 
-/* ===== TOAST ===== */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--navy);
-  color: #fff;
-  padding: 12px 18px;
-  border-radius: var(--radius);
-  font-size: 13px;
-  font-weight: 500;
-  z-index: 300;
-  display: none;
-  border-left: 3px solid var(--orange);
-  box-shadow: var(--shadow-md);
-  max-width: 320px;
-}
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: #fff; padding: 12px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 500; z-index: 300; display: none; border-left: 3px solid var(--orange); box-shadow: var(--shadow-md); max-width: 320px; }
 
-/* ===== SCROLLBAR ===== */
 .table-wrap::-webkit-scrollbar { height: 6px; }
 .table-wrap::-webkit-scrollbar-track { background: #f1f5f9; }
 .table-wrap::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 .table-wrap::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* ===== RESPONSIVE ===== */
+/* Modal Perfil */
+.modal-perfil-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
+.modal-perfil-backdrop.open { display: flex; }
+.modal-perfil { background: #fff; border-radius: 12px; padding: 28px; width: 100%; max-width: 440px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+.modal-perfil-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.modal-perfil-title { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 700; color: #1A2E4A; }
+.perfil-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 24px; }
+.perfil-avatar-preview { width: 80px; height: 80px; border-radius: 50%; background: #F4801A; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 700; color: #fff; overflow: hidden; border: 3px solid #e2e8f0; }
+.perfil-avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
+.btn-upload-foto { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border: 1.5px solid #1A2E4A; border-radius: 8px; background: transparent; color: #1A2E4A; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.12s; }
+.btn-upload-foto:hover { background: #f1f5f9; }
+.perfil-fields { display: flex; flex-direction: column; gap: 14px; }
+.perfil-field label { display: block; font-size: 12px; font-weight: 500; color: #475569; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 5px; }
+.perfil-field input { width: 100%; padding: 9px 12px; font-size: 13px; font-family: 'Inter', sans-serif; border: 1px solid #e2e8f0; border-radius: 8px; color: #1A2E4A; outline: none; transition: border-color 0.15s; }
+.perfil-field input:focus { border-color: #1A2E4A; }
+.perfil-field input:disabled { background: #f8fafc; color: #94a3b8; cursor: not-allowed; }
+.perfil-footer { margin-top: 20px; display: flex; justify-content: flex-end; gap: 8px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+
 @media (max-width: 640px) {
   .main { padding: 16px; }
   .topbar { padding: 0 16px; }
@@ -615,225 +212,25 @@ tbody td {
   .form-group.full { grid-column: 1; }
   .user-name { display: none; }
 }
-
-/* ===== DROPDOWN CONFIGURAÇÕES ===== */
-.user-menu-wrap {
-  position: relative;
-}
-
-.user-dropdown {
-  display: none;
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-  width: 220px;
-  z-index: 100;
-  overflow: hidden;
-}
-.user-dropdown.open { display: block; }
-
-.dropdown-header {
-  padding: 14px 16px;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f8fafc;
-}
-.dropdown-header-name {
-  font-weight: 600;
-  font-size: 13px;
-  color: #1A2E4A;
-}
-.dropdown-header-email {
-  font-size: 11px;
-  color: #64748b;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 11px 16px;
-  font-size: 13px;
-  color: #1A2E4A;
-  cursor: pointer;
-  transition: background 0.12s;
-  border: none;
-  background: none;
-  width: 100%;
-  text-align: left;
-  text-decoration: none;
-}
-.dropdown-item:hover { background: #f1f5f9; }
-.dropdown-item svg { flex-shrink: 0; color: #64748b; }
-.dropdown-item.danger { color: #b91c1c; }
-.dropdown-item.danger svg { color: #b91c1c; }
-.dropdown-divider { border: none; border-top: 1px solid #e2e8f0; margin: 4px 0; }
-
-/* Avatar com foto */
-.avatar-img {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-/* ===== MODAL PERFIL ===== */
-.modal-perfil-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 300;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.modal-perfil-backdrop.open { display: flex; }
-
-.modal-perfil {
-  background: #fff;
-  border-radius: 12px;
-  padding: 28px;
-  width: 100%;
-  max-width: 440px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-}
-
-.modal-perfil-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.modal-perfil-title {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 16px;
-  font-weight: 700;
-  color: #1A2E4A;
-}
-
-.perfil-avatar-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.perfil-avatar-preview {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: #F4801A;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: #fff;
-  overflow: hidden;
-  border: 3px solid #e2e8f0;
-}
-.perfil-avatar-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.btn-upload-foto {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 16px;
-  border: 1.5px solid #1A2E4A;
-  border-radius: 8px;
-  background: transparent;
-  color: #1A2E4A;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.12s;
-}
-.btn-upload-foto:hover { background: #f1f5f9; }
-
-.perfil-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.perfil-field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 500;
-  color: #475569;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-bottom: 5px;
-}
-
-.perfil-field input {
-  width: 100%;
-  padding: 9px 12px;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  color: #1A2E4A;
-  outline: none;
-  transition: border-color 0.15s;
-}
-.perfil-field input:focus { border-color: #1A2E4A; }
-.perfil-field input:disabled {
-  background: #f8fafc;
-  color: #94a3b8;
-  cursor: not-allowed;
-}
-
-.perfil-footer {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  padding-top: 16px;
-  border-top: 1px solid #e2e8f0;
-}
-
 </style>
-    <!-- Supabase SDK + config inline -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
-    <script>
-    const SUPABASE_URL = 'https://zxigimbhdzwhsxvjkzhx.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4aWdpbWJoZHp3aHN4dmpremh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MjE1OTIsImV4cCI6MjA5Mzk5NzU5Mn0.8gEJwKv2OPgLyb1M4v7W5opye9EH--x5pXxQ4jK8IHU';
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
-    async function getUser() {
-      try { const { data: { user } } = await db.auth.getUser(); return user; } catch(e) { return null; }
-    }
-    function onAuthChange(callback) {
-      db.auth.onAuthStateChange((_event, session) => { callback(session?.user ?? null); });
-    }
-    </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script>
+const SUPABASE_URL = 'https://zxigimbhdzwhsxvjkzhx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4aWdpbWJoZHp3aHN4dmpremh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MjE1OTIsImV4cCI6MjA5Mzk5NzU5Mn0.8gEJwKv2OPgLyb1M4v7W5opye9EH--x5pXxQ4jK8IHU';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+</script>
 </head>
 <body>
 
-<!-- TOPBAR -->
 <header class="topbar">
   <div style="display:flex;align-items:center;gap:10px;">
-    <a href="index.html" title="Voltar para a página inicial" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;transition:background 0.15s;text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+    <a href="index.html" title="Voltar" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;transition:background 0.15s;text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
     </a>
     <a href="index.html" class="brand">
-      <img src="logo1.jpeg" alt="Engs Hub" class="brand-logo" style="width:36px;height:36px;object-fit:contain;">
+      <img src="logo1.jpeg" alt="Engs Hub" class="brand-logo">
       <div class="brand-text">
         <span class="brand-name">Engs Hub</span>
         <span class="brand-tagline">Concursos</span>
@@ -844,7 +241,7 @@ tbody td {
     <a href="index.html" class="topbar-link">Editais</a>
     <div class="user-menu-wrap" id="userMenuWrap">
       <div class="user-badge" id="userBadge" onclick="toggleDropdown()">
-        <div class="avatar" id="avatarEl">GS</div>
+        <div class="avatar" id="avatarEl">??</div>
         <span class="user-name" id="userNameEl">Carregando...</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
@@ -871,52 +268,29 @@ tbody td {
   </div>
 </header>
 
-<!-- SUBNAV -->
 <nav class="subnav">
   <a href="#" class="subnav-tab active">Meu controle de concursos</a>
 </nav>
 
-<!-- MAIN -->
 <main class="main">
-
-  <!-- PAGE HEADER -->
   <div class="page-header">
     <h1>Meu controle de concursos</h1>
     <p>Gerencie seus prazos e inscrições em um só lugar.</p>
   </div>
 
-  <!-- STATS -->
-  <div class="stats-grid" id="statsGrid">
-    <div class="stat-card">
-      <span class="stat-label">Total</span>
-      <span class="stat-value" id="statTotal">—</span>
-    </div>
-    <div class="stat-card green">
-      <span class="stat-label">Inscritos</span>
-      <span class="stat-value" id="statInscrito">—</span>
-    </div>
-    <div class="stat-card blue">
-      <span class="stat-label">Aguardando isenção</span>
-      <span class="stat-value" id="statIsencao">—</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-label">Não inscritos</span>
-      <span class="stat-value" id="statNao">—</span>
-    </div>
-    <div class="stat-card orange">
-      <span class="stat-label">Com gabarito</span>
-      <span class="stat-value" id="statGabarito">—</span>
-    </div>
+  <div class="stats-grid">
+    <div class="stat-card"><span class="stat-label">Total</span><span class="stat-value" id="statTotal">—</span></div>
+    <div class="stat-card green"><span class="stat-label">Inscritos</span><span class="stat-value" id="statInscrito">—</span></div>
+    <div class="stat-card blue"><span class="stat-label">Aguardando isenção</span><span class="stat-value" id="statIsencao">—</span></div>
+    <div class="stat-card"><span class="stat-label">Não inscritos</span><span class="stat-value" id="statNao">—</span></div>
+    <div class="stat-card orange"><span class="stat-label">Com gabarito</span><span class="stat-value" id="statGabarito">—</span></div>
   </div>
 
-  <!-- TABLE CARD -->
   <div class="card">
     <div class="card-toolbar">
       <span class="card-title">Meus concursos</span>
       <div class="search-wrap">
-        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-        </svg>
+        <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" class="search-input" id="searchInput" placeholder="Buscar por banca ou órgão..." oninput="filterTable()">
       </div>
       <select class="filter-select" id="filterSituacao" onchange="filterTable()">
@@ -927,77 +301,45 @@ tbody td {
         <option value="resultado">Resultado saiu</option>
       </select>
       <button class="btn-add" onclick="openModal()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Adicionar concurso
       </button>
     </div>
-
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Banca</th>
-            <th>Órgão / Cargo</th>
-            <th>Data da prova</th>
-            <th>Vagas</th>
-            <th>Salário</th>
-            <th>Inscrição até</th>
-            <th>Situação</th>
-            <th>Isenção até</th>
-            <th>Gabarito</th>
-            <th>Ações</th>
+            <th>Banca</th><th>Órgão / Cargo</th><th>Data da prova</th>
+            <th>Vagas</th><th>Salário</th><th>Inscrição até</th>
+            <th>Situação</th><th>Isenção até</th><th>Gabarito</th><th>Ações</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
       </table>
       <div class="empty-state" id="emptyState" style="display:none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
-        <p>Nenhum concurso encontrado para esse filtro.</p>
+        <p>Nenhum concurso encontrado.</p>
       </div>
     </div>
   </div>
 </main>
 
-<!-- MODAL -->
+<!-- MODAL CONCURSO -->
 <div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="modal-header">
       <span class="modal-title" id="modalTitle">Adicionar concurso</span>
-      <button class="btn-close" onclick="closeModal()" aria-label="Fechar">&#x2715;</button>
+      <button class="btn-close" onclick="closeModal()">&#x2715;</button>
     </div>
     <div class="form-grid">
-      <div class="form-group">
-        <label class="form-label">Banca</label>
-        <input type="text" class="form-input" id="fBanca" placeholder="Ex: VUNESP">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Órgão</label>
-        <input type="text" class="form-input" id="fOrgao" placeholder="Ex: TCE-SP">
-      </div>
-      <div class="form-group full">
-        <label class="form-label">Cargo</label>
-        <input type="text" class="form-input" id="fCargo" placeholder="Ex: Engenheiro Civil">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Data da prova</label>
-        <input type="date" class="form-input" id="fDataProva">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Vagas</label>
-        <input type="number" class="form-input" id="fVagas" placeholder="Ex: 10" min="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Salário</label>
-        <input type="text" class="form-input" id="fSalario" placeholder="Ex: R$ 8.500,00">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Inscrição até</label>
-        <input type="date" class="form-input" id="fDataInscricao">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Situação</label>
+      <div class="form-group"><label class="form-label">Banca</label><input type="text" class="form-input" id="fBanca" placeholder="Ex: VUNESP"></div>
+      <div class="form-group"><label class="form-label">Órgão</label><input type="text" class="form-input" id="fOrgao" placeholder="Ex: TCE-SP"></div>
+      <div class="form-group full"><label class="form-label">Cargo</label><input type="text" class="form-input" id="fCargo" placeholder="Ex: Engenheiro Civil"></div>
+      <div class="form-group"><label class="form-label">Data da prova</label><input type="date" class="form-input" id="fDataProva"></div>
+      <div class="form-group"><label class="form-label">Vagas</label><input type="number" class="form-input" id="fVagas" placeholder="Ex: 10" min="0"></div>
+      <div class="form-group"><label class="form-label">Salário</label><input type="text" class="form-input" id="fSalario" placeholder="Ex: R$ 8.500,00"></div>
+      <div class="form-group"><label class="form-label">Inscrição até</label><input type="date" class="form-input" id="fDataInscricao"></div>
+      <div class="form-group"><label class="form-label">Situação</label>
         <select class="form-select" id="fSituacao">
           <option value="nao">Não inscrito</option>
           <option value="inscrito">Inscrito</option>
@@ -1005,14 +347,8 @@ tbody td {
           <option value="resultado">Resultado saiu</option>
         </select>
       </div>
-      <div class="form-group">
-        <label class="form-label">Isenção até</label>
-        <input type="date" class="form-input" id="fDataIsencao">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Gabarito preliminar</label>
-        <input type="text" class="form-input" id="fGabarito" placeholder="Ex: 12/07/2025">
-      </div>
+      <div class="form-group"><label class="form-label">Isenção até</label><input type="date" class="form-input" id="fDataIsencao"></div>
+      <div class="form-group"><label class="form-label">Gabarito preliminar</label><input type="text" class="form-input" id="fGabarito" placeholder="Ex: 12/07/2025"></div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
@@ -1021,9 +357,6 @@ tbody td {
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
 <!-- MODAL PERFIL -->
 <div class="modal-perfil-backdrop" id="modalPerfilBackdrop" onclick="closePerfilOutside(event)">
   <div class="modal-perfil">
@@ -1031,33 +364,19 @@ tbody td {
       <span class="modal-perfil-title">Meu perfil</span>
       <button class="btn-close" onclick="closePerfil()">&#x2715;</button>
     </div>
-
     <div class="perfil-avatar-wrap">
-      <div class="perfil-avatar-preview" id="perfilAvatarPreview">
-        <span id="perfilAvatarInitials"></span>
-      </div>
+      <div class="perfil-avatar-preview" id="perfilAvatarPreview"><span id="perfilAvatarInitials">?</span></div>
       <label class="btn-upload-foto" for="fotoInput">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Alterar foto
       </label>
       <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="handleFotoUpload(event)">
     </div>
-
     <div class="perfil-fields">
-      <div class="perfil-field">
-        <label>Nome completo</label>
-        <input type="text" id="perfilNome" placeholder="Seu nome">
-      </div>
-      <div class="perfil-field">
-        <label>E-mail</label>
-        <input type="email" id="perfilEmail" disabled>
-      </div>
-      <div class="perfil-field">
-        <label>Área de atuação</label>
-        <input type="text" id="perfilArea" placeholder="Ex: Engenharia Civil">
-      </div>
+      <div class="perfil-field"><label>Nome completo</label><input type="text" id="perfilNome" placeholder="Seu nome"></div>
+      <div class="perfil-field"><label>E-mail</label><input type="email" id="perfilEmail" disabled></div>
+      <div class="perfil-field"><label>Área de atuação</label><input type="text" id="perfilArea" placeholder="Ex: Engenharia Civil"></div>
     </div>
-
     <div class="perfil-footer">
       <button class="btn-cancel" onclick="closePerfil()">Cancelar</button>
       <button class="btn-save" onclick="salvarPerfil()">Salvar alterações</button>
@@ -1065,9 +384,9 @@ tbody td {
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
 
 <script>
-// ===== CONFIGURAÇÃO =====
 const SITUACAO_CONFIG = {
   inscrito:  { label: 'Inscrito',           cls: 'badge-inscrito'  },
   isencao:   { label: 'Aguardando isenção', cls: 'badge-isencao'   },
@@ -1076,47 +395,59 @@ const SITUACAO_CONFIG = {
 };
 
 let data = [];
-let nextId = null; // não usado com Supabase, mas mantido para compatibilidade
 let editId = null;
 let currentUser = null;
 
-// ===== INIT: verificar login =====
+// ===== INIT — usa getSession() para leitura instantânea do localStorage =====
 async function init() {
-  currentUser = await getUser();
-  if (!currentUser) {
-    // Não está logado — redireciona para home e abre modal de login automaticamente
+  // Primeira tentativa: getSession (localStorage, instantâneo)
+  let { data: { session } } = await db.auth.getSession();
+
+  // Se não encontrou, aguarda um tick e tenta getUser como fallback
+  if (!session) {
+    await new Promise(r => setTimeout(r, 500));
+    const { data: { session: s2 } } = await db.auth.getSession();
+    session = s2;
+  }
+
+  if (!session || !session.user) {
     window.location.href = 'index.html?login=1';
     return;
   }
-  // Atualiza nome do usuário no header
-  const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || currentUser.email;
-  const primeiroNome = nome.split(' ')[0];
-  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiroNome + ' 👋';
-  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
 
-  // Avatar: foto ou iniciais
-  const fotoUrl = currentUser.user_metadata?.foto_url;
+  currentUser = session.user;
+  atualizarHeader(currentUser);
+  await loadData();
+
+  // Listener para mudanças de sessão (ex: logout em outra aba)
+  db.auth.onAuthStateChange((_event, newSession) => {
+    if (!newSession) window.location.href = 'index.html';
+  });
+}
+
+function atualizarHeader(user) {
+  const meta = user.user_metadata || {};
+  const nome = meta.nome_completo || user.email;
+  const primeiroNome = nome.split(' ')[0];
+  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiroNome + ' 👋';
+  document.getElementById('dropdownName').textContent = nome;
+  document.getElementById('dropdownEmail').textContent = user.email;
+
   const avatarEl = document.getElementById('avatarEl');
-  if (fotoUrl) {
-    avatarEl.innerHTML = `<img src="${fotoUrl}" alt="Foto" class="avatar-img">`;
+  if (meta.foto_url) {
+    avatarEl.innerHTML = `<img src="${meta.foto_url}" alt="Foto">`;
   } else {
     avatarEl.textContent = iniciais;
   }
 
-  // Dropdown header
-  document.getElementById('dropdownName').textContent  = nome;
-  document.getElementById('dropdownEmail').textContent = currentUser.email;
-
-  // Botão sair no dropdown
-  document.getElementById('btnSair').addEventListener('click', async () => {
+  document.getElementById('btnSair').onclick = async () => {
     if (confirm('Deseja sair da sua conta?')) {
       await db.auth.signOut();
       window.location.href = 'index.html';
     }
-  });
-
-  await loadData();
+  };
 }
 
 // ===== DROPDOWN =====
@@ -1124,7 +455,6 @@ function toggleDropdown() {
   document.getElementById('userDropdown').classList.toggle('open');
 }
 
-// Fecha dropdown ao clicar fora
 document.addEventListener('click', (e) => {
   const wrap = document.getElementById('userMenuWrap');
   if (wrap && !wrap.contains(e.target)) {
@@ -1132,23 +462,21 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ===== PERFIL MODAL =====
+// ===== PERFIL =====
 function openPerfil() {
   document.getElementById('userDropdown').classList.remove('open');
-  // Preenche campos com dados atuais
-  const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || '';
-  const area = meta?.area || '';
+  const meta = currentUser.user_metadata || {};
+  const nome = meta.nome_completo || '';
+  const area = meta.area || '';
+  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || '?';
+
   document.getElementById('perfilNome').value  = nome;
   document.getElementById('perfilEmail').value = currentUser.email;
   document.getElementById('perfilArea').value  = area;
-  // Avatar preview
-  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
-  document.getElementById('perfilAvatarInitials').textContent = iniciais;
-  const fotoUrl = meta?.foto_url;
+
   const preview = document.getElementById('perfilAvatarPreview');
-  if (fotoUrl) {
-    preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
+  if (meta.foto_url) {
+    preview.innerHTML = `<img src="${meta.foto_url}" alt="Foto de perfil">`;
   } else {
     preview.innerHTML = `<span id="perfilAvatarInitials">${iniciais}</span>`;
   }
@@ -1170,27 +498,16 @@ async function salvarPerfil() {
   btn.textContent = 'Salvando...';
   btn.disabled = true;
 
-  const { error } = await db.auth.updateUser({
-    data: { nome_completo: nome, area }
-  });
+  const { error } = await db.auth.updateUser({ data: { nome_completo: nome, area } });
 
   btn.textContent = 'Salvar alterações';
   btn.disabled = false;
 
-  if (error) {
-    showToast('Erro ao salvar: ' + error.message);
-    return;
-  }
+  if (error) { showToast('Erro ao salvar: ' + error.message); return; }
 
-  // Atualiza currentUser local
   currentUser.user_metadata.nome_completo = nome;
   currentUser.user_metadata.area = area;
-
-  // Atualiza header
-  const primeiro = nome.split(' ')[0];
-  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiro + ' 👋';
-  document.getElementById('dropdownName').textContent = nome;
-
+  atualizarHeader(currentUser);
   showToast('Perfil atualizado com sucesso.');
   closePerfil();
 }
@@ -1198,54 +515,45 @@ async function salvarPerfil() {
 function handleFotoUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('Foto muito grande. Máximo 2MB.');
-    return;
-  }
+  if (file.size > 2 * 1024 * 1024) { showToast('Foto muito grande. Máximo 2MB.'); return; }
   const reader = new FileReader();
   reader.onload = (e) => {
     const url = e.target.result;
-    // Mostra preview
-    document.getElementById('perfilAvatarPreview').innerHTML = `<img src="${url}" alt="Foto de perfil">`;
-    // Atualiza avatar no header
-    const avatarEl = document.getElementById('avatarEl');
-    avatarEl.innerHTML = `<img src="${url}" alt="Foto" class="avatar-img">`;
-    // Salva no metadata do Supabase
+    document.getElementById('perfilAvatarPreview').innerHTML = `<img src="${url}" alt="Foto">`;
+    currentUser.user_metadata.foto_url = url;
+    atualizarHeader(currentUser);
     db.auth.updateUser({ data: { foto_url: url } });
     showToast('Foto atualizada!');
   };
   reader.readAsDataURL(file);
 }
 
-// ===== CARREGAR dados do Supabase =====
+// ===== DADOS =====
 async function loadData() {
   const { data: rows, error } = await db
     .from('controle_concursos')
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error) {
-    showToast('Erro ao carregar dados: ' + error.message);
-    return;
-  }
+  if (error) { showToast('Erro ao carregar dados: ' + error.message); return; }
+
   data = rows.map(r => ({
-    id:             r.id,
-    banca:          r.banca,
-    orgao:          r.orgao,
-    cargo:          r.cargo || '',
-    dataProva:      r.data_prova || '',
-    vagas:          r.vagas || 0,
-    salario:        r.salario || '—',
-    dataInscricao:  r.data_inscricao || '',
-    situacao:       r.situacao || 'nao',
-    dataIsencao:    r.data_isencao || '',
-    gabarito:       r.gabarito || '',
+    id:            r.id,
+    banca:         r.banca,
+    orgao:         r.orgao,
+    cargo:         r.cargo || '',
+    dataProva:     r.data_prova || '',
+    vagas:         r.vagas || 0,
+    salario:       r.salario || '—',
+    dataInscricao: r.data_inscricao || '',
+    situacao:      r.situacao || 'nao',
+    dataIsencao:   r.data_isencao || '',
+    gabarito:      r.gabarito || '',
   }));
   updateStats();
   filterTable();
 }
 
-// ===== UTILITÁRIOS =====
 function fmt(d) {
   if (!d) return '—';
   const [y, m, dd] = d.split('-');
@@ -1260,18 +568,30 @@ function showToast(msg) {
   t._timer = setTimeout(() => { t.style.display = 'none'; }, 3200);
 }
 
-// ===== RENDER =====
+function updateStats() {
+  document.getElementById('statTotal').textContent    = data.length;
+  document.getElementById('statInscrito').textContent = data.filter(r => r.situacao === 'inscrito').length;
+  document.getElementById('statIsencao').textContent  = data.filter(r => r.situacao === 'isencao').length;
+  document.getElementById('statNao').textContent      = data.filter(r => r.situacao === 'nao').length;
+  document.getElementById('statGabarito').textContent = data.filter(r => r.gabarito && r.gabarito.trim()).length;
+}
+
+function filterTable() {
+  const q   = document.getElementById('searchInput').value.toLowerCase();
+  const sit = document.getElementById('filterSituacao').value;
+  const rows = data.filter(r => {
+    const matchQ = !q || r.banca.toLowerCase().includes(q) || r.orgao.toLowerCase().includes(q) || (r.cargo||'').toLowerCase().includes(q);
+    const matchS = !sit || r.situacao === sit;
+    return matchQ && matchS;
+  });
+  renderTable(rows);
+}
+
 function renderTable(rows) {
-  const body = document.getElementById('tableBody');
+  const body  = document.getElementById('tableBody');
   const empty = document.getElementById('emptyState');
-
-  if (!rows.length) {
-    body.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
+  if (!rows.length) { body.innerHTML = ''; empty.style.display = 'block'; return; }
   empty.style.display = 'none';
-
   body.innerHTML = rows.map(r => {
     const s = SITUACAO_CONFIG[r.situacao] || SITUACAO_CONFIG['nao'];
     const gabTxt = r.gabarito ? r.gabarito : '<span style="color:#94a3b8">Aguardando</span>';
@@ -1290,18 +610,11 @@ function renderTable(rows) {
       <td class="td-muted">${gabTxt}</td>
       <td>
         <div class="actions">
-          <button class="btn-icon edit" data-action="edit" data-id="${r.id}" title="Editar" aria-label="Editar concurso">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
+          <button class="btn-icon edit" data-action="edit" data-id="${r.id}" title="Editar">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
-          <button class="btn-icon del" data-action="delete" data-id="${r.id}" title="Excluir" aria-label="Excluir concurso">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6"/><path d="M14 11v6"/>
-              <path d="M9 6V4h6v2"/>
-            </svg>
+          <button class="btn-icon del" data-action="delete" data-id="${r.id}" title="Excluir">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
         </div>
       </td>
@@ -1309,39 +622,20 @@ function renderTable(rows) {
   }).join('');
 }
 
-function updateStats() {
-  document.getElementById('statTotal').textContent    = data.length;
-  document.getElementById('statInscrito').textContent = data.filter(r => r.situacao === 'inscrito').length;
-  document.getElementById('statIsencao').textContent  = data.filter(r => r.situacao === 'isencao').length;
-  document.getElementById('statNao').textContent      = data.filter(r => r.situacao === 'nao').length;
-  document.getElementById('statGabarito').textContent = data.filter(r => r.gabarito && r.gabarito.trim() !== '').length;
-}
-
-function filterTable() {
-  const q   = document.getElementById('searchInput').value.toLowerCase();
-  const sit = document.getElementById('filterSituacao').value;
-  const rows = data.filter(r => {
-    const matchQ = !q || r.banca.toLowerCase().includes(q) || r.orgao.toLowerCase().includes(q) || (r.cargo || '').toLowerCase().includes(q);
-    const matchS = !sit || r.situacao === sit;
-    return matchQ && matchS;
-  });
-  renderTable(rows);
-}
-
-// ===== MODAL =====
+// ===== MODAL CONCURSO =====
 function openModal(entry) {
   editId = entry ? entry.id : null;
-  document.getElementById('modalTitle').textContent = entry ? 'Editar concurso' : 'Adicionar concurso';
-  document.getElementById('fBanca').value         = entry ? entry.banca          : '';
-  document.getElementById('fOrgao').value         = entry ? entry.orgao          : '';
-  document.getElementById('fCargo').value         = entry ? (entry.cargo  || '') : '';
-  document.getElementById('fDataProva').value     = entry ? entry.dataProva      : '';
-  document.getElementById('fVagas').value         = entry ? entry.vagas          : '';
-  document.getElementById('fSalario').value       = entry ? entry.salario        : '';
-  document.getElementById('fDataInscricao').value = entry ? entry.dataInscricao  : '';
-  document.getElementById('fSituacao').value      = entry ? entry.situacao       : 'nao';
-  document.getElementById('fDataIsencao').value   = entry ? (entry.dataIsencao || '') : '';
-  document.getElementById('fGabarito').value      = entry ? (entry.gabarito     || '') : '';
+  document.getElementById('modalTitle').textContent   = entry ? 'Editar concurso' : 'Adicionar concurso';
+  document.getElementById('fBanca').value             = entry ? entry.banca          : '';
+  document.getElementById('fOrgao').value             = entry ? entry.orgao          : '';
+  document.getElementById('fCargo').value             = entry ? (entry.cargo || '')  : '';
+  document.getElementById('fDataProva').value         = entry ? entry.dataProva      : '';
+  document.getElementById('fVagas').value             = entry ? entry.vagas          : '';
+  document.getElementById('fSalario').value           = entry ? entry.salario        : '';
+  document.getElementById('fDataInscricao').value     = entry ? entry.dataInscricao  : '';
+  document.getElementById('fSituacao').value          = entry ? entry.situacao       : 'nao';
+  document.getElementById('fDataIsencao').value       = entry ? (entry.dataIsencao || '') : '';
+  document.getElementById('fGabarito').value          = entry ? (entry.gabarito || '') : '';
   document.getElementById('modalBackdrop').classList.add('open');
   setTimeout(() => document.getElementById('fBanca').focus(), 50);
 }
@@ -1354,17 +648,13 @@ function closeModalOutside(e) {
   if (e.target === document.getElementById('modalBackdrop')) closeModal();
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
-});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closePerfil(); } });
 
 async function saveEntry() {
   const banca = document.getElementById('fBanca').value.trim();
   const orgao = document.getElementById('fOrgao').value.trim();
-  if (!banca || !orgao) {
-    showToast('Preencha ao menos a banca e o órgão.');
-    return;
-  }
+  if (!banca || !orgao) { showToast('Preencha ao menos a banca e o órgão.'); return; }
+
   const payload = {
     user_id:        currentUser.id,
     banca,
@@ -1379,7 +669,7 @@ async function saveEntry() {
     gabarito:       document.getElementById('fGabarito').value.trim() || null,
   };
 
-  const btn = document.querySelector('.btn-save');
+  const btn = document.querySelector('#modalBackdrop .btn-save');
   btn.textContent = 'Salvando...';
   btn.disabled = true;
 
@@ -1393,238 +683,32 @@ async function saveEntry() {
   btn.textContent = 'Salvar concurso';
   btn.disabled = false;
 
-  if (error) {
-    showToast('Erro ao salvar: ' + error.message);
-    return;
-  }
-
-  showToast(editId ? 'Concurso atualizado com sucesso.' : 'Concurso adicionado com sucesso.');
+  if (error) { showToast('Erro ao salvar: ' + error.message); return; }
+  showToast(editId ? 'Concurso atualizado.' : 'Concurso adicionado.');
   closeModal();
   await loadData();
 }
 
-// ===== DROPDOWN =====
-function toggleDropdown() {
-  document.getElementById('userDropdown').classList.toggle('open');
-}
-
-// Fecha dropdown ao clicar fora
-document.addEventListener('click', (e) => {
-  const wrap = document.getElementById('userMenuWrap');
-  if (wrap && !wrap.contains(e.target)) {
-    document.getElementById('userDropdown').classList.remove('open');
-  }
-});
-
-// ===== PERFIL MODAL =====
-function openPerfil() {
-  document.getElementById('userDropdown').classList.remove('open');
-  // Preenche campos com dados atuais
-  const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || '';
-  const area = meta?.area || '';
-  document.getElementById('perfilNome').value  = nome;
-  document.getElementById('perfilEmail').value = currentUser.email;
-  document.getElementById('perfilArea').value  = area;
-  // Avatar preview
-  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
-  document.getElementById('perfilAvatarInitials').textContent = iniciais;
-  const fotoUrl = meta?.foto_url;
-  const preview = document.getElementById('perfilAvatarPreview');
-  if (fotoUrl) {
-    preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
-  } else {
-    preview.innerHTML = `<span id="perfilAvatarInitials">${iniciais}</span>`;
-  }
-  document.getElementById('modalPerfilBackdrop').classList.add('open');
-}
-
-function closePerfil() {
-  document.getElementById('modalPerfilBackdrop').classList.remove('open');
-}
-
-function closePerfilOutside(e) {
-  if (e.target === document.getElementById('modalPerfilBackdrop')) closePerfil();
-}
-
-async function salvarPerfil() {
-  const nome = document.getElementById('perfilNome').value.trim();
-  const area = document.getElementById('perfilArea').value.trim();
-  const btn  = document.querySelector('#modalPerfilBackdrop .btn-save');
-  btn.textContent = 'Salvando...';
-  btn.disabled = true;
-
-  const { error } = await db.auth.updateUser({
-    data: { nome_completo: nome, area }
-  });
-
-  btn.textContent = 'Salvar alterações';
-  btn.disabled = false;
-
-  if (error) {
-    showToast('Erro ao salvar: ' + error.message);
-    return;
-  }
-
-  // Atualiza currentUser local
-  currentUser.user_metadata.nome_completo = nome;
-  currentUser.user_metadata.area = area;
-
-  // Atualiza header
-  const primeiro = nome.split(' ')[0];
-  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiro + ' 👋';
-  document.getElementById('dropdownName').textContent = nome;
-
-  showToast('Perfil atualizado com sucesso.');
-  closePerfil();
-}
-
-function handleFotoUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('Foto muito grande. Máximo 2MB.');
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const url = e.target.result;
-    // Mostra preview
-    document.getElementById('perfilAvatarPreview').innerHTML = `<img src="${url}" alt="Foto de perfil">`;
-    // Atualiza avatar no header
-    const avatarEl = document.getElementById('avatarEl');
-    avatarEl.innerHTML = `<img src="${url}" alt="Foto" class="avatar-img">`;
-    // Salva no metadata do Supabase
-    db.auth.updateUser({ data: { foto_url: url } });
-    showToast('Foto atualizada!');
-  };
-  reader.readAsDataURL(file);
-}
-
-function editEntry(id) {
-  openModal(data.find(r => r.id === id));
-}
+function editEntry(id) { openModal(data.find(r => r.id === id)); }
 
 async function deleteEntry(id) {
   if (!confirm('Tem certeza que deseja excluir este concurso?')) return;
   const { error } = await db.from('controle_concursos').delete().eq('id', id);
-  if (error) {
-    showToast('Erro ao excluir: ' + error.message);
-    return;
-  }
+  if (error) { showToast('Erro ao excluir: ' + error.message); return; }
   showToast('Concurso removido.');
   await loadData();
 }
 
-// ===== DROPDOWN =====
-function toggleDropdown() {
-  document.getElementById('userDropdown').classList.toggle('open');
-}
-
-// Fecha dropdown ao clicar fora
-document.addEventListener('click', (e) => {
-  const wrap = document.getElementById('userMenuWrap');
-  if (wrap && !wrap.contains(e.target)) {
-    document.getElementById('userDropdown').classList.remove('open');
-  }
-});
-
-// ===== PERFIL MODAL =====
-function openPerfil() {
-  document.getElementById('userDropdown').classList.remove('open');
-  // Preenche campos com dados atuais
-  const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || '';
-  const area = meta?.area || '';
-  document.getElementById('perfilNome').value  = nome;
-  document.getElementById('perfilEmail').value = currentUser.email;
-  document.getElementById('perfilArea').value  = area;
-  // Avatar preview
-  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
-  document.getElementById('perfilAvatarInitials').textContent = iniciais;
-  const fotoUrl = meta?.foto_url;
-  const preview = document.getElementById('perfilAvatarPreview');
-  if (fotoUrl) {
-    preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
-  } else {
-    preview.innerHTML = `<span id="perfilAvatarInitials">${iniciais}</span>`;
-  }
-  document.getElementById('modalPerfilBackdrop').classList.add('open');
-}
-
-function closePerfil() {
-  document.getElementById('modalPerfilBackdrop').classList.remove('open');
-}
-
-function closePerfilOutside(e) {
-  if (e.target === document.getElementById('modalPerfilBackdrop')) closePerfil();
-}
-
-async function salvarPerfil() {
-  const nome = document.getElementById('perfilNome').value.trim();
-  const area = document.getElementById('perfilArea').value.trim();
-  const btn  = document.querySelector('#modalPerfilBackdrop .btn-save');
-  btn.textContent = 'Salvando...';
-  btn.disabled = true;
-
-  const { error } = await db.auth.updateUser({
-    data: { nome_completo: nome, area }
-  });
-
-  btn.textContent = 'Salvar alterações';
-  btn.disabled = false;
-
-  if (error) {
-    showToast('Erro ao salvar: ' + error.message);
-    return;
-  }
-
-  // Atualiza currentUser local
-  currentUser.user_metadata.nome_completo = nome;
-  currentUser.user_metadata.area = area;
-
-  // Atualiza header
-  const primeiro = nome.split(' ')[0];
-  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiro + ' 👋';
-  document.getElementById('dropdownName').textContent = nome;
-
-  showToast('Perfil atualizado com sucesso.');
-  closePerfil();
-}
-
-function handleFotoUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  if (file.size > 2 * 1024 * 1024) {
-    showToast('Foto muito grande. Máximo 2MB.');
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const url = e.target.result;
-    // Mostra preview
-    document.getElementById('perfilAvatarPreview').innerHTML = `<img src="${url}" alt="Foto de perfil">`;
-    // Atualiza avatar no header
-    const avatarEl = document.getElementById('avatarEl');
-    avatarEl.innerHTML = `<img src="${url}" alt="Foto" class="avatar-img">`;
-    // Salva no metadata do Supabase
-    db.auth.updateUser({ data: { foto_url: url } });
-    showToast('Foto atualizada!');
-  };
-  reader.readAsDataURL(file);
-}
-
-// ===== EVENT DELEGATION PARA TABELA =====
+// ===== EVENT DELEGATION =====
 document.getElementById('tableBody').addEventListener('click', function(e) {
   const btn = e.target.closest('[data-action]');
   if (!btn) return;
   const id = btn.dataset.id;
-  const action = btn.dataset.action;
-  if (action === 'edit') editEntry(id);
-  if (action === 'delete') deleteEntry(id);
+  if (btn.dataset.action === 'edit') editEntry(id);
+  if (btn.dataset.action === 'delete') deleteEntry(id);
 });
 
-// ===== INIT =====
+// ===== START =====
 init();
 </script>
 </body>
