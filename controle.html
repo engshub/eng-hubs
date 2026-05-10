@@ -814,9 +814,8 @@ let currentUser = null;
 async function init() {
   currentUser = await getUser();
   if (!currentUser) {
-    // Não está logado — redireciona para home com modal de login
-    alert('Faça login para acessar sua área.');
-    window.location.href = 'index.html';
+    // Não está logado — redireciona para home e abre modal de login automaticamente
+    window.location.href = 'index.html?login=1';
     return;
   }
   // Atualiza nome do usuário no header
