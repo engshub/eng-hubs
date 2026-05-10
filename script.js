@@ -758,19 +758,33 @@
     // Atualiza UI conforme estado de login
     if (typeof onAuthChange === 'function') {
         onAuthChange((user) => {
-            const btnEntrar   = document.querySelector('[data-modal-open="login"]');
-            const btnCadastro = document.querySelector('[data-modal-open="cadastro"]');
+            const btnEntrar    = document.querySelector('[data-modal-open="login"]');
+            const btnCadastro  = document.querySelector('[data-modal-open="cadastro"]');
             const navMinhaArea = document.querySelector('.nav-minha-area');
+            const greeting     = document.getElementById('user-greeting');
+
             if (user) {
-                if (btnEntrar)   btnEntrar.textContent = 'Sair';
-                if (btnEntrar)   btnEntrar.onclick = async (e) => {
-                    e.preventDefault();
-                    await db.auth.signOut();
-                    showToast({ type: 'info', title: 'Até logo!', message: 'Você saiu da sua conta.' });
-                };
+                // Monta saudação com primeiro nome
+                const meta = user.user_metadata;
+                const nomeCompleto = meta?.nome_completo || user.email;
+                const primeiro = nomeCompleto.split(' ')[0];
+
+                if (greeting) {
+                    greeting.textContent = 'Olá, ' + primeiro + ' 👋';
+                    greeting.style.display = 'inline';
+                }
+                if (btnEntrar) {
+                    btnEntrar.textContent = 'Sair';
+                    btnEntrar.onclick = async (e) => {
+                        e.preventDefault();
+                        await db.auth.signOut();
+                        showToast({ type: 'info', title: 'Até logo, ' + primeiro + '!', message: 'Você saiu da sua conta.' });
+                    };
+                }
                 if (btnCadastro) btnCadastro.style.display = 'none';
                 if (navMinhaArea) navMinhaArea.style.fontWeight = '700';
             } else {
+                if (greeting)    { greeting.style.display = 'none'; greeting.textContent = ''; }
                 if (btnEntrar)   btnEntrar.textContent = 'Entrar';
                 if (btnCadastro) btnCadastro.style.display = '';
             }
