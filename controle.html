@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Meu Controle de Concursos — Engs Hub</title>
+<link rel="icon" type="image/jpeg" href="logo1.jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -614,6 +615,199 @@ tbody td {
   .form-group.full { grid-column: 1; }
   .user-name { display: none; }
 }
+
+/* ===== DROPDOWN CONFIGURAÇÕES ===== */
+.user-menu-wrap {
+  position: relative;
+}
+
+.user-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  width: 220px;
+  z-index: 100;
+  overflow: hidden;
+}
+.user-dropdown.open { display: block; }
+
+.dropdown-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.dropdown-header-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #1A2E4A;
+}
+.dropdown-header-email {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  font-size: 13px;
+  color: #1A2E4A;
+  cursor: pointer;
+  transition: background 0.12s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+.dropdown-item:hover { background: #f1f5f9; }
+.dropdown-item svg { flex-shrink: 0; color: #64748b; }
+.dropdown-item.danger { color: #b91c1c; }
+.dropdown-item.danger svg { color: #b91c1c; }
+.dropdown-divider { border: none; border-top: 1px solid #e2e8f0; margin: 4px 0; }
+
+/* Avatar com foto */
+.avatar-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* ===== MODAL PERFIL ===== */
+.modal-perfil-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-perfil-backdrop.open { display: flex; }
+
+.modal-perfil {
+  background: #fff;
+  border-radius: 12px;
+  padding: 28px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.modal-perfil-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-perfil-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1A2E4A;
+}
+
+.perfil-avatar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.perfil-avatar-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #F4801A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  border: 3px solid #e2e8f0;
+}
+.perfil-avatar-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn-upload-foto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border: 1.5px solid #1A2E4A;
+  border-radius: 8px;
+  background: transparent;
+  color: #1A2E4A;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.btn-upload-foto:hover { background: #f1f5f9; }
+
+.perfil-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.perfil-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 5px;
+}
+
+.perfil-field input {
+  width: 100%;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #1A2E4A;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.perfil-field input:focus { border-color: #1A2E4A; }
+.perfil-field input:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.perfil-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #e2e8f0;
+}
+
 </style>
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -632,9 +826,31 @@ tbody td {
   </a>
   <div class="topbar-right">
     <a href="index.html" class="topbar-link">Editais</a>
-    <div class="user-badge">
-      <div class="avatar">GS</div>
-      <span class="user-name">Gabriel S.</span>
+    <div class="user-menu-wrap" id="userMenuWrap">
+      <div class="user-badge" id="userBadge" onclick="toggleDropdown()">
+        <div class="avatar" id="avatarEl">GS</div>
+        <span class="user-name" id="userNameEl">Carregando...</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="user-dropdown" id="userDropdown">
+        <div class="dropdown-header">
+          <div class="dropdown-header-name" id="dropdownName">—</div>
+          <div class="dropdown-header-email" id="dropdownEmail">—</div>
+        </div>
+        <button class="dropdown-item" onclick="openPerfil()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Meu perfil
+        </button>
+        <button class="dropdown-item" onclick="openPerfil()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Configurações
+        </button>
+        <hr class="dropdown-divider">
+        <button class="dropdown-item danger" id="btnSair">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </button>
+      </div>
     </div>
   </div>
 </header>
@@ -796,6 +1012,48 @@ tbody td {
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- MODAL PERFIL -->
+<div class="modal-perfil-backdrop" id="modalPerfilBackdrop" onclick="closePerfilOutside(event)">
+  <div class="modal-perfil">
+    <div class="modal-perfil-header">
+      <span class="modal-perfil-title">Meu perfil</span>
+      <button class="btn-close" onclick="closePerfil()">&#x2715;</button>
+    </div>
+
+    <div class="perfil-avatar-wrap">
+      <div class="perfil-avatar-preview" id="perfilAvatarPreview">
+        <span id="perfilAvatarInitials"></span>
+      </div>
+      <label class="btn-upload-foto" for="fotoInput">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Alterar foto
+      </label>
+      <input type="file" id="fotoInput" accept="image/*" style="display:none" onchange="handleFotoUpload(event)">
+    </div>
+
+    <div class="perfil-fields">
+      <div class="perfil-field">
+        <label>Nome completo</label>
+        <input type="text" id="perfilNome" placeholder="Seu nome">
+      </div>
+      <div class="perfil-field">
+        <label>E-mail</label>
+        <input type="email" id="perfilEmail" disabled>
+      </div>
+      <div class="perfil-field">
+        <label>Área de atuação</label>
+        <input type="text" id="perfilArea" placeholder="Ex: Engenharia Civil">
+      </div>
+    </div>
+
+    <div class="perfil-footer">
+      <button class="btn-cancel" onclick="closePerfil()">Cancelar</button>
+      <button class="btn-save" onclick="salvarPerfil()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+
 <script>
 // ===== CONFIGURAÇÃO =====
 const SITUACAO_CONFIG = {
@@ -822,12 +1080,24 @@ async function init() {
   const meta = currentUser.user_metadata;
   const nome = meta?.nome_completo || currentUser.email;
   const primeiroNome = nome.split(' ')[0];
-  document.querySelector('.user-name').textContent = primeiroNome;
+  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiroNome + ' 👋';
   const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
-  document.querySelector('.avatar').textContent = iniciais;
 
-  // Botão sair
-  document.querySelector('.user-badge').addEventListener('click', async () => {
+  // Avatar: foto ou iniciais
+  const fotoUrl = currentUser.user_metadata?.foto_url;
+  const avatarEl = document.getElementById('avatarEl');
+  if (fotoUrl) {
+    avatarEl.innerHTML = `<img src="${fotoUrl}" alt="Foto" class="avatar-img">`;
+  } else {
+    avatarEl.textContent = iniciais;
+  }
+
+  // Dropdown header
+  document.getElementById('dropdownName').textContent  = nome;
+  document.getElementById('dropdownEmail').textContent = currentUser.email;
+
+  // Botão sair no dropdown
+  document.getElementById('btnSair').addEventListener('click', async () => {
     if (confirm('Deseja sair da sua conta?')) {
       await db.auth.signOut();
       window.location.href = 'index.html';
@@ -835,6 +1105,104 @@ async function init() {
   });
 
   await loadData();
+}
+
+// ===== DROPDOWN =====
+function toggleDropdown() {
+  document.getElementById('userDropdown').classList.toggle('open');
+}
+
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('userMenuWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+});
+
+// ===== PERFIL MODAL =====
+function openPerfil() {
+  document.getElementById('userDropdown').classList.remove('open');
+  // Preenche campos com dados atuais
+  const meta = currentUser.user_metadata;
+  const nome = meta?.nome_completo || '';
+  const area = meta?.area || '';
+  document.getElementById('perfilNome').value  = nome;
+  document.getElementById('perfilEmail').value = currentUser.email;
+  document.getElementById('perfilArea').value  = area;
+  // Avatar preview
+  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
+  document.getElementById('perfilAvatarInitials').textContent = iniciais;
+  const fotoUrl = meta?.foto_url;
+  const preview = document.getElementById('perfilAvatarPreview');
+  if (fotoUrl) {
+    preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
+  } else {
+    preview.innerHTML = `<span id="perfilAvatarInitials">${iniciais}</span>`;
+  }
+  document.getElementById('modalPerfilBackdrop').classList.add('open');
+}
+
+function closePerfil() {
+  document.getElementById('modalPerfilBackdrop').classList.remove('open');
+}
+
+function closePerfilOutside(e) {
+  if (e.target === document.getElementById('modalPerfilBackdrop')) closePerfil();
+}
+
+async function salvarPerfil() {
+  const nome = document.getElementById('perfilNome').value.trim();
+  const area = document.getElementById('perfilArea').value.trim();
+  const btn  = document.querySelector('#modalPerfilBackdrop .btn-save');
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+
+  const { error } = await db.auth.updateUser({
+    data: { nome_completo: nome, area }
+  });
+
+  btn.textContent = 'Salvar alterações';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Erro ao salvar: ' + error.message);
+    return;
+  }
+
+  // Atualiza currentUser local
+  currentUser.user_metadata.nome_completo = nome;
+  currentUser.user_metadata.area = area;
+
+  // Atualiza header
+  const primeiro = nome.split(' ')[0];
+  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiro + ' 👋';
+  document.getElementById('dropdownName').textContent = nome;
+
+  showToast('Perfil atualizado com sucesso.');
+  closePerfil();
+}
+
+function handleFotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Foto muito grande. Máximo 2MB.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const url = e.target.result;
+    // Mostra preview
+    document.getElementById('perfilAvatarPreview').innerHTML = `<img src="${url}" alt="Foto de perfil">`;
+    // Atualiza avatar no header
+    const avatarEl = document.getElementById('avatarEl');
+    avatarEl.innerHTML = `<img src="${url}" alt="Foto" class="avatar-img">`;
+    // Salva no metadata do Supabase
+    db.auth.updateUser({ data: { foto_url: url } });
+    showToast('Foto atualizada!');
+  };
+  reader.readAsDataURL(file);
 }
 
 // ===== CARREGAR dados do Supabase =====
@@ -1023,6 +1391,104 @@ async function saveEntry() {
   await loadData();
 }
 
+// ===== DROPDOWN =====
+function toggleDropdown() {
+  document.getElementById('userDropdown').classList.toggle('open');
+}
+
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('userMenuWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+});
+
+// ===== PERFIL MODAL =====
+function openPerfil() {
+  document.getElementById('userDropdown').classList.remove('open');
+  // Preenche campos com dados atuais
+  const meta = currentUser.user_metadata;
+  const nome = meta?.nome_completo || '';
+  const area = meta?.area || '';
+  document.getElementById('perfilNome').value  = nome;
+  document.getElementById('perfilEmail').value = currentUser.email;
+  document.getElementById('perfilArea').value  = area;
+  // Avatar preview
+  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
+  document.getElementById('perfilAvatarInitials').textContent = iniciais;
+  const fotoUrl = meta?.foto_url;
+  const preview = document.getElementById('perfilAvatarPreview');
+  if (fotoUrl) {
+    preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
+  } else {
+    preview.innerHTML = `<span id="perfilAvatarInitials">${iniciais}</span>`;
+  }
+  document.getElementById('modalPerfilBackdrop').classList.add('open');
+}
+
+function closePerfil() {
+  document.getElementById('modalPerfilBackdrop').classList.remove('open');
+}
+
+function closePerfilOutside(e) {
+  if (e.target === document.getElementById('modalPerfilBackdrop')) closePerfil();
+}
+
+async function salvarPerfil() {
+  const nome = document.getElementById('perfilNome').value.trim();
+  const area = document.getElementById('perfilArea').value.trim();
+  const btn  = document.querySelector('#modalPerfilBackdrop .btn-save');
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+
+  const { error } = await db.auth.updateUser({
+    data: { nome_completo: nome, area }
+  });
+
+  btn.textContent = 'Salvar alterações';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Erro ao salvar: ' + error.message);
+    return;
+  }
+
+  // Atualiza currentUser local
+  currentUser.user_metadata.nome_completo = nome;
+  currentUser.user_metadata.area = area;
+
+  // Atualiza header
+  const primeiro = nome.split(' ')[0];
+  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiro + ' 👋';
+  document.getElementById('dropdownName').textContent = nome;
+
+  showToast('Perfil atualizado com sucesso.');
+  closePerfil();
+}
+
+function handleFotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Foto muito grande. Máximo 2MB.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const url = e.target.result;
+    // Mostra preview
+    document.getElementById('perfilAvatarPreview').innerHTML = `<img src="${url}" alt="Foto de perfil">`;
+    // Atualiza avatar no header
+    const avatarEl = document.getElementById('avatarEl');
+    avatarEl.innerHTML = `<img src="${url}" alt="Foto" class="avatar-img">`;
+    // Salva no metadata do Supabase
+    db.auth.updateUser({ data: { foto_url: url } });
+    showToast('Foto atualizada!');
+  };
+  reader.readAsDataURL(file);
+}
+
 function editEntry(id) {
   openModal(data.find(r => r.id === id));
 }
@@ -1036,6 +1502,104 @@ async function deleteEntry(id) {
   }
   showToast('Concurso removido.');
   await loadData();
+}
+
+// ===== DROPDOWN =====
+function toggleDropdown() {
+  document.getElementById('userDropdown').classList.toggle('open');
+}
+
+// Fecha dropdown ao clicar fora
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('userMenuWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('userDropdown').classList.remove('open');
+  }
+});
+
+// ===== PERFIL MODAL =====
+function openPerfil() {
+  document.getElementById('userDropdown').classList.remove('open');
+  // Preenche campos com dados atuais
+  const meta = currentUser.user_metadata;
+  const nome = meta?.nome_completo || '';
+  const area = meta?.area || '';
+  document.getElementById('perfilNome').value  = nome;
+  document.getElementById('perfilEmail').value = currentUser.email;
+  document.getElementById('perfilArea').value  = area;
+  // Avatar preview
+  const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
+  document.getElementById('perfilAvatarInitials').textContent = iniciais;
+  const fotoUrl = meta?.foto_url;
+  const preview = document.getElementById('perfilAvatarPreview');
+  if (fotoUrl) {
+    preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
+  } else {
+    preview.innerHTML = `<span id="perfilAvatarInitials">${iniciais}</span>`;
+  }
+  document.getElementById('modalPerfilBackdrop').classList.add('open');
+}
+
+function closePerfil() {
+  document.getElementById('modalPerfilBackdrop').classList.remove('open');
+}
+
+function closePerfilOutside(e) {
+  if (e.target === document.getElementById('modalPerfilBackdrop')) closePerfil();
+}
+
+async function salvarPerfil() {
+  const nome = document.getElementById('perfilNome').value.trim();
+  const area = document.getElementById('perfilArea').value.trim();
+  const btn  = document.querySelector('#modalPerfilBackdrop .btn-save');
+  btn.textContent = 'Salvando...';
+  btn.disabled = true;
+
+  const { error } = await db.auth.updateUser({
+    data: { nome_completo: nome, area }
+  });
+
+  btn.textContent = 'Salvar alterações';
+  btn.disabled = false;
+
+  if (error) {
+    showToast('Erro ao salvar: ' + error.message);
+    return;
+  }
+
+  // Atualiza currentUser local
+  currentUser.user_metadata.nome_completo = nome;
+  currentUser.user_metadata.area = area;
+
+  // Atualiza header
+  const primeiro = nome.split(' ')[0];
+  document.getElementById('userNameEl').textContent = 'Olá, ' + primeiro + ' 👋';
+  document.getElementById('dropdownName').textContent = nome;
+
+  showToast('Perfil atualizado com sucesso.');
+  closePerfil();
+}
+
+function handleFotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Foto muito grande. Máximo 2MB.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const url = e.target.result;
+    // Mostra preview
+    document.getElementById('perfilAvatarPreview').innerHTML = `<img src="${url}" alt="Foto de perfil">`;
+    // Atualiza avatar no header
+    const avatarEl = document.getElementById('avatarEl');
+    avatarEl.innerHTML = `<img src="${url}" alt="Foto" class="avatar-img">`;
+    // Salva no metadata do Supabase
+    db.auth.updateUser({ data: { foto_url: url } });
+    showToast('Foto atualizada!');
+  };
+  reader.readAsDataURL(file);
 }
 
 // ===== INIT =====
