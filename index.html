@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Eng Hubs - Portal de concursos públicos para Engenheiros e Arquitetos. Editais, prazos e notificações em um só lugar.">
+    <title>Eng Hubs — Concursos de Engenharia e Arquitetura</title>
+
+    <!-- Tipografia: Inter (corpo) + Montserrat (títulos) conforme identidade da marca -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Ícones (Lucide via CDN) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ============================================================
+         HEADER / NAVEGAÇÃO PRINCIPAL
+         ============================================================ -->
+    <header class="header" id="header">
+        <div class="container header-inner">
+
+            <!-- Logo: hexágono com sino (alerta de concurso) -->
+            <a href="#" class="logo" aria-label="Eng Hubs - Página inicial">
+                <svg class="logo-mark" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <!-- Hexágono = forma geométrica associada à engenharia -->
+                    <path d="M20 2 L36 11 L36 29 L20 38 L4 29 L4 11 Z" fill="#1A2E4A" stroke="#F4801A" stroke-width="2"/>
+                    <!-- Sino interno = notificação / alerta de edital -->
+                    <path d="M20 13 C16.5 13 14 15.5 14 19 V23 L12.5 25 H27.5 L26 23 V19 C26 15.5 23.5 13 20 13 Z" fill="#F4801A"/>
+                    <circle cx="20" cy="28" r="1.8" fill="#F4801A"/>
+                </svg>
+                <div class="logo-text">
+                    <span class="logo-title">Eng Hubs</span>
+                    <span class="logo-subtitle">Concursos</span>
+                </div>
+            </a>
+
+            <!-- Navegação desktop -->
+            <nav class="nav-desktop" aria-label="Navegação principal">
+                <a href="#concursos">Concursos</a>
+                <a href="#previstos">Previstos</a>
+                <a href="#noticias">Notícias</a>
+                <a href="#sobre">Sobre</a>
+            </nav>
+
+            <!-- Ações do usuário -->
+            <div class="header-actions">
+                <button class="btn-icon" id="btn-notif" aria-label="Notificações">
+                    <i data-lucide="bell"></i>
+                    <span class="notif-badge">3</span>
+                </button>
+                <button class="btn btn-ghost" data-modal-open="login">Entrar</button>
+                <button class="btn btn-primary" data-modal-open="cadastro">Cadastrar</button>
+
+                <!-- Botão de menu mobile (hamburger) -->
+                <button class="btn-icon btn-menu-mobile" id="btn-menu" aria-label="Abrir menu" aria-expanded="false">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu mobile (oculto por padrão, expandido via JS) -->
+        <nav class="nav-mobile" id="nav-mobile" aria-label="Navegação mobile">
+            <a href="#concursos">Concursos</a>
+            <a href="#previstos">Previstos</a>
+            <a href="#noticias">Notícias</a>
+            <a href="#sobre">Sobre</a>
+            <hr>
+            <button class="btn btn-ghost btn-block" data-modal-open="login">Entrar</button>
+            <button class="btn btn-primary btn-block" data-modal-open="cadastro">Cadastrar</button>
+        </nav>
+    </header>
+
+    <!-- ============================================================
+         HERO — Apresentação direta. Tom de voz: sem enrolação.
+         ============================================================ -->
+    <section class="hero">
+        <div class="container hero-inner">
+            <div class="hero-content">
+                <span class="hero-tag">
+                    <i data-lucide="zap"></i> Atualizado hoje · 12 editais ativos
+                </span>
+                <h1 class="hero-title">
+                    Concursos de <span class="hl">Engenharia</span> e <span class="hl">Arquitetura</span>.<br>
+                    Sem ruído. Sem atraso.
+                </h1>
+                <p class="hero-subtitle">
+                    Editais, prazos e jurisprudência reunidos em um só lugar.
+                    Acompanhe os concursos que importam e receba notificação na hora da publicação.
+                </p>
+
+                <!-- Barra de busca principal -->
+                <form class="search-bar" id="search-form" role="search">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input
+                        type="search"
+                        id="search-input"
+                        placeholder="Busque por cargo, banca ou estado (ex: TCE-SP, Auditor, Engenheiro Civil)"
+                        aria-label="Buscar concursos"
+                    >
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
+
+                <!-- Filtros rápidos (chips) -->
+                <div class="quick-filters" role="group" aria-label="Filtros rápidos">
+                    <button class="chip chip-active" data-filter="todos">Todos</button>
+                    <button class="chip" data-filter="engenharia-civil">Engenharia Civil</button>
+                    <button class="chip" data-filter="arquitetura">Arquitetura</button>
+                    <button class="chip" data-filter="eletrica">Elétrica</button>
+                    <button class="chip" data-filter="ambiental">Ambiental</button>
+                    <button class="chip" data-filter="agronomia">Agronomia</button>
+                </div>
+            </div>
+
+            <!-- Card lateral de estatísticas (KPIs) -->
+            <aside class="hero-stats" aria-label="Estatísticas do portal">
+                <div class="stat">
+                    <span class="stat-num">147</span>
+                    <span class="stat-label">Vagas abertas</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">12</span>
+                    <span class="stat-label">Editais ativos</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">28</span>
+                    <span class="stat-label">Previstos 2026</span>
+                </div>
+                <div class="stat stat-highlight">
+                    <span class="stat-num">R$ 23.110</span>
+                    <span class="stat-label">Maior remuneração</span>
+                </div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- ============================================================
+         SEÇÃO PRINCIPAL — LISTA DE CONCURSOS ABERTOS
+         ============================================================ -->
+    <main class="main">
+        <section class="section" id="concursos">
+            <div class="container">
+                <header class="section-header">
+                    <div>
+                        <h2 class="section-title">Editais abertos</h2>
+                        <p class="section-subtitle">Inscrições em andamento. Atualizado em tempo real.</p>
+                    </div>
+                    <div class="section-actions">
+                        <select class="select" id="sort-select" aria-label="Ordenar por">
+                            <option value="prazo">Ordenar: Prazo final</option>
+                            <option value="salario">Ordenar: Maior salário</option>
+                            <option value="vagas">Ordenar: Mais vagas</option>
+                            <option value="recentes">Ordenar: Mais recentes</option>
+                        </select>
+                    </div>
+                </header>
+
+                <!-- Grade de concursos. Os cards são populados via JS para permitir filtros/ordenação,
+                     mas mantemos o markup base de exemplo abaixo (no JS reescrevemos esta lista) -->
+                <div class="cards-grid" id="cards-grid">
+                    <!-- Cards inseridos via JavaScript -->
+                </div>
+
+                <!-- Empty state (exibido se filtro não retornar resultados) -->
+                <div class="empty-state hidden" id="empty-state">
+                    <i data-lucide="search-x"></i>
+                    <h3>Nenhum concurso encontrado</h3>
+                    <p>Tente ajustar os filtros ou a busca.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             SEÇÃO — CONCURSOS PREVISTOS (Pré-edital)
+             ============================================================ -->
+        <section class="section section-alt" id="previstos">
+            <div class="container">
+                <header class="section-header">
+                    <div>
+                        <h2 class="section-title">Previstos para os próximos meses</h2>
+                        <p class="section-subtitle">Antecipe-se. Acompanhe e seja avisado quando o edital sair.</p>
+                    </div>
+                </header>
+
+                <div class="forecast-grid">
+
+                    <article class="forecast-card">
+                        <div class="forecast-status status-iminente">
+                            <i data-lucide="alert-circle"></i> Edital iminente
+                        </div>
+                        <h3>TCE-SP — Auditor de Controle Externo</h3>
+                        <p class="forecast-meta">Engenharia · 12 vagas · Banca: VUNESP</p>
+                        <p class="forecast-desc">Edital previsto para junho/2026. Comissão já formada e nomeada.</p>
+                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-1">
+                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
+                        </button>
+                    </article>
+
+                    <article class="forecast-card">
+                        <div class="forecast-status status-andamento">
+                            <i data-lucide="clock"></i> Em estudos
+                        </div>
+                        <h3>TCE-RJ — Analista de Controle Externo</h3>
+                        <p class="forecast-meta">Engenharia/Arquitetura · 30 vagas estimadas</p>
+                        <p class="forecast-desc">Solicitação encaminhada. Previsão para 2º semestre de 2026.</p>
+                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-2">
+                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
+                        </button>
+                    </article>
+
+                    <article class="forecast-card">
+                        <div class="forecast-status status-andamento">
+                            <i data-lucide="clock"></i> Em estudos
+                        </div>
+                        <h3>Petrobras — Engenheiro Júnior</h3>
+                        <p class="forecast-meta">Múltiplas especialidades · Banca: CESGRANRIO</p>
+                        <p class="forecast-desc">Concurso histórico. Movimentações indicam edital até dezembro.</p>
+                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-3">
+                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
+                        </button>
+                    </article>
+
+                    <article class="forecast-card">
+                        <div class="forecast-status status-iminente">
+                            <i data-lucide="alert-circle"></i> Edital iminente
+                        </div>
+                        <h3>DNIT — Engenheiro Civil</h3>
+                        <p class="forecast-meta">120 vagas estimadas · Banca: CEBRASPE</p>
+                        <p class="forecast-desc">Autorização publicada. Edital esperado nas próximas semanas.</p>
+                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-4">
+                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
+                        </button>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             CTA — Cadastro para receber notificações
+             ============================================================ -->
+        <section class="cta-section">
+            <div class="container cta-inner">
+                <div class="cta-content">
+                    <h2>Não perca o próximo edital.</h2>
+                    <p>Cadastre-se gratuitamente e receba alerta no e-mail e no celular assim que um concurso da sua área for publicado.</p>
+                </div>
+                <button class="btn btn-cta" data-modal-open="cadastro">
+                    <i data-lucide="bell-ring"></i> Quero ser avisado
+                </button>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             SEÇÃO — Como funciona / Sobre
+             ============================================================ -->
+        <section class="section" id="sobre">
+            <div class="container">
+                <header class="section-header section-header-center">
+                    <div>
+                        <h2 class="section-title">Como o Eng Hubs funciona</h2>
+                        <p class="section-subtitle">Direto. Técnico. Sem enrolação.</p>
+                    </div>
+                </header>
+
+                <div class="how-grid">
+                    <div class="how-card">
+                        <div class="how-icon"><i data-lucide="search"></i></div>
+                        <h3>1. Encontre</h3>
+                        <p>Editais filtrados por cargo, banca, estado e remuneração. Apenas o que importa para Engenharia e Arquitetura.</p>
+                    </div>
+                    <div class="how-card">
+                        <div class="how-icon"><i data-lucide="bookmark-plus"></i></div>
+                        <h3>2. Acompanhe</h3>
+                        <p>Marque os concursos do seu interesse. Receba atualizações de prazo, retificações e gabaritos.</p>
+                    </div>
+                    <div class="how-card">
+                        <div class="how-icon"><i data-lucide="bell-ring"></i></div>
+                        <h3>3. Seja avisado</h3>
+                        <p>Notificações por e-mail no momento da publicação do edital. Sem você precisar conferir o diário oficial.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
+    <footer class="footer">
+        <div class="container footer-inner">
+            <div class="footer-brand">
+                <a href="#" class="logo logo-footer">
+                    <svg width="36" height="36" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M20 2 L36 11 L36 29 L20 38 L4 29 L4 11 Z" fill="#FFFFFF" stroke="#F4801A" stroke-width="2"/>
+                        <path d="M20 13 C16.5 13 14 15.5 14 19 V23 L12.5 25 H27.5 L26 23 V19 C26 15.5 23.5 13 20 13 Z" fill="#F4801A"/>
+                        <circle cx="20" cy="28" r="1.8" fill="#F4801A"/>
+                    </svg>
+                    <div class="logo-text">
+                        <span class="logo-title">Eng Hubs</span>
+                        <span class="logo-subtitle">Concursos</span>
+                    </div>
+                </a>
+                <p class="footer-tagline">O hub de concursos para quem constrói o Brasil.</p>
+            </div>
+
+            <div class="footer-cols">
+                <div class="footer-col">
+                    <h4>Navegação</h4>
+                    <a href="#concursos">Editais abertos</a>
+                    <a href="#previstos">Previstos</a>
+                    <a href="#noticias">Notícias</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Áreas</h4>
+                    <a href="#">Engenharia Civil</a>
+                    <a href="#">Arquitetura</a>
+                    <a href="#">Elétrica</a>
+                    <a href="#">Ambiental</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Conta</h4>
+                    <a href="#" data-modal-open="login">Entrar</a>
+                    <a href="#" data-modal-open="cadastro">Cadastrar</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <p>© 2026 Eng Hubs. Todos os direitos reservados.</p>
+                <div class="footer-social">
+                    <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i data-lucide="linkedin"></i></a>
+                    <a href="#" aria-label="YouTube"><i data-lucide="youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================================
+         MODAL — Login / Cadastro (uma única estrutura, alterna conteúdo)
+         ============================================================ -->
+    <div class="modal-overlay" id="modal" aria-hidden="true">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <button class="modal-close" id="modal-close" aria-label="Fechar">
+                <i data-lucide="x"></i>
+            </button>
+
+            <!-- Tabs Login / Cadastro -->
+            <div class="modal-tabs" role="tablist">
+                <button class="modal-tab" data-tab="login" role="tab">Entrar</button>
+                <button class="modal-tab" data-tab="cadastro" role="tab">Criar conta</button>
+            </div>
+
+            <!-- Conteúdo: Login -->
+            <div class="modal-content" id="content-login">
+                <h2 id="modal-title-login" class="modal-title">Bem-vindo de volta</h2>
+                <p class="modal-subtitle">Acesse seus concursos acompanhados.</p>
+
+                <form class="modal-form" id="form-login">
+                    <label>
+                        E-mail
+                        <input type="email" name="email" placeholder="seu@email.com" required>
+                    </label>
+                    <label>
+                        Senha
+                        <input type="password" name="senha" placeholder="••••••••" required>
+                    </label>
+                    <a href="#" class="modal-link">Esqueci minha senha</a>
+                    <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+                </form>
+            </div>
+
+            <!-- Conteúdo: Cadastro -->
+            <div class="modal-content hidden" id="content-cadastro">
+                <h2 id="modal-title-cadastro" class="modal-title">Crie sua conta gratuita</h2>
+                <p class="modal-subtitle">Receba notificações dos concursos da sua área.</p>
+
+                <form class="modal-form" id="form-cadastro">
+                    <label>
+                        Nome completo
+                        <input type="text" name="nome" placeholder="Maria Silva" required>
+                    </label>
+                    <label>
+                        E-mail profissional
+                        <input type="email" name="email" placeholder="seu@email.com" required>
+                    </label>
+                    <label>
+                        Área de interesse
+                        <select name="area" required>
+                            <option value="">Selecione...</option>
+                            <option>Engenharia Civil</option>
+                            <option>Arquitetura e Urbanismo</option>
+                            <option>Engenharia Elétrica</option>
+                            <option>Engenharia Ambiental</option>
+                            <option>Engenharia Mecânica</option>
+                            <option>Agronomia</option>
+                            <option>Múltiplas áreas</option>
+                        </select>
+                    </label>
+                    <label>
+                        Senha
+                        <input type="password" name="senha" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" required>
+                        <span>Aceito os <a href="#">termos de uso</a> e a <a href="#">política de privacidade</a>.</span>
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-block">Criar conta gratuita</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         TOAST CONTAINER — alertas de notificação
+         ============================================================ -->
+    <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
