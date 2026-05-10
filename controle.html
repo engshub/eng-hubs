@@ -438,9 +438,9 @@ function atualizarHeader(user) {
     avatarEl.textContent = iniciais;
   }
 
-  document.getElementById('btnSair').onclick = async () => {
+  document.getElementById('btnSair').onclick = () => {
     if (confirm('Deseja sair da sua conta?')) {
-      await db.auth.signOut();
+      localStorage.clear();
       window.location.href = 'index.html';
     }
   };
