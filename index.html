@@ -20,6 +20,17 @@
 
         
 
+        /* Saudação do usuário no header */
+        .user-greeting {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1A2E4A;
+            white-space: nowrap;
+        }
+        @media (max-width: 768px) {
+            .user-greeting { display: none !important; }
+        }
+
         /* Link "Minha área" com destaque laranja */
         .nav-desktop .nav-minha-area {
             display: inline-flex;
@@ -71,7 +82,7 @@
  
             <!-- Logo: hexágono com sino (alerta de concurso) -->
             <a href="#" class="logo" aria-label="Engs Hub - Página inicial">
-                <img src="logo1.png" alt="Engs Hub" class="logo-mark" width="40" height="40" style="display:block;">
+                <img src="logo1.jpeg" alt="Engs Hub" class="logo-mark" width="40" height="40" style="display:block;">
                 <div class="logo-text">
                     <span class="logo-title">Engs Hub</span>
                     <span class="logo-subtitle">Concursos</span>
@@ -92,6 +103,8 @@
  
             <!-- Ações do usuário -->
             <div class="header-actions">
+                <!-- Saudação do usuário logado (preenchida via JS) -->
+                <span class="user-greeting" id="user-greeting" style="display:none; font-size:13px; font-weight:500; color:#1A2E4A;"></span>
                 <button class="btn-icon" id="btn-notif" aria-label="Notificações">
                     <i data-lucide="bell"></i>
                     <span class="notif-badge">3</span>
@@ -339,7 +352,7 @@
         <div class="container footer-inner">
             <div class="footer-brand">
                 <a href="#" class="logo logo-footer">
-                    <img src="logo1.png" alt="Engs Hub" width="36" height="36" style="display:block;">
+                    <img src="logo1.jpeg" alt="Engs Hub" width="36" height="36" style="display:block;">
                     <div class="logo-text">
                         <span class="logo-title">Engs Hub</span>
                         <span class="logo-subtitle">Concursos</span>
