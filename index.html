@@ -518,9 +518,20 @@
  
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
  
-    <!-- Supabase SDK -->
+    <!-- Supabase SDK + config inline -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-client.js"></script>
+    <script>
+    const SUPABASE_URL = 'https://zxigimbhdzwhsxvjkzhx.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4aWdpbWJoZHp3aHN4dmpremh4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0MjE1OTIsImV4cCI6MjA5Mzk5NzU5Mn0.8gEJwKv2OPgLyb1M4v7W5opye9EH--x5pXxQ4jK8IHU';
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+    async function getUser() {
+      try { const { data: { user } } = await db.auth.getUser(); return user; } catch(e) { return null; }
+    }
+    function onAuthChange(callback) {
+      db.auth.onAuthStateChange((_event, session) => { callback(session?.user ?? null); });
+    }
+    </script>
     <script src="script.js"></script>
 
     <script>
