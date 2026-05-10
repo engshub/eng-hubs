@@ -535,14 +535,15 @@
             btn.style.background = '#94a3b8';
 
             const params = {
-                name:     document.getElementById('contato-nome').value,
+                nome:     document.getElementById('contato-nome').value,
                 email:    document.getElementById('contato-email').value,
                 title:    document.getElementById('contato-assunto').value,
                 mensagem: document.getElementById('contato-mensagem').value,
+                name:     document.getElementById('contato-nome').value,
             };
 
             try {
-                await emailjs.send('service_gtxy756', 'template_rbhnsuf', params);
+                await emailjs.send('service_gtxy756', 'template_lfznthy', params);
                 document.getElementById('form-contato').style.display = 'none';
                 document.getElementById('contato-sucesso').style.display = 'block';
                 if (window.lucide) window.lucide.createIcons();
