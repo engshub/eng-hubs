@@ -21,17 +21,6 @@
 
         
 
-        /* Saudação do usuário no header */
-        .user-greeting {
-            font-size: 13px;
-            font-weight: 500;
-            color: #1A2E4A;
-            white-space: nowrap;
-        }
-        @media (max-width: 768px) {
-            .user-greeting { display: none !important; }
-        }
-
         /* Link "Minha área" com destaque laranja */
         .nav-desktop .nav-minha-area {
             display: inline-flex;
@@ -104,8 +93,8 @@
  
             <!-- Ações do usuário -->
             <div class="header-actions">
-                <!-- Saudação do usuário logado (preenchida via JS) -->
-                <span class="user-greeting" id="user-greeting" style="display:none; font-size:13px; font-weight:500; color:#1A2E4A;"></span>
+                <!-- Dropdown do usuário logado (preenchido via JS) -->
+                <div id="user-greeting-wrap" style="display:none; position:relative;"></div>
                 <button class="btn-icon" id="btn-notif" aria-label="Notificações">
                     <i data-lucide="bell"></i>
                     <span class="notif-badge">3</span>
