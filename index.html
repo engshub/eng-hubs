@@ -476,7 +476,10 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
     async function getUser() {
-      try { const { data: { user } } = await db.auth.getUser(); return user; } catch(e) { return null; }
+      try {
+        const { data: { session } } = await db.auth.getSession();
+        return session?.user ?? null;
+      } catch(e) { return null; }
     }
     function onAuthChange(callback) {
       db.auth.onAuthStateChange((_event, session) => { callback(session?.user ?? null); });
