@@ -1082,9 +1082,29 @@ let currentUser = null;
 
 // ===== INIT: verificar login =====
 async function init() {
-  currentUser = await getUser();
+  // Tenta sessão local primeiro (sem rede)
+  currentUser = null;
+  try {
+    const { data } = await db.auth.getSession();
+    if (data.session) currentUser = data.session.user;
+  } catch(e) {}
+
+  // Fallback: lê localStorage diretamente
   if (!currentUser) {
-    // Não está logado — redireciona para home e abre modal de login automaticamente
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        try {
+          const val = JSON.parse(localStorage.getItem(key));
+          if (val && val.user && val.user.email) { currentUser = val.user; break; }
+          if (val && val.access_token && val.user) { currentUser = val.user; break; }
+        } catch(e2) {}
+      }
+    } catch(e) {}
+  }
+
+  if (!currentUser) {
     window.location.href = 'index.html?login=1';
     return;
   }
@@ -1109,9 +1129,9 @@ async function init() {
   document.getElementById('dropdownEmail').textContent = currentUser.email;
 
   // Botão sair no dropdown
-  document.getElementById('btnSair').addEventListener('click', async () => {
+  document.getElementById('btnSair').addEventListener('click', () => {
     if (confirm('Deseja sair da sua conta?')) {
-      await db.auth.signOut();
+      localStorage.clear();
       window.location.href = 'index.html';
     }
   });
