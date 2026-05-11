@@ -6,10 +6,12 @@
     <meta name="description" content="Engs Hub - Portal de concursos públicos para Engenheiros e Arquitetos. Editais, prazos e notificações em um só lugar.">
     <title>Engs Hub — Concursos de Engenharia e Arquitetura</title>
  
+    <!-- Tipografia: Inter (corpo) + Montserrat (títulos) conforme identidade da marca -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
  
+    <!-- Ícones (Lucide via CDN) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
  
@@ -17,6 +19,10 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
+
+        
+
+        /* Link "Minha área" com destaque laranja */
         .nav-desktop .nav-minha-area {
             display: inline-flex;
             align-items: center;
@@ -59,8 +65,13 @@
 </head>
 <body>
  
+    <!-- ============================================================
+         HEADER / NAVEGAÇÃO PRINCIPAL
+         ============================================================ -->
     <header class="header" id="header">
         <div class="container header-inner">
+ 
+            <!-- Logo: hexágono com sino (alerta de concurso) -->
             <a href="#" class="logo" aria-label="Engs Hub - Página inicial">
                 <img src="logo1.jpeg" alt="Engs Hub" class="logo-mark" width="40" height="40" style="display:block;">
                 <div class="logo-text">
@@ -69,18 +80,22 @@
                 </div>
             </a>
  
+            <!-- Navegação desktop -->
             <nav class="nav-desktop" aria-label="Navegação principal">
                 <a href="#concursos">Concursos</a>
                 <a href="#previstos">Previstos</a>
                 <a href="#noticias">Notícias</a>
                 <a href="#sobre">Sobre</a>
                 <a href="#contato">Contato</a>
+                <!-- Link para a Área do Usuário -->
                 <a href="controle.html" class="nav-minha-area">
                     <i data-lucide="layout-dashboard"></i> Minha área
                 </a>
             </nav>
  
+            <!-- Ações do usuário -->
             <div class="header-actions">
+                <!-- Dropdown do usuário logado (preenchido via JS) -->
                 <div id="user-greeting-wrap" style="display:none; position:relative;"></div>
                 <button class="btn-icon" id="btn-notif" aria-label="Notificações">
                     <i data-lucide="bell"></i>
@@ -88,18 +103,22 @@
                 </button>
                 <button class="btn btn-ghost" data-modal-open="login">Entrar</button>
                 <button class="btn btn-primary" data-modal-open="cadastro">Cadastrar</button>
+ 
+                <!-- Botão de menu mobile (hamburger) -->
                 <button class="btn-icon btn-menu-mobile" id="btn-menu" aria-label="Abrir menu" aria-expanded="false">
                     <i data-lucide="menu"></i>
                 </button>
             </div>
         </div>
  
+        <!-- Menu mobile (oculto por padrão, expandido via JS) -->
         <nav class="nav-mobile" id="nav-mobile" aria-label="Navegação mobile">
             <a href="#concursos">Concursos</a>
             <a href="#previstos">Previstos</a>
             <a href="#noticias">Notícias</a>
             <a href="#sobre">Sobre</a>
             <a href="#contato">Contato</a>
+            <!-- Link para a Área do Usuário no mobile -->
             <a href="controle.html" class="nav-minha-area-mobile">
                 <i data-lucide="layout-dashboard"></i> Minha área
             </a>
@@ -109,6 +128,9 @@
         </nav>
     </header>
  
+    <!-- ============================================================
+         HERO — Apresentação direta. Tom de voz: sem enrolação.
+         ============================================================ -->
     <section class="hero">
         <div class="container hero-inner">
             <div class="hero-content">
@@ -124,6 +146,7 @@
                     Acompanhe os concursos que importam e receba notificação na hora da publicação.
                 </p>
  
+                <!-- Barra de busca principal -->
                 <form class="search-bar" id="search-form" role="search">
                     <i data-lucide="search" class="search-icon"></i>
                     <input
@@ -135,6 +158,7 @@
                     <button type="submit" class="btn btn-primary">Buscar</button>
                 </form>
  
+                <!-- Filtros rápidos (chips) -->
                 <div class="quick-filters" role="group" aria-label="Filtros rápidos">
                     <button class="chip chip-active" data-filter="todos">Todos</button>
                     <button class="chip" data-filter="engenharia-civil">Engenharia Civil</button>
@@ -145,6 +169,7 @@
                 </div>
             </div>
  
+            <!-- Card lateral de estatísticas (KPIs) -->
             <aside class="hero-stats" aria-label="Estatísticas do portal">
                 <div class="stat">
                     <span class="stat-num">147</span>
@@ -166,6 +191,9 @@
         </div>
     </section>
  
+    <!-- ============================================================
+         SEÇÃO PRINCIPAL — LISTA DE CONCURSOS ABERTOS
+         ============================================================ -->
     <main class="main">
         <section class="section" id="concursos">
             <div class="container">
@@ -184,7 +212,9 @@
                     </div>
                 </header>
  
-                <div class="cards-grid" id="cards-grid"></div>
+                <div class="cards-grid" id="cards-grid">
+                    <!-- Cards inseridos via JavaScript -->
+                </div>
  
                 <div class="empty-state hidden" id="empty-state">
                     <i data-lucide="search-x"></i>
@@ -194,6 +224,9 @@
             </div>
         </section>
  
+        <!-- ============================================================
+             SEÇÃO — CONCURSOS PREVISTOS (Pré-edital)
+             ============================================================ -->
         <section class="section section-alt" id="previstos">
             <div class="container">
                 <header class="section-header">
@@ -204,6 +237,7 @@
                 </header>
  
                 <div class="forecast-grid">
+ 
                     <article class="forecast-card">
                         <div class="forecast-status status-iminente">
                             <i data-lucide="alert-circle"></i> Edital iminente
@@ -251,10 +285,14 @@
                             <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
                         </button>
                     </article>
+ 
                 </div>
             </div>
         </section>
  
+        <!-- ============================================================
+             CTA — Cadastro para receber notificações
+             ============================================================ -->
         <section class="cta-section">
             <div class="container cta-inner">
                 <div class="cta-content">
@@ -267,6 +305,9 @@
             </div>
         </section>
  
+        <!-- ============================================================
+             SEÇÃO — Como funciona / Sobre
+             ============================================================ -->
         <section class="section" id="sobre">
             <div class="container">
                 <header class="section-header section-header-center">
@@ -296,6 +337,7 @@
             </div>
         </section>
 
+        <!-- SEÇÃO CONTATO -->
         <section class="section section-alt" id="contato">
             <div class="container">
                 <header class="section-header section-header-center">
@@ -348,8 +390,12 @@
                 </div>
             </div>
         </section>
+
     </main>
  
+    <!-- ============================================================
+         FOOTER
+         ============================================================ -->
     <footer class="footer">
         <div class="container footer-inner">
             <div class="footer-brand">
@@ -381,6 +427,7 @@
                     <h4>Conta</h4>
                     <a href="#" data-modal-open="login">Entrar</a>
                     <a href="#" data-modal-open="cadastro">Cadastrar</a>
+                    <!-- Link para área do usuário no footer -->
                     <a href="controle.html">Minha área</a>
                 </div>
             </div>
@@ -397,6 +444,9 @@
         </div>
     </footer>
  
+    <!-- ============================================================
+         MODAL — Login / Cadastro
+         ============================================================ -->
     <div class="modal-overlay" id="modal" aria-hidden="true">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <button class="modal-close" id="modal-close" aria-label="Fechar">
@@ -468,18 +518,15 @@
  
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
  
-    <!-- Supabase SDK + config inline — NOVO PROJETO -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+    <!-- Supabase SDK + config inline -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-    const SUPABASE_URL = 'https://irkwrupzfrazvthlsejy.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_stmwg_VqNUihgFMThh746w_3xSdvOWQ';
+    const SUPABASE_URL = 'https://xyvsiihpdfgnihgomdntb.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnNpaHBkZmduaWhnb21kbnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NDE3MjMsImV4cCI6MjA5NDAxNzcyM30.k5-B3_7ZtZoXMYU8RNax7_6JHA4Z_O2ZGn7whlQd_IM';
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_KEY);
     async function getUser() {
-      try {
-        const { data: { session } } = await db.auth.getSession();
-        return session?.user ?? null;
-      } catch(e) { return null; }
+      try { const { data: { user } } = await db.auth.getUser(); return user; } catch(e) { return null; }
     }
     function onAuthChange(callback) {
       db.auth.onAuthStateChange((_event, session) => { callback(session?.user ?? null); });
@@ -488,6 +535,7 @@
     <script src="script.js"></script>
 
     <script>
+        // ===== EMAILJS — Formulário de contato =====
         emailjs.init('BMAYYHY62IGL2pJey');
 
         document.getElementById('form-contato').addEventListener('submit', async function(e) {
