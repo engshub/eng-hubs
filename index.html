@@ -471,7 +471,7 @@
                         Senha
                         <input type="password" name="senha" placeholder="••••••••" required>
                     </label>
-                    <a href="#" class="modal-link" id="link-esqueci" onclick="event.preventDefault();event.stopPropagation();var login=document.getElementById('modal');if(login){login.classList.remove('is-open');login.setAttribute('aria-hidden','true');document.body.style.overflow='';}var m=document.getElementById('modal-reset');m.style.cssText='display:flex !important;position:fixed !important;inset:0 !important;background:rgba(0,0,0,0.5) !important;z-index:999999 !important;align-items:center !important;justify-content:center !important;visibility:visible !important;opacity:1 !important;';document.body.style.overflow='hidden';">Esqueci minha senha</a>
+                    <a href="#" class="modal-link" id="link-esqueci">Esqueci minha senha</a>
                     <button type="submit" class="btn btn-primary btn-block">Entrar</button>
                 </form>
             </div>
@@ -596,77 +596,71 @@
 
 
     <script>
-    // Recuperação de senha
+    // Recuperação de senha — usa mesma lógica do modal de login (classe is-open)
     (function() {
-        const linkEsqueci = document.getElementById('link-esqueci');
-        const modalReset  = document.getElementById('modal-reset');
-        const btnClose    = document.getElementById('modal-reset-close');
-        const formReset   = document.getElementById('form-reset');
-        const btnSubmit   = document.getElementById('btn-reset-submit');
-        const sucesso     = document.getElementById('reset-sucesso');
+        var linkEsqueci = document.getElementById('link-esqueci');
+        var modalReset  = document.getElementById('modal-reset');
+        var modalLogin  = document.getElementById('modal');
 
-        if (linkEsqueci) {
-            linkEsqueci.addEventListener('click', function(e) {
-                e.preventDefault();
-                // Pré-preenche com e-mail digitado no login se houver
-                const emailLogin = document.querySelector('#form-login input[name="email"]');
-                if (emailLogin && emailLogin.value) {
-                    document.getElementById('reset-email').value = emailLogin.value;
-                }
-                modalReset.style.display = 'flex';
-                modalReset.setAttribute('aria-hidden', 'false');
-                document.getElementById('reset-email').focus();
-            });
-        }
+        if (!linkEsqueci || !modalReset) return;
 
-        if (btnClose) {
-            btnClose.addEventListener('click', function() {
-                modalReset.style.display = 'none';
-                formReset.style.display = 'block';
-                sucesso.style.display = 'none';
-                document.getElementById('reset-email').value = '';
-            });
-        }
+        linkEsqueci.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            // Fecha modal de login
+            if (modalLogin) {
+                modalLogin.classList.remove('is-open');
+                modalLogin.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            }
+            // Pré-preenche e-mail se digitado
+            var emailInput = document.querySelector('#form-login input[name="email"]');
+            if (emailInput && emailInput.value) {
+                document.getElementById('reset-email').value = emailInput.value;
+            }
+            // Abre modal de reset com is-open
+            modalReset.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            setTimeout(function() { document.getElementById('reset-email').focus(); }, 100);
+        });
+
+        // Fechar modal reset
+        document.getElementById('modal-reset-close').addEventListener('click', function() {
+            modalReset.classList.remove('is-open');
+            document.body.style.overflow = '';
+        });
 
         modalReset.addEventListener('click', function(e) {
             if (e.target === modalReset) {
-                modalReset.style.display = 'none';
-                formReset.style.display = 'block';
-                sucesso.style.display = 'none';
+                modalReset.classList.remove('is-open');
+                document.body.style.overflow = '';
             }
         });
 
-        if (formReset) {
-            formReset.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                const email = document.getElementById('reset-email').value.trim();
-                if (!email) return;
+        // Enviar e-mail de recuperação
+        document.getElementById('form-reset').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            var email = document.getElementById('reset-email').value.trim();
+            var btn   = document.getElementById('btn-reset-submit');
+            if (!email) return;
 
-                btnSubmit.textContent = 'Enviando...';
-                btnSubmit.disabled = true;
+            btn.textContent = 'Enviando...';
+            btn.disabled = true;
 
-                try {
-                    const { error } = await db.auth.resetPasswordForEmail(email, {
-                        redirectTo: 'https://engshub.com.br/controle.html'
-                    });
-
-                    if (error) {
-                        btnSubmit.textContent = 'Enviar link de recuperação';
-                        btnSubmit.disabled = false;
-                        alert('Erro: ' + error.message);
-                        return;
-                    }
-
-                    formReset.style.display = 'none';
-                    sucesso.style.display = 'block';
-                } catch(err) {
-                    btnSubmit.textContent = 'Enviar link de recuperação';
-                    btnSubmit.disabled = false;
-                    alert('Erro ao enviar e-mail. Tente novamente.');
-                }
-            });
-        }
-    });
+            try {
+                var result = await db.auth.resetPasswordForEmail(email, {
+                    redirectTo: 'https://engshub.com.br/controle.html'
+                });
+                if (result.error) throw result.error;
+                document.getElementById('form-reset').style.display = 'none';
+                document.getElementById('reset-sucesso').style.display = 'block';
+            } catch(err) {
+                btn.textContent = 'Enviar link de recuperação';
+                btn.disabled = false;
+                alert('Erro: ' + (err.message || 'Tente novamente.'));
+            }
+        });
+    })();
     </script>
 
 </body>
