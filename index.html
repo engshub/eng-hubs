@@ -471,7 +471,7 @@
                         Senha
                         <input type="password" name="senha" placeholder="••••••••" required>
                     </label>
-                    <a href="#" class="modal-link">Esqueci minha senha</a>
+                    <a href="#" class="modal-link" id="link-esqueci">Esqueci minha senha</a>
                     <button type="submit" class="btn btn-primary btn-block">Entrar</button>
                 </form>
             </div>
@@ -516,6 +516,32 @@
         </div>
     </div>
  
+
+    <!-- MODAL RECUPERAR SENHA -->
+    <div class="modal-overlay" id="modal-reset" aria-hidden="true" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+      <div class="modal" role="dialog" style="max-width:400px;">
+        <button class="modal-close" id="modal-reset-close" aria-label="Fechar" style="position:absolute;top:16px;right:16px;">
+          <i data-lucide="x"></i>
+        </button>
+        <div style="margin-bottom:20px;">
+          <h2 class="modal-title">Recuperar senha</h2>
+          <p class="modal-subtitle">Digite seu e-mail e enviaremos um link para redefinir sua senha.</p>
+        </div>
+        <form id="form-reset">
+          <label style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+            E-mail
+            <input type="email" id="reset-email" placeholder="seu@email.com" required
+              style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:Inter,sans-serif;outline:none;">
+          </label>
+          <button type="submit" class="btn btn-primary btn-block" id="btn-reset-submit">Enviar link de recuperação</button>
+        </form>
+        <div id="reset-sucesso" style="display:none;text-align:center;padding:20px 0;">
+          <p style="color:#16a34a;font-weight:500;">✅ E-mail enviado!</p>
+          <p style="color:#475569;font-size:13px;margin-top:8px;">Verifique sua caixa de entrada e clique no link para redefinir sua senha.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
  
     <!-- Supabase SDK + config inline -->
@@ -566,6 +592,81 @@
                 alert('Erro ao enviar. Tente novamente.');
             }
         });
+    </script>
+
+
+    <script>
+    // Recuperação de senha
+    document.addEventListener('DOMContentLoaded', function() {
+        const linkEsqueci = document.getElementById('link-esqueci');
+        const modalReset  = document.getElementById('modal-reset');
+        const btnClose    = document.getElementById('modal-reset-close');
+        const formReset   = document.getElementById('form-reset');
+        const btnSubmit   = document.getElementById('btn-reset-submit');
+        const sucesso     = document.getElementById('reset-sucesso');
+
+        if (linkEsqueci) {
+            linkEsqueci.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Pré-preenche com e-mail digitado no login se houver
+                const emailLogin = document.querySelector('#form-login input[name="email"]');
+                if (emailLogin && emailLogin.value) {
+                    document.getElementById('reset-email').value = emailLogin.value;
+                }
+                modalReset.style.display = 'flex';
+                modalReset.setAttribute('aria-hidden', 'false');
+                document.getElementById('reset-email').focus();
+            });
+        }
+
+        if (btnClose) {
+            btnClose.addEventListener('click', function() {
+                modalReset.style.display = 'none';
+                formReset.style.display = 'block';
+                sucesso.style.display = 'none';
+                document.getElementById('reset-email').value = '';
+            });
+        }
+
+        modalReset.addEventListener('click', function(e) {
+            if (e.target === modalReset) {
+                modalReset.style.display = 'none';
+                formReset.style.display = 'block';
+                sucesso.style.display = 'none';
+            }
+        });
+
+        if (formReset) {
+            formReset.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const email = document.getElementById('reset-email').value.trim();
+                if (!email) return;
+
+                btnSubmit.textContent = 'Enviando...';
+                btnSubmit.disabled = true;
+
+                try {
+                    const { error } = await db.auth.resetPasswordForEmail(email, {
+                        redirectTo: 'https://engshub.com.br/controle.html'
+                    });
+
+                    if (error) {
+                        btnSubmit.textContent = 'Enviar link de recuperação';
+                        btnSubmit.disabled = false;
+                        alert('Erro: ' + error.message);
+                        return;
+                    }
+
+                    formReset.style.display = 'none';
+                    sucesso.style.display = 'block';
+                } catch(err) {
+                    btnSubmit.textContent = 'Enviar link de recuperação';
+                    btnSubmit.disabled = false;
+                    alert('Erro ao enviar e-mail. Tente novamente.');
+                }
+            });
+        }
+    });
     </script>
 
 </body>
