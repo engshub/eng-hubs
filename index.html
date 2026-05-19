@@ -471,7 +471,7 @@
                         Senha
                         <input type="password" name="senha" placeholder="••••••••" required>
                     </label>
-                    <a href="#" class="modal-link" id="link-esqueci" onclick="event.preventDefault();event.stopPropagation();var m=document.getElementById('modal-reset');m.style.display='flex';m.style.zIndex='999999';">Esqueci minha senha</a>
+                    <a href="#" class="modal-link" id="link-esqueci" onclick="event.preventDefault();event.stopPropagation();var login=document.getElementById('modal');if(login){login.classList.remove('is-open');login.setAttribute('aria-hidden','true');document.body.style.overflow='';}var m=document.getElementById('modal-reset');m.style.display='flex';m.style.zIndex='999999';">Esqueci minha senha</a>
                     <button type="submit" class="btn btn-primary btn-block">Entrar</button>
                 </form>
             </div>
