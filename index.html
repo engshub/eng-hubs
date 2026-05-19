@@ -6,12 +6,10 @@
     <meta name="description" content="Engs Hub - Portal de concursos públicos para Engenheiros e Arquitetos. Editais, prazos e notificações em um só lugar.">
     <title>Engs Hub — Concursos de Engenharia e Arquitetura</title>
  
-    <!-- Tipografia: Inter (corpo) + Montserrat (títulos) conforme identidade da marca -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
  
-    <!-- Ícones (Lucide via CDN) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
  
@@ -19,10 +17,6 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-
-        
-
-        /* Link "Minha área" com destaque laranja */
         .nav-desktop .nav-minha-area {
             display: inline-flex;
             align-items: center;
@@ -65,13 +59,9 @@
 </head>
 <body>
  
-    <!-- ============================================================
-         HEADER / NAVEGAÇÃO PRINCIPAL
-         ============================================================ -->
     <header class="header" id="header">
         <div class="container header-inner">
  
-            <!-- Logo: hexágono com sino (alerta de concurso) -->
             <a href="#" class="logo" aria-label="Engs Hub - Página inicial">
                 <img src="logo1.jpeg" alt="Engs Hub" class="logo-mark" width="40" height="40" style="display:block;">
                 <div class="logo-text">
@@ -80,22 +70,18 @@
                 </div>
             </a>
  
-            <!-- Navegação desktop -->
             <nav class="nav-desktop" aria-label="Navegação principal">
                 <a href="#concursos">Concursos</a>
                 <a href="#previstos">Previstos</a>
                 <a href="#noticias">Notícias</a>
                 <a href="#sobre">Sobre</a>
                 <a href="#contato">Contato</a>
-                <!-- Link para a Área do Usuário -->
                 <a href="controle.html" class="nav-minha-area">
                     <i data-lucide="layout-dashboard"></i> Minha área
                 </a>
             </nav>
  
-            <!-- Ações do usuário -->
             <div class="header-actions">
-                <!-- Dropdown do usuário logado (preenchido via JS) -->
                 <div id="user-greeting-wrap" style="display:none; position:relative;"></div>
                 <button class="btn-icon" id="btn-notif" aria-label="Notificações">
                     <i data-lucide="bell"></i>
@@ -104,21 +90,18 @@
                 <button class="btn btn-ghost" data-modal-open="login">Entrar</button>
                 <button class="btn btn-primary" data-modal-open="cadastro">Cadastrar</button>
  
-                <!-- Botão de menu mobile (hamburger) -->
                 <button class="btn-icon btn-menu-mobile" id="btn-menu" aria-label="Abrir menu" aria-expanded="false">
                     <i data-lucide="menu"></i>
                 </button>
             </div>
         </div>
  
-        <!-- Menu mobile (oculto por padrão, expandido via JS) -->
         <nav class="nav-mobile" id="nav-mobile" aria-label="Navegação mobile">
             <a href="#concursos">Concursos</a>
             <a href="#previstos">Previstos</a>
             <a href="#noticias">Notícias</a>
             <a href="#sobre">Sobre</a>
             <a href="#contato">Contato</a>
-            <!-- Link para a Área do Usuário no mobile -->
             <a href="controle.html" class="nav-minha-area-mobile">
                 <i data-lucide="layout-dashboard"></i> Minha área
             </a>
@@ -128,9 +111,6 @@
         </nav>
     </header>
  
-    <!-- ============================================================
-         HERO — Apresentação direta. Tom de voz: sem enrolação.
-         ============================================================ -->
     <section class="hero">
         <div class="container hero-inner">
             <div class="hero-content">
@@ -146,7 +126,6 @@
                     Acompanhe os concursos que importam e receba notificação na hora da publicação.
                 </p>
  
-                <!-- Barra de busca principal -->
                 <form class="search-bar" id="search-form" role="search">
                     <i data-lucide="search" class="search-icon"></i>
                     <input
@@ -158,7 +137,6 @@
                     <button type="submit" class="btn btn-primary">Buscar</button>
                 </form>
  
-                <!-- Filtros rápidos (chips) -->
                 <div class="quick-filters" role="group" aria-label="Filtros rápidos">
                     <button class="chip chip-active" data-filter="todos">Todos</button>
                     <button class="chip" data-filter="engenharia-civil">Engenharia Civil</button>
@@ -169,7 +147,6 @@
                 </div>
             </div>
  
-            <!-- Card lateral de estatísticas (KPIs) -->
             <aside class="hero-stats" aria-label="Estatísticas do portal">
                 <div class="stat">
                     <span class="stat-num">147</span>
@@ -191,9 +168,6 @@
         </div>
     </section>
  
-    <!-- ============================================================
-         SEÇÃO PRINCIPAL — LISTA DE CONCURSOS ABERTOS
-         ============================================================ -->
     <main class="main">
         <section class="section" id="concursos">
             <div class="container">
@@ -212,9 +186,7 @@
                     </div>
                 </header>
  
-                <div class="cards-grid" id="cards-grid">
-                    <!-- Cards inseridos via JavaScript -->
-                </div>
+                <div class="cards-grid" id="cards-grid"></div>
  
                 <div class="empty-state hidden" id="empty-state">
                     <i data-lucide="search-x"></i>
@@ -224,9 +196,6 @@
             </div>
         </section>
  
-        <!-- ============================================================
-             SEÇÃO — CONCURSOS PREVISTOS (Pré-edital)
-             ============================================================ -->
         <section class="section section-alt" id="previstos">
             <div class="container">
                 <header class="section-header">
@@ -290,9 +259,6 @@
             </div>
         </section>
  
-        <!-- ============================================================
-             CTA — Cadastro para receber notificações
-             ============================================================ -->
         <section class="cta-section">
             <div class="container cta-inner">
                 <div class="cta-content">
@@ -305,9 +271,6 @@
             </div>
         </section>
  
-        <!-- ============================================================
-             SEÇÃO — Como funciona / Sobre
-             ============================================================ -->
         <section class="section" id="sobre">
             <div class="container">
                 <header class="section-header section-header-center">
@@ -337,7 +300,6 @@
             </div>
         </section>
 
-        <!-- SEÇÃO CONTATO -->
         <section class="section section-alt" id="contato">
             <div class="container">
                 <header class="section-header section-header-center">
@@ -393,9 +355,6 @@
 
     </main>
  
-    <!-- ============================================================
-         FOOTER
-         ============================================================ -->
     <footer class="footer">
         <div class="container footer-inner">
             <div class="footer-brand">
@@ -427,7 +386,6 @@
                     <h4>Conta</h4>
                     <a href="#" data-modal-open="login">Entrar</a>
                     <a href="#" data-modal-open="cadastro">Cadastrar</a>
-                    <!-- Link para área do usuário no footer -->
                     <a href="controle.html">Minha área</a>
                 </div>
             </div>
@@ -444,9 +402,7 @@
         </div>
     </footer>
  
-    <!-- ============================================================
-         MODAL — Login / Cadastro
-         ============================================================ -->
+    <!-- MODAL Login / Cadastro -->
     <div class="modal-overlay" id="modal" aria-hidden="true">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <button class="modal-close" id="modal-close" aria-label="Fechar">
@@ -515,36 +471,36 @@
             </div>
         </div>
     </div>
- 
 
-    <!-- MODAL RECUPERAR SENHA -->
-    <div class="modal-overlay" id="modal-reset" aria-hidden="true" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;align-items:center;justify-content:center;">
+    <!-- MODAL Recuperar Senha — SEM display:none inline (correção do bug) -->
+    <div class="modal-overlay" id="modal-reset" aria-hidden="true">
       <div class="modal" role="dialog" style="max-width:400px;">
-        <button class="modal-close" id="modal-reset-close" aria-label="Fechar" style="position:absolute;top:16px;right:16px;">
+        <button class="modal-close" id="modal-reset-close" aria-label="Fechar">
           <i data-lucide="x"></i>
         </button>
-        <div style="margin-bottom:20px;">
+        <div style="padding:32px 32px 0;">
           <h2 class="modal-title">Recuperar senha</h2>
           <p class="modal-subtitle">Digite seu e-mail e enviaremos um link para redefinir sua senha.</p>
         </div>
-        <form id="form-reset">
-          <label style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
-            E-mail
-            <input type="email" id="reset-email" placeholder="seu@email.com" required
-              style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:Inter,sans-serif;outline:none;">
-          </label>
-          <button type="submit" class="btn btn-primary btn-block" id="btn-reset-submit">Enviar link de recuperação</button>
-        </form>
-        <div id="reset-sucesso" style="display:none;text-align:center;padding:20px 0;">
-          <p style="color:#16a34a;font-weight:500;">✅ E-mail enviado!</p>
-          <p style="color:#475569;font-size:13px;margin-top:8px;">Verifique sua caixa de entrada e clique no link para redefinir sua senha.</p>
+        <div style="padding:0 32px 32px;">
+          <form id="form-reset" class="modal-form">
+            <label>
+              E-mail
+              <input type="email" id="reset-email" placeholder="seu@email.com" required>
+            </label>
+            <button type="submit" class="btn btn-primary btn-block" id="btn-reset-submit">Enviar link de recuperação</button>
+          </form>
+          <div id="reset-sucesso" style="display:none;text-align:center;padding:20px 0;">
+            <p style="color:#16a34a;font-weight:500;">✅ E-mail enviado!</p>
+            <p style="color:#475569;font-size:13px;margin-top:8px;">Verifique sua caixa de entrada e clique no link para redefinir sua senha.</p>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
  
-    <!-- Supabase SDK + config inline -->
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
     const SUPABASE_URL = 'https://xyvsihpdfgnihgomdntb.supabase.co';
@@ -561,7 +517,7 @@
     <script src="script.js"></script>
 
     <script>
-        // ===== EMAILJS — Formulário de contato =====
+        // EmailJS — Formulário de contato
         emailjs.init('BMAYYHY62IGL2pJey');
 
         document.getElementById('form-contato').addEventListener('submit', async function(e) {
@@ -594,9 +550,8 @@
         });
     </script>
 
-
     <script>
-    // Recuperação de senha — usa mesma lógica do modal de login (classe is-open)
+    // Recuperação de senha
     (function() {
         var linkEsqueci = document.getElementById('link-esqueci');
         var modalReset  = document.getElementById('modal-reset');
@@ -618,8 +573,9 @@
             if (emailInput && emailInput.value) {
                 document.getElementById('reset-email').value = emailInput.value;
             }
-            // Abre modal de reset com is-open
+            // Abre modal de reset
             modalReset.classList.add('is-open');
+            modalReset.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
             setTimeout(function() { document.getElementById('reset-email').focus(); }, 100);
         });
@@ -627,17 +583,19 @@
         // Fechar modal reset
         document.getElementById('modal-reset-close').addEventListener('click', function() {
             modalReset.classList.remove('is-open');
+            modalReset.setAttribute('aria-hidden', 'true');
             document.body.style.overflow = '';
         });
 
         modalReset.addEventListener('click', function(e) {
             if (e.target === modalReset) {
                 modalReset.classList.remove('is-open');
+                modalReset.setAttribute('aria-hidden', 'true');
                 document.body.style.overflow = '';
             }
         });
 
-        // Enviar e-mail de recuperação
+        // Enviar e-mail de recuperação via Supabase
         document.getElementById('form-reset').addEventListener('submit', async function(e) {
             e.preventDefault();
             var email = document.getElementById('reset-email').value.trim();
