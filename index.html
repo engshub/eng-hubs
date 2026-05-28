@@ -627,6 +627,7 @@
   (function(){
     'use strict';
     var SUPABASE_URL = 'https://xyvsihpdfgnihgomdntb.supabase.co';
+    var db = null;
 
     function fmtBRL(v){
       if(v == null || v === '') return '—';
@@ -668,6 +669,11 @@
       art.className = 'card';
       art.setAttribute('data-id', c.id);
       art.setAttribute('data-area', c.area || '');
+      art.setAttribute('data-c', JSON.stringify({
+        orgao: c.orgao || '', cargo: c.cargo || '', banca: c.banca || '',
+        vagas: (c.vagas != null ? c.vagas : 0), salario: (c.salario != null ? String(c.salario) : ''),
+        data_inscricao: c.inscricoes_ate || null
+      }));
       var st = statusInfo(c);
       art.innerHTML =
         '<div class="card-header">' +
@@ -708,7 +714,7 @@
           if(m) key = m[0];
         }catch(e){}
         if(!key) return;
-        var db = window.supabase.createClient(SUPABASE_URL, key);
+        db = window.supabase.createClient(SUPABASE_URL, key);
         var r = await db.from('concursos').select('*').order('created_at', {ascending:false});
         if(r.error || !r.data || !r.data.length) return;
         var grid = document.getElementById('cards-grid');
@@ -718,11 +724,73 @@
         var frag = document.createDocumentFragment();
         r.data.forEach(function(c){ frag.appendChild(buildCard(c)); });
         grid.appendChild(frag);
+        // Liga o botão 'Acompanhar' à Minha área (controle_concursos)
+        if(!grid.__watchBound){
+          grid.__watchBound = true;
+          grid.addEventListener('click', function(ev){
+            var btn = ev.target.closest('.btn-watch');
+            if(!btn) return;
+            ev.preventDefault();
+            acompanhar(btn);
+          });
+        }
         if(window.lucide && window.lucide.createIcons){ try{ window.lucide.createIcons(); }catch(e){} }
       }catch(e){ /* silencioso: mantém os cards estáticos */ }
     }
 
-    if(document.readyState === 'loading'){
+    function showAviso(msg, tipo){
+      var d = document.createElement('div');
+      d.textContent = msg;
+      d.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'+(tipo==='erro'?'#d9483b':(tipo==='ok'?'#1f9d57':'#1A2E4A'))+';color:#fff;padding:13px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:99999;';
+      document.body.appendChild(d);
+      setTimeout(function(){ d.style.transition='opacity .3s'; d.style.opacity='0'; setTimeout(function(){ d.remove(); }, 320); }, 2600);
+    }
+    async function acompanhar(btn){
+      try{
+        await getDbReady();
+        if(!db){ showAviso('Não foi possível conectar. Tente novamente.', 'erro'); return; }
+        var sess = await db.auth.getUser();
+        var user = sess && sess.data ? sess.data.user : null;
+        if(!user){
+          showAviso('Faça login para acompanhar este concurso.', 'erro');
+          setTimeout(function(){ location.href = 'controle.html'; }, 1200);
+          return;
+        }
+        var card = btn.closest('.card');
+        var data = {};
+        try{ data = JSON.parse(card.getAttribute('data-c') || '{}'); }catch(e){}
+        // Evita duplicar: verifica se já acompanha esse órgão+cargo
+        var ex = await db.from('controle_concursos').select('id').eq('user_id', user.id).eq('orgao', data.orgao).eq('cargo', data.cargo).limit(1);
+        if(ex.data && ex.data.length){ showAviso('Você já está acompanhando este concurso.'); return; }
+        var registro = {
+          user_id: user.id,
+          orgao: data.orgao || '',
+          cargo: data.cargo || '',
+          banca: data.banca || '',
+          vagas: data.vagas || 0,
+          salario: data.salario || '',
+          data_inscricao: data.data_inscricao || null,
+          situacao: 'nao'
+        };
+        btn.disabled = true;
+        var r = await db.from('controle_concursos').insert([registro]);
+        btn.disabled = false;
+        if(r.error){ showAviso('Erro ao acompanhar: ' + r.error.message, 'erro'); return; }
+        btn.textContent = 'Acompanhando ✓';
+        btn.classList.add('btn-watching');
+        showAviso('Adicionado à sua Minha área!', 'ok');
+      }catch(e){ showAviso('Erro inesperado ao acompanhar.', 'erro'); }
+    }
+    // garante que o db (anon) está pronto, reaproveitando a key pública
+    async function getDbReady(){
+      if(db) return;
+      try{
+        var t = await fetch('controle.html', {cache:'no-store'}).then(function(r){return r.text();});
+        var m = t.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
+        if(m && window.supabase){ db = window.supabase.createClient(SUPABASE_URL, m[0]); }
+      }catch(e){}
+    }
+        if(document.readyState === 'loading'){
       document.addEventListener('DOMContentLoaded', function(){ setTimeout(loadDynamic, 300); });
     } else {
       setTimeout(loadDynamic, 300);
