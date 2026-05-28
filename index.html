@@ -692,7 +692,7 @@
         '</div>' +
         '<div class="card-actions">' +
           '<button class="btn btn-outline btn-watch" data-watch-id="' + esc(c.id) + '">Acompanhar</button>' +
-          '<button class="btn-details" data-details-id="' + esc(c.id) + '">Detalhes</button>' +
+          (c.link_edital ? '<a class="btn-details" href="' + esc(c.link_edital) + '" target="_blank" rel="noopener">Ver edital</a>' : '<button class="btn-details" data-details-id="' + esc(c.id) + '">Detalhes</button>') +
         '</div>';
       return art;
     }
@@ -713,9 +713,11 @@
         if(r.error || !r.data || !r.data.length) return;
         var grid = document.getElementById('cards-grid');
         if(!grid) return;
+        // Home passa a exibir SOMENTE os concursos do banco (sem duplicar os estáticos)
+        grid.innerHTML = '';
         var frag = document.createDocumentFragment();
         r.data.forEach(function(c){ frag.appendChild(buildCard(c)); });
-        grid.insertBefore(frag, grid.firstChild);
+        grid.appendChild(frag);
         if(window.lucide && window.lucide.createIcons){ try{ window.lucide.createIcons(); }catch(e){} }
       }catch(e){ /* silencioso: mantém os cards estáticos */ }
     }
