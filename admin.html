@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin — Engs Hub</title>
+<link rel="icon" type="image/jpeg" href="logo1.jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --azul:#1A2E4A; --laranja:#F4801A; --cinza:#F5F5F5;
+    --borda:#e3e7ee; --texto:#2b3banc; --ok:#1f9d57; --erro:#d9483b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--cinza);color:#1f2937;}
+  a{color:inherit}
+  .topbar{background:var(--azul);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .topbar .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;}
+  .topbar .brand img{height:34px;width:34px;border-radius:8px;object-fit:cover;}
+  .topbar .right{display:flex;align-items:center;gap:14px;font-size:14px;}
+  .btn{cursor:pointer;border:none;border-radius:8px;font-weight:600;font-family:inherit;font-size:14px;padding:10px 16px;transition:.15s;}
+  .btn-primary{background:var(--laranja);color:#fff;}
+  .btn-primary:hover{filter:brightness(.95)}
+  .btn-ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);}
+  .btn-danger{background:var(--erro);color:#fff;}
+  .btn-sm{padding:6px 10px;font-size:13px;}
+  .wrap{max-width:1100px;margin:28px auto;padding:0 20px;}
+  .gate{max-width:440px;margin:80px auto;background:#fff;border:1px solid var(--borda);border-radius:14px;padding:32px;text-align:center;}
+  .gate h1{color:var(--azul);font-size:22px;margin-bottom:8px;}
+  .gate p{color:#6b7280;font-size:14px;margin-bottom:20px;}
+  .card{background:#fff;border:1px solid var(--borda);border-radius:14px;padding:24px;margin-bottom:24px;}
+  .card h2{color:var(--azul);font-size:18px;margin-bottom:18px;}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1 / -1;}
+  label{font-size:13px;font-weight:600;color:#374151;}
+  input,select{font-family:inherit;font-size:14px;padding:10px 12px;border:1px solid var(--borda);border-radius:8px;width:100%;background:#fff;}
+  input:focus,select:focus{outline:none;border-color:var(--laranja);}
+  .checkbox{flex-direction:row;align-items:center;gap:8px;}
+  .checkbox input{width:auto;}
+  .form-actions{display:flex;gap:12px;margin-top:18px;}
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  th,td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--borda);vertical-align:middle;}
+  th{color:#6b7280;font-size:12px;text-transform:uppercase;letter-spacing:.04em;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:600;background:#eef2f7;color:var(--azul);}
+  .badge.aberto{background:#e6f6ec;color:var(--ok);}
+  .badge.encerrado{background:#fdecea;color:var(--erro);}
+  .row-actions{display:flex;gap:8px;}
+  .empty{text-align:center;color:#9ca3af;padding:30px;}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--azul);color:#fff;padding:14px 18px;border-radius:10px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:9999;}
+  .toast.show{opacity:1;transform:translateY(0);}
+  .toast.erro{background:var(--erro);}
+  .toast.ok{background:var(--ok);}
+  .hidden{display:none!important;}
+  .muted{color:#9ca3af;font-size:13px;}
+  .form-title-edit{color:var(--laranja);}
+  @media(max-width:640px){.grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand"><img src="logo1.jpeg" alt="Engs Hub"> Engs Hub <span class="muted" style="color:#9fb0c9;font-weight:600;">· Painel Admin</span></div>
+    <div class="right">
+      <span id="admin-email"></span>
+      <a href="index.html" class="btn btn-ghost btn-sm">Ver site</a>
+      <button id="btn-logout" class="btn btn-ghost btn-sm hidden">Sair</button>
+    </div>
+  </div>
+
+  <!-- Tela de bloqueio (nao logado ou nao admin) -->
+  <div id="gate" class="gate hidden">
+    <h1 id="gate-title">Acesso restrito</h1>
+    <p id="gate-msg">Esta área é exclusiva para administradores.</p>
+    <a href="index.html" class="btn btn-primary">Voltar ao site</a>
+  </div>
+
+  <!-- Painel (somente admin) -->
+  <div id="painel" class="wrap hidden">
+    <div class="card">
+      <h2 id="form-title">Cadastrar novo concurso</h2>
+      <form id="form-concurso">
+        <input type="hidden" id="f-id">
+        <div class="grid">
+          <div class="field"><label>Órgão *</label><input id="f-orgao" required placeholder="Ex: TCE-SP"></div>
+          <div class="field"><label>Cargo *</label><input id="f-cargo" required placeholder="Ex: Engenheiro Civil"></div>
+          <div class="field"><label>Área (slug)</label><input id="f-area" placeholder="Ex: civil"></div>
+          <div class="field"><label>Rótulo da área</label><input id="f-area-label" placeholder="Ex: Engenharia Civil"></div>
+          <div class="field"><label>Banca</label><input id="f-banca" placeholder="Ex: FGV"></div>
+          <div class="field"><label>Estado (UF)</label><input id="f-estado" maxlength="2" placeholder="Ex: SP"></div>
+          <div class="field"><label>Vagas</label><input id="f-vagas" type="number" min="0" placeholder="Ex: 10"></div>
+          <div class="field"><label>Salário (R$)</label><input id="f-salario" type="number" step="0.01" min="0" placeholder="Ex: 23110.00"></div>
+          <div class="field"><label>Inscrições até</label><input id="f-inscricoes" type="date"></div>
+          <div class="field"><label>Status (slug)</label>
+            <select id="f-status-badge">
+              <option value="aberto">aberto</option>
+              <option value="previsto">previsto</option>
+              <option value="encerrado">encerrado</option>
+            </select>
+          </div>
+          <div class="field"><label>Rótulo do status</label><input id="f-status-label" placeholder="Ex: Inscrições abertas"></div>
+          <div class="field checkbox full"><input type="checkbox" id="f-highlight"><label for="f-highlight">Destacar este concurso</label></div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="btn-salvar">Cadastrar concurso</button>
+          <button type="button" class="btn btn-ghost" id="btn-cancelar" style="color:var(--azul);border-color:var(--borda);">Cancelar edição</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Concursos cadastrados (<span id="count">0</span>)</h2>
+      <div id="lista-wrap">
+        <table>
+          <thead>
+            <tr><th>Órgão / Cargo</th><th>UF</th><th>Banca</th><th>Vagas</th><th>Status</th><th>Inscrições até</th><th></th></tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+        <div id="empty" class="empty hidden">Nenhum concurso cadastrado ainda.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var SUPABASE_URL = 'https://xyvsihpdfgnihgomdntb.supabase.co';
+  var db = null;
+
+  // A anon key é pública; reaproveita a mesma que já está no site (controle.html)
+  // assim não precisa duplicar/colar a chave manualmente.
+  async function getDb(){
+    if(db) return db;
+    var key = null;
+    try{
+      var resp = await fetch('controle.html', { cache: 'no-store' });
+      var txt = await resp.text();
+      var m = txt.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
+      if(m) key = m[0];
+    }catch(e){}
+    if(!key){
+      try{
+        var r2 = await fetch('index.html', { cache: 'no-store' });
+        var t2 = await r2.text();
+        var m2 = t2.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
+        if(m2) key = m2[0];
+      }catch(e){}
+    }
+    if(!key){ throw new Error('Não foi possível carregar a configuração do Supabase.'); }
+    db = window.supabase.createClient(SUPABASE_URL, key);
+    return db;
+  }
+
+  var $ = function(id){ return document.getElementById(id); };
+  var gate = $('gate'), painel = $('painel');
+
+  function toast(msg, tipo){
+    var t = $('toast');
+    t.textContent = msg;
+    t.className = 'toast show ' + (tipo || '');
+    setTimeout(function(){ t.className = 'toast ' + (tipo || ''); }, 3200);
+  }
+
+  function showGate(title, msg){
+    gate.classList.remove('hidden');
+    painel.classList.add('hidden');
+    $('gate-title').textContent = title;
+    $('gate-msg').textContent = msg;
+  }
+
+  function fmtData(d){
+    if(!d) return '—';
+    var p = String(d).split('-');
+    return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : d;
+  }
+
+  // ---- Autenticação + checagem de admin ----
+  async function init(){
+    try { await getDb(); } catch(err){ showGate('Erro de configuração', err.message); return; }
+    var res = await db.auth.getUser();
+    var user = res && res.data ? res.data.user : null;
+    if(!user){
+      showGate('Acesso restrito', 'Faça login na sua conta para acessar o painel. Use a tela de login do site.');
+      return;
+    }
+    // Confere role na tabela profiles
+    var prof = await db.from('profiles').select('role,email').eq('id', user.id).single();
+    if(prof.error || !prof.data || prof.data.role !== 'admin'){
+      showGate('Acesso negado', 'Sua conta (' + user.email + ') não tem permissão de administrador.');
+      return;
+    }
+    // É admin: libera painel
+    $('admin-email').textContent = user.email;
+    $('btn-logout').classList.remove('hidden');
+    painel.classList.remove('hidden');
+    gate.classList.add('hidden');
+    carregar();
+  }
+
+  // ---- Listar concursos ----
+  async function carregar(){
+    var r = await db.from('concursos').select('*').order('created_at', { ascending: false });
+    if(r.error){ toast('Erro ao carregar: ' + r.error.message, 'erro'); return; }
+    var rows = r.data || [];
+    $('count').textContent = rows.length;
+    var tb = $('tbody');
+    tb.innerHTML = '';
+    $('empty').classList.toggle('hidden', rows.length > 0);
+    rows.forEach(function(c){
+      var tr = document.createElement('tr');
+      var statusClass = (c.status_badge === 'aberto') ? 'aberto' : (c.status_badge === 'encerrado' ? 'encerrado' : '');
+      tr.innerHTML =
+        '<td><strong>' + esc(c.orgao) + '</strong><br><span class="muted">' + esc(c.cargo || '') + '</span></td>' +
+        '<td>' + esc(c.estado || '—') + '</td>' +
+        '<td>' + esc(c.banca || '—') + '</td>' +
+        '<td>' + (c.vagas != null ? c.vagas : '—') + '</td>' +
+        '<td><span class="badge ' + statusClass + '">' + esc(c.status_label || c.status_badge || '—') + '</span></td>' +
+        '<td>' + fmtData(c.inscricoes_ate) + '</td>';
+      var tdAct = document.createElement('td');
+      tdAct.className = 'row-actions';
+      var bEdit = document.createElement('button');
+      bEdit.className = 'btn btn-ghost btn-sm';
+      bEdit.style.color = '#1A2E4A'; bEdit.style.border = '1px solid #e3e7ee';
+      bEdit.textContent = 'Editar';
+      bEdit.onclick = function(){ editar(c); };
+      var bDel = document.createElement('button');
+      bDel.className = 'btn btn-danger btn-sm';
+      bDel.textContent = 'Excluir';
+      bDel.onclick = function(){ excluir(c); };
+      tdAct.appendChild(bEdit); tdAct.appendChild(bDel);
+      tr.appendChild(tdAct);
+      tb.appendChild(tr);
+    });
+  }
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(ch){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[ch]; }); }
+
+  // ---- Coletar/limpar formulário ----
+  function coletar(){
+    var vagas = $('f-vagas').value;
+    var salario = $('f-salario').value;
+    return {
+      orgao: $('f-orgao').value.trim(),
+      cargo: $('f-cargo').value.trim(),
+      area: $('f-area').value.trim() || null,
+      area_label: $('f-area-label').value.trim() || null,
+      banca: $('f-banca').value.trim() || null,
+      estado: $('f-estado').value.trim().toUpperCase() || null,
+      vagas: vagas === '' ? null : parseInt(vagas, 10),
+      salario: salario === '' ? null : parseFloat(salario),
+      inscricoes_ate: $('f-inscricoes').value || null,
+      status_badge: $('f-status-badge').value,
+      status_label: $('f-status-label').value.trim() || null,
+      is_highlight: $('f-highlight').checked
+    };
+  }
+
+  function limpar(){
+    $('form-concurso').reset();
+    $('f-id').value = '';
+    $('form-title').textContent = 'Cadastrar novo concurso';
+    $('form-title').classList.remove('form-title-edit');
+    $('btn-salvar').textContent = 'Cadastrar concurso';
+    $('btn-cancelar').classList.add('hidden');
+  }
+
+  function editar(c){
+    $('f-id').value = c.id;
+    $('f-orgao').value = c.orgao || '';
+    $('f-cargo').value = c.cargo || '';
+    $('f-area').value = c.area || '';
+    $('f-area-label').value = c.area_label || '';
+    $('f-banca').value = c.banca || '';
+    $('f-estado').value = c.estado || '';
+    $('f-vagas').value = c.vagas != null ? c.vagas : '';
+    $('f-salario').value = c.salario != null ? c.salario : '';
+    $('f-inscricoes').value = c.inscricoes_ate || '';
+    $('f-status-badge').value = c.status_badge || 'aberto';
+    $('f-status-label').value = c.status_label || '';
+    $('f-highlight').checked = !!c.is_highlight;
+    $('form-title').textContent = 'Editando: ' + (c.orgao || '');
+    $('form-title').classList.add('form-title-edit');
+    $('btn-salvar').textContent = 'Salvar alterações';
+    $('btn-cancelar').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ---- Criar / atualizar ----
+  $('form-concurso').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var dados = coletar();
+    if(!dados.orgao || !dados.cargo){ toast('Órgão e Cargo são obrigatórios.', 'erro'); return; }
+    var id = $('f-id').value;
+    var r;
+    $('btn-salvar').disabled = true;
+    if(id){
+      r = await db.from('concursos').update(dados).eq('id', id);
+    } else {
+      r = await db.from('concursos').insert([dados]);
+    }
+    $('btn-salvar').disabled = false;
+    if(r.error){ toast('Erro ao salvar: ' + r.error.message, 'erro'); return; }
+    toast(id ? 'Concurso atualizado!' : 'Concurso cadastrado!', 'ok');
+    limpar();
+    carregar();
+  });
+
+  $('btn-cancelar').addEventListener('click', limpar);
+
+  // ---- Excluir ----
+  async function excluir(c){
+    if(!confirm('Excluir o concurso "' + c.orgao + ' — ' + (c.cargo || '') + '"? Esta ação não pode ser desfeita.')) return;
+    var r = await db.from('concursos').delete().eq('id', c.id);
+    if(r.error){ toast('Erro ao excluir: ' + r.error.message, 'erro'); return; }
+    toast('Concurso excluído.', 'ok');
+    carregar();
+  }
+
+  // ---- Logout ----
+  $('btn-logout').addEventListener('click', async function(){
+    await db.auth.signOut();
+    location.href = 'index.html';
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
