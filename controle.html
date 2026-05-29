@@ -1314,7 +1314,7 @@ async function loadData() {
       cargo: r.cargo || '',
       dataProva: r.data_prova || '',
       vagas: r.vagas || 0,
-      salario: r.salario || '\u2014',
+      salario: r.salario,
       dataInscricao: r.data_inscricao || '',
       situacao: r.situacao || 'nao',
       dataIsencao: r.data_isencao || '',
@@ -1348,6 +1348,12 @@ function fmt(d) {
   return dd + '/' + m + '/' + y;
 }
 
+function formatBRL(valor) {
+  const num = parseFloat(valor);
+  if (!valor || isNaN(num)) return '—';
+  return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -1379,7 +1385,7 @@ function renderTable(rows) {
       </td>
       <td class="td-muted">${fmt(r.dataProva)}</td>
       <td class="td-bold">${r.vagas}</td>
-      <td class="td-bold">${r.salario}</td>
+      <td class="td-bold">${formatBRL(r.salario)}</td>
       <td class="td-muted">${fmt(r.dataInscricao)}</td>
       <td><span class="badge ${s.cls}">${s.label}</span></td>
       <td class="td-muted">${fmt(r.dataIsencao)}</td>
@@ -1417,7 +1423,7 @@ function renderHomologados() {
       <td><span class="td-orgao td-bold">${r.orgao}</span>${r.cargo ? `<div style="font-size:11px;color:#64748b;margin-top:2px;white-space:normal;max-width:180px;">${r.cargo}</div>` : ''}</td>
       <td class="td-muted">${fmt(r.dataProva)}</td>
       <td class="td-bold">${r.vagas}</td>
-      <td class="td-bold">${r.salario}</td>
+      <td class="td-bold">${formatBRL(r.salario)}</td>
       <td><span class="badge badge-resultado">Homologado</span></td>
     </tr>`;
   }).join('');
