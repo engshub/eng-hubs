@@ -92,14 +92,16 @@
           <div class="field"><label>Vagas</label><input id="f-vagas" type="number" min="0" placeholder="Ex: 10"></div>
           <div class="field"><label>Salário (R$)</label><input id="f-salario" type="number" step="0.01" min="0" placeholder="Ex: 23110.00"></div>
           <div class="field"><label>Inscrições até</label><input id="f-inscricoes" type="date"></div>
-          <div class="field"><label>Status (slug)</label>
-            <select id="f-status-badge">
-              <option value="aberto">aberto</option>
-              <option value="previsto">previsto</option>
-              <option value="encerrado">encerrado</option>
+          <div class="field"><label>Seção *</label>
+            <select id="f-secao">
+              <option value="aberto">Editais abertos</option>
+              <option value="previsto">Previstos</option>
             </select>
           </div>
-          <div class="field"><label>Rótulo do status</label><input id="f-status-label" placeholder="Ex: Inscrições abertas"></div>
+          <div class="field"><label>Fase</label>
+            <select id="f-fase"></select>
+          </div>
+          <div class="field checkbox"><input type="checkbox" id="f-homologado"><label for="f-homologado">Homologado (sai da home)</label></div>
           <div class="field full"><label>Link do edital</label><input id="f-link-edital" type="url" placeholder="https://..."></div>
           <div class="field checkbox full"><input type="checkbox" id="f-highlight"><label for="f-highlight">Destacar este concurso</label></div>
         </div>
@@ -115,7 +117,7 @@
       <div id="lista-wrap">
         <table>
           <thead>
-            <tr><th>Órgão / Cargo</th><th>UF</th><th>Banca</th><th>Vagas</th><th>Status</th><th>Inscrições até</th><th>Edital</th><th></th></tr>
+            <tr><th>Órgão / Cargo</th><th>UF</th><th>Banca</th><th>Vagas</th><th>Seção / Fase</th><th>Inscrições até</th><th>Edital</th><th></th></tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -214,13 +216,15 @@
     $('empty').classList.toggle('hidden', rows.length > 0);
     rows.forEach(function(c){
       var tr = document.createElement('tr');
-      var statusClass = (c.status_badge === 'aberto') ? 'aberto' : (c.status_badge === 'encerrado' ? 'encerrado' : '');
+      var secaoLabel = (c.secao === 'previsto') ? 'Previsto' : 'Aberto';
+      var statusClass = (c.secao === 'previsto') ? '' : 'aberto';
+      var homTag = c.homologado ? ' <span class="badge encerrado" style="margin-left:4px;">homologado</span>' : '';
       tr.innerHTML =
         '<td><strong>' + esc(c.orgao) + '</strong><br><span class="muted">' + esc(c.cargo || '') + '</span></td>' +
         '<td>' + esc(c.estado || '—') + '</td>' +
         '<td>' + esc(c.banca || '—') + '</td>' +
         '<td>' + (c.vagas != null ? c.vagas : '—') + '</td>' +
-        '<td><span class="badge ' + statusClass + '">' + esc(c.status_label || c.status_badge || '—') + '</span></td>' +
+        '<td><span class="badge ' + statusClass + '">' + esc(secaoLabel) + '</span>' + homTag + '<br><span class="muted">' + esc(c.fase || '—') + '</span></td>' +
         '<td>' + fmtData(c.inscricoes_ate) + '</td>' +
         '<td>' + (c.link_edital ? '<a href="' + esc(c.link_edital) + '" target="_blank" rel="noopener" style="color:#F4801A;font-weight:600;">edital</a>' : '<span class="muted">—</span>') + '</td>';
       var tdAct = document.createElement('td');
@@ -256,15 +260,34 @@
       vagas: vagas === '' ? null : parseInt(vagas, 10),
       salario: salario === '' ? null : parseFloat(salario),
       inscricoes_ate: $('f-inscricoes').value || null,
-      status_badge: $('f-status-badge').value,
-      status_label: $('f-status-label').value.trim() || null,
+      secao: $('f-secao').value,
+      fase: $('f-fase').value || null,
+      homologado: $('f-homologado').checked,
+      status_badge: $('f-secao').value === 'previsto' ? 'previsto' : 'aberto',
+      status_label: $('f-fase').value || null,
       link_edital: $('f-link-edital').value.trim() || null,
       is_highlight: $('f-highlight').checked
     };
   }
 
-  function limpar(){
+  var FASES = {"aberto":["Inscrições abertas","Inscrições encerradas","Prova aplicada","Em fase de recursos","Resultado preliminar"],"previsto":["Sem banca contratada","Banca contratada","Edital iminente"]};
+function preencherFases(selecionada){
+  var secao = $('f-secao').value;
+  var lista = FASES[secao] || [];
+  var sel = $('f-fase');
+  sel.innerHTML = '';
+  lista.forEach(function(f){
+    var o = document.createElement('option');
+    o.value = f; o.textContent = f;
+    if(f === selecionada) o.selected = true;
+    sel.appendChild(o);
+  });
+}
+function limpar(){
     $('form-concurso').reset();
+      $('f-secao').value = 'aberto';
+      preencherFases('');
+      $('f-homologado').checked = false;
     $('f-id').value = '';
     $('form-title').textContent = 'Cadastrar novo concurso';
     $('form-title').classList.remove('form-title-edit');
@@ -283,8 +306,9 @@
     $('f-vagas').value = c.vagas != null ? c.vagas : '';
     $('f-salario').value = c.salario != null ? c.salario : '';
     $('f-inscricoes').value = c.inscricoes_ate || '';
-    $('f-status-badge').value = c.status_badge || 'aberto';
-    $('f-status-label').value = c.status_label || '';
+      $('f-secao').value = c.secao || 'aberto';
+      preencherFases(c.fase || '');
+      $('f-homologado').checked = !!c.homologado;
     $('f-link-edital').value = c.link_edital || '';
     $('f-highlight').checked = !!c.is_highlight;
     $('form-title').textContent = 'Editando: ' + (c.orgao || '');
@@ -315,6 +339,9 @@
   });
 
   $('btn-cancelar').addEventListener('click', limpar);
+
+$('f-secao').addEventListener('change', function(){ preencherFases(''); });
+preencherFases('');
 
   // ---- Excluir ----
   async function excluir(c){
