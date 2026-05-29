@@ -768,8 +768,8 @@ marcarAcompanhados();
         var r = await db.from('controle_concursos').insert([registro]);
         btn.disabled = false;
         if(r.error){ showAviso('Erro ao acompanhar: ' + r.error.message, 'erro'); return; }
-        btn.textContent = 'Acompanhando ✓';
-        btn.classList.add('btn-watching');
+        btn.innerHTML = '<span class="btn-watch-label">Acompanhando ✓</span>';
+        btn.classList.add('is-active');
         showAviso('Adicionado à sua Minha área!', 'ok');
       }catch(e){ showAviso('Erro inesperado ao acompanhar.', 'erro'); }
     }
@@ -795,8 +795,8 @@ var data = {};
 try{ data = JSON.parse(card.getAttribute('data-c') || '{}'); }catch(e){}
 var chave = ((data.orgao||'')+'||'+(data.cargo||'')).toLowerCase();
 if(seguidos[chave]){
-btn.textContent = 'Acompanhando ✓';
-btn.classList.add('btn-watching');
+btn.innerHTML = '<span class="btn-watch-label">Acompanhando ✓</span>';
+btn.classList.add('is-active');
 }
 });
 }catch(e){}
