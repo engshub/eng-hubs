@@ -1148,3 +1148,17 @@ h1, h2, h3, h4 {
     outline-offset: 2px;
     border-radius: var(--radius-sm);
 }
+
+/* Botão Acompanhando — estado ativo = azul do site */
+.btn.btn-watch.is-active,
+.btn-watch.is-active {
+    background: var(--c-primary) !important;
+    color: #fff !important;
+    border-color: var(--c-primary) !important;
+}
+.btn.btn-watch.is-active:hover,
+.btn-watch.is-active:hover {
+    background: var(--c-primary-dark) !important;
+    border-color: var(--c-primary-dark) !important;
+    color: #fff !important;
+}
