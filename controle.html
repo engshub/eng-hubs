@@ -958,6 +958,29 @@ tbody td {
       </div>
     </div>
   </div>
+
+<!-- CONCURSOS HOMOLOGADOS -->
+<div class="card" id="homologadosCard" style="margin-top:24px;display:none;">
+  <div class="card-toolbar">
+    <span class="card-title">Concursos homologados</span>
+    <span class="td-muted" style="font-size:12px;">Concursos que você acompanhava e já foram homologados.</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Banca</th>
+          <th>Órgão / Cargo</th>
+          <th>Data da prova</th>
+          <th>Vagas</th>
+          <th>Salário</th>
+          <th>Situação</th>
+        </tr>
+      </thead>
+      <tbody id="homologadosBody"></tbody>
+    </table>
+  </div>
+</div>
 </main>
 
 <!-- MODAL -->
@@ -1076,6 +1099,7 @@ const SITUACAO_CONFIG = {
 };
 
 let data = [];
+let homologados = [];
 let nextId = null; // não usado com Supabase, mas mantido para compatibilidade
 let editId = null;
 let currentUser = null;
@@ -1248,19 +1272,36 @@ async function loadData() {
     showToast('Erro ao carregar dados: ' + error.message);
     return;
   }
-  data = rows.map(r => ({
-    id:             r.id,
-    banca:          r.banca,
-    orgao:          r.orgao,
-    cargo:          r.cargo || '',
-    dataProva:      r.data_prova || '',
-    vagas:          r.vagas || 0,
-    salario:        r.salario || '—',
-    dataInscricao:  r.data_inscricao || '',
-    situacao:       r.situacao || 'nao',
-    dataIsencao:    r.data_isencao || '',
-    gabarito:       r.gabarito || '',
-  }));
+  const mapped = rows.map(r => ({
+      id: r.id,
+      banca: r.banca,
+      orgao: r.orgao,
+      cargo: r.cargo || '',
+      dataProva: r.data_prova || '',
+      vagas: r.vagas || 0,
+      salario: r.salario || '\u2014',
+      dataInscricao: r.data_inscricao || '',
+      situacao: r.situacao || 'nao',
+      dataIsencao: r.data_isencao || '',
+      gabarito: r.gabarito || '',
+      concursoId: r.concurso_id || null,
+    }));
+    // Descobre quais concursos acompanhados ja foram homologados (saem da home e vao para a secao homologados)
+    let homologadosSet = { ids: {}, chaves: {} };
+    try {
+      const { data: homs } = await db.from('concursos').select('id,orgao,cargo,homologado').eq('homologado', true);
+      (homs || []).forEach(h => {
+        homologadosSet.ids[h.id] = true;
+        homologadosSet.chaves[((h.orgao||'')+'||'+(h.cargo||'')).toLowerCase()] = true;
+      });
+    } catch(e) {}
+    function isHomologado(row){
+      if(row.concursoId && homologadosSet.ids[row.concursoId]) return true;
+      return !!homologadosSet.chaves[((row.orgao||'')+'||'+(row.cargo||'')).toLowerCase()];
+    }
+    data = mapped.filter(r => !isHomologado(r));
+    homologados = mapped.filter(r => isHomologado(r));
+    renderHomologados();
   updateStats();
   filterTable();
 }
@@ -1325,6 +1366,24 @@ function renderTable(rows) {
           </button>
         </div>
       </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHomologados() {
+  const card = document.getElementById('homologadosCard');
+  const body = document.getElementById('homologadosBody');
+  if(!card || !body) return;
+  if(!homologados.length){ card.style.display = 'none'; body.innerHTML = ''; return; }
+  card.style.display = 'block';
+  body.innerHTML = homologados.map(r => {
+    return `<tr>
+      <td class="td-muted">${r.banca || '\u2014'}</td>
+      <td><span class="td-orgao td-bold">${r.orgao}</span>${r.cargo ? `<div style="font-size:11px;color:#64748b;margin-top:2px;white-space:normal;max-width:180px;">${r.cargo}</div>` : ''}</td>
+      <td class="td-muted">${fmt(r.dataProva)}</td>
+      <td class="td-bold">${r.vagas}</td>
+      <td class="td-bold">${r.salario}</td>
+      <td><span class="badge badge-resultado">Homologado</span></td>
     </tr>`;
   }).join('');
 }
