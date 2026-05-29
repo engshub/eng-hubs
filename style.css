@@ -1162,3 +1162,23 @@ h1, h2, h3, h4 {
     border-color: var(--c-primary-dark) !important;
     color: #fff !important;
 }
+
+/* Botão Acompanhando — hover mostra "Deixar de acompanhar" */
+.btn.btn-watch.is-active .btn-watch-label,
+.btn-watch.is-active .btn-watch-label {
+    transition: opacity 0.15s;
+}
+.btn.btn-watch.is-active:hover .btn-watch-label,
+.btn-watch.is-active:hover .btn-watch-label {
+    display: none;
+}
+.btn.btn-watch.is-active:hover::after,
+.btn-watch.is-active:hover::after {
+    content: 'Deixar de acompanhar';
+    font-size: 12px;
+    font-weight: 600;
+}
+.btn.btn-watch.is-active:hover i,
+.btn-watch.is-active:hover i {
+    display: none;
+}
