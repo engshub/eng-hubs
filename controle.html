@@ -12,7 +12,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
 body {
-  font-family: 'Inter', sans-serif;h
+  font-family: 'Inter', sans-serif;hh
   background: #F5F5F5;
   color: #1A2E4A;
   min-height: 100vh;
@@ -1438,7 +1438,7 @@ function updateStats() {
 }
 
 function filterTable() {
-  const q   = document.getElementById('searchInput').value.toLowerCase();
+  let q = document.getElementById('searchInput').value; if(q.includes('@'))q=''; q=q.toLowerCase();
   const sit = document.getElementById('filterSituacao').value;
   const rows = data.filter(r => {
     const matchQ = !q || r.banca.toLowerCase().includes(q) || r.orgao.toLowerCase().includes(q) || (r.cargo || '').toLowerCase().includes(q);
