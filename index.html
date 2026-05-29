@@ -753,7 +753,7 @@ marcarAcompanhados();
         try{ data = JSON.parse(card.getAttribute('data-c') || '{}'); }catch(e){}
         // Evita duplicar: verifica se já acompanha esse órgão+cargo
         var ex = await db.from('controle_concursos').select('id').eq('user_id', user.id).eq('orgao', data.orgao).eq('cargo', data.cargo).limit(1);
-        if(ex.data && ex.data.length){ showAviso('Você já está acompanhando este concurso.'); return; }
+        if(ex.data && ex.data.length){ btn.disabled=true; var delR=await db.from('controle_concursos').delete().eq('id',ex.data[0].id); btn.disabled=false; if(delR.error){ showAviso('Erro ao deixar de acompanhar.','erro'); return; } btn.classList.remove('is-active'); btn.innerHTML='Acompanhar'; showAviso('Você deixou de acompanhar este concurso.','ok'); return; }
         var registro = {
           user_id: user.id,
           orgao: data.orgao || '',
