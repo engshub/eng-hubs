@@ -735,6 +735,7 @@
           });
         }
         if(window.lucide && window.lucide.createIcons){ try{ window.lucide.createIcons(); }catch(e){} }
+marcarAcompanhados();
       }catch(e){ /* silencioso: mantém os cards estáticos */ }
     }
 
@@ -781,7 +782,35 @@
         showAviso('Adicionado à sua Minha área!', 'ok');
       }catch(e){ showAviso('Erro inesperado ao acompanhar.', 'erro'); }
     }
-    // garante que o db (anon) está pronto, reaproveitando a key pública
+    // Marca como 'Acompanhando ✓' os concursos que o usuário logado já segue
+async function marcarAcompanhados(){
+try{
+await getDbReady();
+if(!db) return;
+var sess = await db.auth.getUser();
+var user = sess && sess.data ? sess.data.user : null;
+if(!user) return;
+var r = await db.from('controle_concursos').select('orgao,cargo').eq('user_id', user.id);
+if(r.error || !r.data) return;
+var seguidos = {};
+r.data.forEach(function(x){ seguidos[((x.orgao||'')+'||'+(x.cargo||'')).toLowerCase()] = true; });
+var grid = document.getElementById('cards-grid');
+if(!grid) return;
+var btns = grid.querySelectorAll('.btn-watch');
+btns.forEach(function(btn){
+var card = btn.closest('.card');
+if(!card) return;
+var data = {};
+try{ data = JSON.parse(card.getAttribute('data-c') || '{}'); }catch(e){}
+var chave = ((data.orgao||'')+'||'+(data.cargo||'')).toLowerCase();
+if(seguidos[chave]){
+btn.textContent = 'Acompanhando ✓';
+btn.classList.add('btn-watching');
+}
+});
+}catch(e){}
+}
+// garante que o db (anon) está pronto, reaproveitando a key pública
     async function getDbReady(){
       if(db) return;
       try{
