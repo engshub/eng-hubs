@@ -1195,7 +1195,7 @@ async function init() {
     }
   });
 
-  await loadData();
+  await loadData(); setTimeout(()=>{const el=document.getElementById('searchInput');if(el&&el.value.includes('@')){el.value='';filterTable();}},500);
 }
 
 // ===== DROPDOWN =====
