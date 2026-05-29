@@ -1775,6 +1775,16 @@ init();
     <div class="modal-config-body">
       <!-- ABA: Dados pessoais -->
       <div class="config-panel active" id="config-panel-perfil">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:20px;">
+          <div id="configAvatarPreview" style="width:80px;height:80px;border-radius:50%;background:#F4801A;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:28px;font-weight:700;color:#fff;overflow:hidden;border:3px solid #e2e8f0;">
+            <span id="configAvatarInitials"></span>
+          </div>
+          <label style="display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border:1.5px solid #1A2E4A;border-radius:8px;background:transparent;color:#1A2E4A;font-size:13px;font-weight:500;cursor:pointer;" for="configFotoUpload">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Alterar foto
+          </label>
+          <input type="file" id="configFotoUpload" accept="image/*" style="display:none" onchange="handleConfigFoto(event)">
+        </div>
         <p class="config-section-title">Informações pessoais</p>
         <div class="config-field">
           <label>Nome completo</label>
