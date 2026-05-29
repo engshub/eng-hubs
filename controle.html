@@ -12,7 +12,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; }
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;h
   background: #F5F5F5;
   color: #1A2E4A;
   min-height: 100vh;
@@ -952,7 +952,7 @@ tbody td {
         <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <input type="text" class="search-input" id="searchInput" placeholder="Buscar por banca ou órgão..." oninput="filterTable()">
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar por banca ou órgão..." autocomplete="off" oninput="filterTable()">
       </div>
       <select class="filter-select" id="filterSituacao" onchange="filterTable()">
         <option value="">Todas as situações</option>
