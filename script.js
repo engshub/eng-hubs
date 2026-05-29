@@ -138,7 +138,7 @@
         filtroArea: 'todos',
         textoBusca: '',
         ordenacao: 'prazo',
-        acompanhando: new Set()
+        acompanhando: new Set(JSON.parse(localStorage.getItem('eng_acompanhando') || '[]'))
     };
 
     function formatBRL(valor) {
@@ -327,6 +327,7 @@
         const isAtivo = state.acompanhando.has(id);
         if (isAtivo) {
             state.acompanhando.delete(id);
+            localStorage.setItem('eng_acompanhando', JSON.stringify([...state.acompanhando]));
             if (btn) {
                 btn.classList.remove('is-active');
                 btn.querySelector('.btn-watch-label').textContent = 'Acompanhar';
@@ -339,6 +340,7 @@
             });
         } else {
             state.acompanhando.add(id);
+            localStorage.setItem('eng_acompanhando', JSON.stringify([...state.acompanhando]));
             if (btn) {
                 btn.classList.add('is-active');
                 btn.querySelector('.btn-watch-label').textContent = 'Acompanhando';
@@ -676,7 +678,7 @@
             btnCfgIdx.addEventListener('click', () => {
                 const dd = document.getElementById('ud');
                 if (dd) dd.style.display = 'none';
-                window.location.href = 'controle.html?config=1';
+                openConfigModal('perfil');
             });
         }
     }
@@ -711,5 +713,255 @@
             }, 400);
         }
     })();
+
+
+/* ===== MODAL CONFIGURAÇÕES DA CONTA — PÁGINA INICIAL ===== */
+(function() {
+
+function injectConfigModalStyles() {
+    if (document.getElementById('cfg-modal-styles')) return;
+    const css = `
+.cfg-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.cfg-backdrop.open{display:flex}
+.cfg-modal{background:#fff;border-radius:14px;width:100%;max-width:500px;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden;display:flex;flex-direction:column;max-height:90vh;font-family:'Inter',sans-serif}
+.cfg-header{display:flex;justify-content:space-between;align-items:center;padding:20px 24px 0}
+.cfg-title{font-family:'Montserrat',sans-serif;font-size:17px;font-weight:700;color:#1A2E4A}
+.cfg-tabs{display:flex;padding:0 24px;margin-top:16px;border-bottom:2px solid #e2e8f0}
+.cfg-tab{padding:10px 16px;font-size:13px;font-weight:500;color:#64748b;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.cfg-tab:hover{color:#1A2E4A}
+.cfg-tab.active{color:#F4801A;border-bottom-color:#F4801A;font-weight:600}
+.cfg-body{padding:24px;overflow-y:auto;flex:1}
+.cfg-panel{display:none}.cfg-panel.active{display:block}
+.cfg-field{margin-bottom:16px}
+.cfg-field label{display:block;font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.cfg-field input{width:100%;padding:10px 12px;font-size:13px;font-family:'Inter',sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;transition:border-color .15s;box-sizing:border-box}
+.cfg-field input:focus{border-color:#F4801A}
+.cfg-field input:disabled{background:#f8fafc;color:#94a3b8;cursor:not-allowed}
+.cfg-field small{display:block;font-size:11px;color:#94a3b8;margin-top:4px}
+.cfg-section-title{font-size:12px;font-weight:700;color:#1A2E4A;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;margin-top:4px}
+.cfg-footer{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid #e2e8f0;background:#f8fafc}
+.cfg-btn-cancel{padding:9px 20px;border:1.5px solid #e2e8f0;border-radius:8px;background:transparent;color:#475569;font-size:13px;font-weight:500;cursor:pointer}
+.cfg-btn-cancel:hover{background:#f1f5f9}
+.cfg-btn-save{padding:9px 22px;background:#F4801A;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.cfg-btn-save:hover{background:#e07016}
+.cfg-btn-save:disabled{opacity:.6;cursor:not-allowed}
+.cfg-pwd-strength{height:4px;border-radius:2px;background:#e2e8f0;margin-top:6px;overflow:hidden}
+.cfg-pwd-bar{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+.cfg-avatar-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:20px}
+.cfg-avatar-preview{width:80px;height:80px;border-radius:50%;background:#F4801A;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-size:28px;font-weight:700;color:#fff;overflow:hidden;border:3px solid #e2e8f0}
+.cfg-avatar-preview img{width:100%;height:100%;object-fit:cover}
+.cfg-btn-foto{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border:1.5px solid #1A2E4A;border-radius:8px;background:transparent;color:#1A2E4A;font-size:13px;font-weight:500;cursor:pointer}
+.cfg-btn-foto:hover{background:#f1f5f9}
+.cfg-premium-box{background:linear-gradient(135deg,#1A2E4A 0%,#2d4a7a 100%);border-radius:12px;padding:20px;color:#fff;margin-bottom:16px}
+.cfg-premium-box h4{font-size:15px;font-weight:700;margin:0 0 6px;font-family:'Montserrat',sans-serif}
+.cfg-premium-box p{font-size:12px;color:rgba(255,255,255,.75);margin:0 0 14px;line-height:1.5}
+.cfg-btn-premium{display:inline-flex;align-items:center;gap:6px;background:#F4801A;color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.cfg-plan-info{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:16px}
+`;
+    const el = document.createElement('style');
+    el.id = 'cfg-modal-styles';
+    el.textContent = css;
+    document.head.appendChild(el);
+}
+
+function injectConfigModalHTML(user) {
+    if (document.getElementById('cfgBackdrop')) return;
+    const meta = user.user_metadata || {};
+    const nome = meta.nome_completo || '';
+    const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || 'U';
+    const fotoUrl = meta.foto_url || null;
+    const avatarHTML = fotoUrl
+        ? `<img src="${fotoUrl}" alt="Foto">`
+        : `<span style="font-size:28px;font-weight:700;color:#fff;font-family:'Montserrat',sans-serif">${iniciais}</span>`;
+
+    const html = `
+<div class="cfg-backdrop" id="cfgBackdrop" onclick="if(event.target===this)closeCfg()">
+  <div class="cfg-modal">
+    <div class="cfg-header">
+      <span class="cfg-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F4801A" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Configurações da conta
+      </span>
+      <button onclick="closeCfg()" style="background:none;border:none;font-size:18px;color:#94a3b8;cursor:pointer;padding:4px;">&#x2715;</button>
+    </div>
+    <div class="cfg-tabs">
+      <button class="cfg-tab active" data-cfg-tab="perfil" onclick="switchCfgTab('perfil')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Dados pessoais
+      </button>
+      <button class="cfg-tab" data-cfg-tab="seguranca" onclick="switchCfgTab('seguranca')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Segurança
+      </button>
+      <button class="cfg-tab" data-cfg-tab="pagamento" onclick="switchCfgTab('pagamento')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Pagamento
+      </button>
+    </div>
+    <div class="cfg-body">
+      <div class="cfg-panel active" id="cfg-panel-perfil">
+        <div class="cfg-avatar-wrap">
+          <div class="cfg-avatar-preview" id="cfgAvatarPreview">${avatarHTML}</div>
+          <label class="cfg-btn-foto" for="cfgFotoInput">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Alterar foto
+          </label>
+          <input type="file" id="cfgFotoInput" accept="image/*" style="display:none" onchange="handleCfgFoto(event)">
+        </div>
+        <p class="cfg-section-title">Informações pessoais</p>
+        <div class="cfg-field"><label>Nome completo</label><input type="text" id="cfgNome" value="${nome}" placeholder="Seu nome completo"></div>
+        <div class="cfg-field"><label>E-mail atual</label><input type="email" id="cfgEmailAtual" value="${user.email||''}" disabled><small>Para alterar o e-mail, acesse a aba Segurança.</small></div>
+        <div class="cfg-field"><label>Área de atuação</label><input type="text" id="cfgArea" value="${meta.area||''}" placeholder="Ex: Engenharia Civil"></div>
+      </div>
+      <div class="cfg-panel" id="cfg-panel-seguranca">
+        <p class="cfg-section-title">Alterar e-mail</p>
+        <div class="cfg-field"><label>Novo e-mail</label><input type="email" id="cfgNovoEmail" placeholder="novo@email.com"><small>Um link de confirmação será enviado para o novo endereço.</small></div>
+        <div style="margin-bottom:24px;"><button class="cfg-btn-save" onclick="cfgSalvarEmail()" style="width:100%;" id="cfgBtnEmail">Alterar e-mail</button></div>
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin-bottom:24px;">
+        <p class="cfg-section-title">Alterar senha</p>
+        <div class="cfg-field"><label>Nova senha</label><input type="password" id="cfgNovaSenha" placeholder="Mínimo 6 caracteres" oninput="cfgPwdStrength(this.value)"><div class="cfg-pwd-strength"><div class="cfg-pwd-bar" id="cfgPwdBar"></div></div><small id="cfgPwdTxt" style="font-weight:500;margin-top:4px;"></small></div>
+        <div class="cfg-field"><label>Confirmar nova senha</label><input type="password" id="cfgConfSenha" placeholder="Repita a nova senha"></div>
+        <div><button class="cfg-btn-save" onclick="cfgSalvarSenha()" style="width:100%;" id="cfgBtnSenha">Alterar senha</button></div>
+      </div>
+      <div class="cfg-panel" id="cfg-panel-pagamento">
+        <div class="cfg-plan-info"><div style="width:36px;height:36px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:18px;">🎓</div><div><strong style="display:block;font-size:13px;font-weight:700;color:#1A2E4A">Plano Gratuito</strong><span style="font-size:11px;color:#64748b">Acesso aos editais públicos e controle de concursos</span></div></div>
+        <div class="cfg-premium-box"><h4>✨ Engs Hub Premium — em breve</h4><p>Alertas instantâneos por e-mail, filtros avançados, histórico completo de bancas e muito mais.</p><button class="cfg-btn-premium" onclick="showToast({type:'success',title:'Em breve!',message:'Você será avisado quando o Premium for lançado.'})">⭐ Quero ser avisado</button></div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;"><p style="margin:0;font-size:12px;color:#92400e;line-height:1.5;"><strong>💳 Forma de pagamento</strong><br>A integração com plataforma de pagamento será disponibilizada em breve.</p></div>
+      </div>
+    </div>
+    <div class="cfg-footer" id="cfgFooter">
+      <button class="cfg-btn-cancel" onclick="closeCfg()">Cancelar</button>
+      <button class="cfg-btn-save" id="cfgBtnSalvar" onclick="cfgSalvarPerfil()">Salvar alterações</button>
+    </div>
+  </div>
+</div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+
+    document.addEventListener('keydown', function(e){
+        if(e.key==='Escape'){const bd=document.getElementById('cfgBackdrop');if(bd&&bd.classList.contains('open'))closeCfg();}
+    });
+}
+
+window._cfgUser = null;
+
+window.openConfigModal = function(tab) {
+    if (!window._cfgUser) return;
+    const user = window._cfgUser;
+    injectConfigModalStyles();
+    injectConfigModalHTML(user);
+    window.switchCfgTab(tab || 'perfil');
+    document.getElementById('cfgBackdrop').classList.add('open');
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeCfg = function() {
+    const bd = document.getElementById('cfgBackdrop');
+    if (bd) bd.classList.remove('open');
+    document.body.style.overflow = '';
+};
+
+window.switchCfgTab = function(t) {
+    document.querySelectorAll('.cfg-tab').forEach(el => el.classList.toggle('active', el.getAttribute('data-cfg-tab')===t));
+    document.querySelectorAll('.cfg-panel').forEach(el => el.classList.remove('active'));
+    const p = document.getElementById('cfg-panel-'+t); if(p) p.classList.add('active');
+    const btn = document.getElementById('cfgBtnSalvar');
+    if(btn) btn.style.display = (t==='seguranca'||t==='pagamento') ? 'none' : '';
+};
+
+window.cfgPwdStrength = function(s) {
+    const bar=document.getElementById('cfgPwdBar'), txt=document.getElementById('cfgPwdTxt');
+    if(!s){bar.style.width='0';txt.textContent='';return;}
+    let sc=0;
+    if(s.length>=6)sc++;if(s.length>=10)sc++;if(/[A-Z]/.test(s))sc++;if(/[0-9]/.test(s))sc++;if(/[^A-Za-z0-9]/.test(s))sc++;
+    const lv=[{w:'20%',c:'#ef4444',l:'Muito fraca'},{w:'40%',c:'#f97316',l:'Fraca'},{w:'60%',c:'#eab308',l:'Razoável'},{w:'80%',c:'#22c55e',l:'Forte'},{w:'100%',c:'#16a34a',l:'Muito forte'}][Math.max(0,sc-1)];
+    bar.style.width=lv.w;bar.style.background=lv.c;txt.textContent=lv.l;txt.style.color=lv.c;
+};
+
+window.handleCfgFoto = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (file.size > 2*1024*1024) { showToast({type:'warning',title:'Foto muito grande',message:'Máximo 2MB.'}); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const url = e.target.result;
+        const preview = document.getElementById('cfgAvatarPreview');
+        if (preview) preview.innerHTML = '<img src="'+url+'" alt="Foto">';
+        // Atualizar avatar no header da index
+        const wrap = document.getElementById('user-greeting-wrap');
+        if (wrap) {
+            const av = wrap.querySelector('img, span[style*="border-radius:50%"]');
+            if (av && av.tagName === 'IMG') av.src = url;
+            else {
+                const img = document.createElement('img');
+                img.src = url;
+                img.style.cssText = 'width:28px;height:28px;border-radius:50%;object-fit:cover;';
+                if (av) av.replaceWith(img);
+            }
+        }
+        // Salvar no Supabase
+        if (typeof db !== 'undefined') db.auth.updateUser({ data: { foto_url: url } });
+        if (window._cfgUser) { window._cfgUser.user_metadata = window._cfgUser.user_metadata || {}; window._cfgUser.user_metadata.foto_url = url; }
+        showToast({type:'success',title:'Foto atualizada!'});
+    };
+    reader.readAsDataURL(file);
+};
+
+window.cfgSalvarPerfil = async function() {
+    const nome = document.getElementById('cfgNome').value.trim();
+    const area = document.getElementById('cfgArea').value.trim();
+    const btn = document.getElementById('cfgBtnSalvar');
+    if (!nome) { showToast({type:'warning',title:'Informe seu nome.'}); return; }
+    btn.textContent = 'Salvando...'; btn.disabled = true;
+    const res = await db.auth.updateUser({ data: { nome_completo: nome, area } });
+    btn.textContent = 'Salvar alterações'; btn.disabled = false;
+    if (res.error) { showToast({type:'warning',title:'Erro: '+res.error.message}); return; }
+    if (window._cfgUser) { window._cfgUser.user_metadata.nome_completo = nome; window._cfgUser.user_metadata.area = area; }
+    // Atualizar header
+    const primeiro = nome.split(' ')[0];
+    const nameEl = document.querySelector('#user-greeting-wrap span');
+    if (nameEl && nameEl.textContent.includes('Olá')) nameEl.textContent = 'Olá, '+primeiro+' 👋';
+    const ddName = document.getElementById('user-greeting-wrap');
+    if (ddName) {
+        const nameSpan = ddName.querySelector('span[style*="font-size:13px"]');
+        if (nameSpan) nameSpan.textContent = 'Olá, '+primeiro+' 👋';
+    }
+    showToast({type:'success',title:'✅ Dados atualizados!'});
+    closeCfg();
+};
+
+window.cfgSalvarEmail = async function() {
+    const e = document.getElementById('cfgNovoEmail').value.trim();
+    const btn = document.getElementById('cfgBtnEmail');
+    if (!e || !/^[^@]+@[^@]+.[^@]+$/.test(e)) { showToast({type:'warning',title:'E-mail inválido.'}); return; }
+    btn.textContent='Enviando...';btn.disabled=true;
+    const res = await db.auth.updateUser({ email: e });
+    btn.textContent='Alterar e-mail';btn.disabled=false;
+    if(res.error){showToast({type:'warning',title:'Erro: '+res.error.message});return;}
+    showToast({type:'success',title:'✅ Confirmação enviada para '+e});
+    document.getElementById('cfgNovoEmail').value='';
+};
+
+window.cfgSalvarSenha = async function() {
+    const nova=document.getElementById('cfgNovaSenha').value, conf=document.getElementById('cfgConfSenha').value;
+    const btn=document.getElementById('cfgBtnSenha');
+    if(!nova||nova.length<6){showToast({type:'warning',title:'Senha mín. 6 caracteres.'});return;}
+    if(nova!==conf){showToast({type:'warning',title:'Senhas não coincidem.'});return;}
+    btn.textContent='Alterando...';btn.disabled=true;
+    const res=await db.auth.updateUser({password:nova});
+    btn.textContent='Alterar senha';btn.disabled=false;
+    if(res.error){showToast({type:'warning',title:'Erro: '+res.error.message});return;}
+    showToast({type:'success',title:'✅ Senha alterada!'});
+    document.getElementById('cfgNovaSenha').value='';
+    document.getElementById('cfgConfSenha').value='';
+    const bar=document.getElementById('cfgPwdBar');if(bar)bar.style.width='0';
+    const txt=document.getElementById('cfgPwdTxt');if(txt)txt.textContent='';
+};
+
+// Expor o user atual para o modal
+if (typeof getUser === 'function') {
+    getUser().then(function(user){ if(user) window._cfgUser = user; });
+}
+if (typeof onAuthChange === 'function') {
+    onAuthChange(function(user){ if(user) window._cfgUser = user; });
+}
+
+})();
 
 })();
