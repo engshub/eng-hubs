@@ -203,56 +203,8 @@
                     </div>
                 </header>
  
-                <div class="forecast-grid">
- 
-                    <article class="forecast-card">
-                        <div class="forecast-status status-iminente">
-                            <i data-lucide="alert-circle"></i> Edital iminente
-                        </div>
-                        <h3>TCE-SP — Auditor de Controle Externo</h3>
-                        <p class="forecast-meta">Engenharia · 12 vagas · Banca: VUNESP</p>
-                        <p class="forecast-desc">Edital previsto para junho/2026. Comissão já formada e nomeada.</p>
-                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-1">
-                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
-                        </button>
-                    </article>
- 
-                    <article class="forecast-card">
-                        <div class="forecast-status status-andamento">
-                            <i data-lucide="clock"></i> Em estudos
-                        </div>
-                        <h3>TCE-RJ — Analista de Controle Externo</h3>
-                        <p class="forecast-meta">Engenharia/Arquitetura · 30 vagas estimadas</p>
-                        <p class="forecast-desc">Solicitação encaminhada. Previsão para 2º semestre de 2026.</p>
-                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-2">
-                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
-                        </button>
-                    </article>
- 
-                    <article class="forecast-card">
-                        <div class="forecast-status status-andamento">
-                            <i data-lucide="clock"></i> Em estudos
-                        </div>
-                        <h3>Petrobras — Engenheiro Júnior</h3>
-                        <p class="forecast-meta">Múltiplas especialidades · Banca: CESGRANRIO</p>
-                        <p class="forecast-desc">Concurso histórico. Movimentações indicam edital até dezembro.</p>
-                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-3">
-                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
-                        </button>
-                    </article>
- 
-                    <article class="forecast-card">
-                        <div class="forecast-status status-iminente">
-                            <i data-lucide="alert-circle"></i> Edital iminente
-                        </div>
-                        <h3>DNIT — Engenheiro Civil</h3>
-                        <p class="forecast-meta">120 vagas estimadas · Banca: CEBRASPE</p>
-                        <p class="forecast-desc">Autorização publicada. Edital esperado nas próximas semanas.</p>
-                        <button class="btn btn-outline btn-block btn-watch" data-id="prev-4">
-                            <i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span>
-                        </button>
-                    </article>
- 
+                <div class="forecast-grid" id="forecast-grid">
+<div class="empty-state hidden" id="previstos-empty"><p>Nenhum concurso previsto no momento.</p></div>
                 </div>
             </div>
         </section>
@@ -700,7 +652,41 @@
       return art;
     }
 
-    async function loadDynamic(){
+    function buildForecastCard(c){
+  var art = document.createElement('article');
+  art.className = 'forecast-card';
+  art.setAttribute('data-id', c.id);
+  var fase = c.fase || 'Previsto';
+  var statusCls = (fase === 'Edital iminente') ? 'status-iminente' : 'status-andamento';
+  var icon = (fase === 'Edital iminente') ? 'alert-circle' : 'clock';
+  var meta = [];
+  if(c.area_label) meta.push(esc(c.area_label));
+  if(c.vagas != null) meta.push(esc(c.vagas) + ' vagas');
+  if(c.banca) meta.push('Banca: ' + esc(c.banca));
+  art.innerHTML =
+    '<div class="forecast-status ' + statusCls + '">' +
+      '<i data-lucide="' + icon + '"></i> ' + esc(fase) +
+    '</div>' +
+    '<h3>' + esc(c.orgao || '') + (c.cargo ? ' — ' + esc(c.cargo) : '') + '</h3>' +
+    '<p class="forecast-meta">' + meta.join(' · ') + '</p>' +
+    (c.link_edital ? '<a class="btn btn-outline btn-block" href="' + esc(c.link_edital) + '" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Mais informações</a>' : '<button class="btn btn-outline btn-block btn-watch" data-watch-id="' + esc(c.id) + '"><i data-lucide="bell-plus"></i> Avisar quando sair</button>');
+  return art;
+}
+function renderPrevistos(lista){
+  var grid = document.getElementById('forecast-grid');
+  if(!grid) return;
+  var empty = document.getElementById('previstos-empty');
+  grid.innerHTML = '';
+  if(!lista || !lista.length){
+    if(empty){ grid.appendChild(empty); empty.classList.remove('hidden'); }
+    return;
+  }
+  var frag = document.createDocumentFragment();
+  lista.forEach(function(c){ frag.appendChild(buildForecastCard(c)); });
+  grid.appendChild(frag);
+  if(window.lucide && window.lucide.createIcons){ try{ window.lucide.createIcons(); }catch(e){} }
+}
+async function loadDynamic(){
       try{
         if(!window.supabase) return;
         // reaproveita a anon key pública já presente em controle.html
@@ -718,9 +704,17 @@
         if(!grid) return;
         // Home passa a exibir SOMENTE os concursos do banco (sem duplicar os estáticos)
         grid.innerHTML = '';
-        var frag = document.createDocumentFragment();
-        r.data.forEach(function(c){ frag.appendChild(buildCard(c)); });
-        grid.appendChild(frag);
+// separa por seção: 'aberto' vai para Editais abertos; 'previsto' vai para Previstos. Homologados saem da home.
+var abertos = [], previstos = [];
+r.data.forEach(function(c){
+  if(c.homologado) return;
+  if((c.secao||'aberto') === 'previsto') previstos.push(c); else abertos.push(c);
+});
+var frag = document.createDocumentFragment();
+abertos.forEach(function(c){ frag.appendChild(buildCard(c)); });
+grid.appendChild(frag);
+// Renderiza a seção Previstos
+renderPrevistos(previstos);
         // Liga o botão 'Acompanhar' à Minha área (controle_concursos)
         if(!grid.__watchBound){
           grid.__watchBound = true;
