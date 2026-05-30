@@ -1,5 +1,5 @@
 /* ============================================================
-   ENG HUBS — Script principal (Vanilla JS)
+   ENG HUBS â Script principal (Vanilla JS)
    ============================================================ */
 (function () {
     'use strict';
@@ -8,7 +8,7 @@
         {
             id: 'c1',
             orgao: 'TCE-SP',
-            cargo: 'Auditor de Controle Externo — Engenharia',
+            cargo: 'Auditor de Controle Externo â Engenharia',
             area: 'engenharia-civil',
             areaLabel: 'Engenharia Civil',
             banca: 'VUNESP',
@@ -22,7 +22,7 @@
         },
         {
             id: 'c2',
-            orgao: 'Prefeitura de Camboriú/SC',
+            orgao: 'Prefeitura de CamboriÃº/SC',
             cargo: 'Engenheiro Civil',
             area: 'engenharia-civil',
             areaLabel: 'Engenharia Civil',
@@ -37,7 +37,7 @@
         {
             id: 'c3',
             orgao: 'TCM-SP',
-            cargo: 'Auditor de Controle Externo — Arquitetura',
+            cargo: 'Auditor de Controle Externo â Arquitetura',
             area: 'arquitetura',
             areaLabel: 'Arquitetura',
             banca: 'FGV',
@@ -53,7 +53,7 @@
             orgao: 'CREA-PR',
             cargo: 'Engenheiro Eletricista',
             area: 'eletrica',
-            areaLabel: 'Engenharia Elétrica',
+            areaLabel: 'Engenharia ElÃ©trica',
             banca: 'IBFC',
             estado: 'PR',
             vagas: 3,
@@ -65,7 +65,7 @@
         {
             id: 'c5',
             orgao: 'IBAMA',
-            cargo: 'Analista Ambiental — Engenharia',
+            cargo: 'Analista Ambiental â Engenharia',
             area: 'ambiental',
             areaLabel: 'Engenharia Ambiental',
             banca: 'CEBRASPE',
@@ -79,7 +79,7 @@
         {
             id: 'c6',
             orgao: 'INCRA',
-            cargo: 'Engenheiro Agrônomo',
+            cargo: 'Engenheiro AgrÃ´nomo',
             area: 'agronomia',
             areaLabel: 'Agronomia',
             banca: 'CEBRASPE',
@@ -107,7 +107,7 @@
         {
             id: 'c8',
             orgao: 'TJ-RS',
-            cargo: 'Analista Judiciário — Engenharia Civil',
+            cargo: 'Analista JudiciÃ¡rio â Engenharia Civil',
             area: 'engenharia-civil',
             areaLabel: 'Engenharia Civil',
             banca: 'FAURGS',
@@ -121,7 +121,7 @@
         {
             id: 'c9',
             orgao: 'CAU/BR',
-            cargo: 'Arquiteto e Urbanista — Fiscalização',
+            cargo: 'Arquiteto e Urbanista â FiscalizaÃ§Ã£o',
             area: 'arquitetura',
             areaLabel: 'Arquitetura',
             banca: 'IADES',
@@ -185,9 +185,9 @@
         if (dias < 0) {
             textoPrazo = `Encerrado em <strong>${formatData(c.inscricoesAte)}</strong>`;
         } else if (dias === 0) {
-            textoPrazo = `<strong>Último dia para inscrição!</strong>`;
+            textoPrazo = `<strong>Ãltimo dia para inscriÃ§Ã£o!</strong>`;
         } else {
-            textoPrazo = `Inscrições até <strong>${formatData(c.inscricoesAte)}</strong> · ${dias} dia${dias > 1 ? 's' : ''}`;
+            textoPrazo = `InscriÃ§Ãµes atÃ© <strong>${formatData(c.inscricoesAte)}</strong> Â· ${dias} dia${dias > 1 ? 's' : ''}`;
         }
         return `
             <article class="card" data-id="${c.id}" data-area="${c.area}">
@@ -215,7 +215,7 @@
                         <span class="card-info-value"><strong>${c.vagas}</strong></span>
                     </div>
                     <div class="card-info-item">
-                        <span class="card-info-label">Remuneração</span>
+                        <span class="card-info-label">RemuneraÃ§Ã£o</span>
                         <span class="card-info-value">${formatBRL(c.salario)}</span>
                     </div>
                     <div class="card-info-item">
@@ -305,10 +305,10 @@
                 <i data-lucide="${iconMap[type] || iconMap.default}"></i>
             </div>
             <div class="toast-body">
-                <div class="toast-title">${title || 'Notificação'}</div>
+                <div class="toast-title">${title || 'NotificaÃ§Ã£o'}</div>
                 ${message ? `<div class="toast-message">${message}</div>` : ''}
             </div>
-            <button class="toast-close" aria-label="Fechar notificação">
+            <button class="toast-close" aria-label="Fechar notificaÃ§Ã£o">
                 <i data-lucide="x"></i>
             </button>
         `;
@@ -334,22 +334,22 @@
                 const iconBtn1 = btn.querySelector('i[data-lucide]') || btn.querySelector('svg');
                 if (iconBtn1 && iconBtn1.tagName === 'I') { iconBtn1.setAttribute('data-lucide', 'bell-plus'); }
             }
-                        // Supabase: remove acompanhamento do banco
+                        // Supabase: remove de controle_concursos
             if (typeof db !== 'undefined') {
                 db.auth.getUser().then(function(res) {
                     var user = res.data && res.data.user;
                     if (user) {
-                        db.from('concursos_acompanhados')
+                        db.from('controle_concursos')
                             .delete()
                             .match({ user_id: user.id, concurso_id: id })
-                            .then(function(r) { if (r.error) console.error('Erro ao remover acompanhamento:', r.error); });
+                            .then(function(r) { if (r.error) console.error('Erro ao remover de controle_concursos:', r.error); });
                     }
                 });
             }
             showToast({
                 type: 'info',
                 title: 'Removido dos acompanhados',
-                message: concurso ? `Você não receberá mais alertas sobre ${concurso.orgao}.` : ''
+                message: concurso ? `VocÃª nÃ£o receberÃ¡ mais alertas sobre ${concurso.orgao}.` : ''
             });
         } else {
             state.acompanhando.add(id);
@@ -360,14 +360,27 @@
                 const iconBtn2 = btn.querySelector('i[data-lucide]') || btn.querySelector('svg');
                 if (iconBtn2 && iconBtn2.tagName === 'I') { iconBtn2.setAttribute('data-lucide', 'check'); }
             }
-                        // Supabase: salvar acompanhamento no banco
-            if (typeof db !== 'undefined') {
+                        // Supabase: salvar em controle_concursos com dados do concurso
+            if (typeof db !== 'undefined' && concurso) {
                 db.auth.getUser().then(function(res) {
                     var user = res.data && res.data.user;
                     if (user) {
-                        db.from('concursos_acompanhados')
-                            .upsert({ user_id: user.id, concurso_id: id })
-                            .then(function(r) { if (r.error) console.error('Erro ao salvar acompanhamento:', r.error); });
+                        db.from('controle_concursos')
+                            .upsert({
+                                user_id:        user.id,
+                                concurso_id:    id,
+                                banca:          concurso.banca,
+                                orgao:          concurso.orgao,
+                                cargo:          concurso.cargo,
+                                vagas:          concurso.vagas,
+                                salario:        String(concurso.salario),
+                                data_inscricao: concurso.inscricoesAte,
+                                situacao:       'nao',
+                                data_prova:     null,
+                                data_isencao:   null,
+                                gabarito:       null
+                            }, { onConflict: 'user_id,concurso_id' })
+                            .then(function(r) { if (r.error) console.error('Erro ao salvar em controle_concursos:', r.error); });
                     }
                 });
             }
@@ -375,8 +388,8 @@
                 type: 'success',
                 title: 'Concurso acompanhado!',
                 message: concurso
-                    ? `Você receberá alertas sobre ${concurso.orgao} — ${concurso.cargo}.`
-                    : 'Você receberá notificações sobre este concurso.'
+                    ? `VocÃª receberÃ¡ alertas sobre ${concurso.orgao} â ${concurso.cargo}.`
+                    : 'VocÃª receberÃ¡ notificaÃ§Ãµes sobre este concurso.'
             });
         }
         refreshIcons();
@@ -401,7 +414,7 @@
             showToast({
                 type: 'success',
                 title: 'Aviso ativado',
-                message: 'Você será notificado assim que o edital for publicado.'
+                message: 'VocÃª serÃ¡ notificado assim que o edital for publicado.'
             });
         } else {
             label.textContent = 'Avisar quando sair';
@@ -409,7 +422,7 @@
             showToast({
                 type: 'info',
                 title: 'Aviso desativado',
-                message: 'Você não receberá mais alertas sobre este edital.'
+                message: 'VocÃª nÃ£o receberÃ¡ mais alertas sobre este edital.'
             });
         }
         refreshIcons();
@@ -544,8 +557,8 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
                 const concurso = CONCURSOS.find(c => c.id === id);
                 showToast({
                     type: 'info',
-                    title: 'Página de detalhes',
-                    message: concurso ? `Abrindo detalhes de ${concurso.orgao} — ${concurso.cargo}.` : 'Em breve.'
+                    title: 'PÃ¡gina de detalhes',
+                    message: concurso ? `Abrindo detalhes de ${concurso.orgao} â ${concurso.cargo}.` : 'Em breve.'
                 });
                 return;
             }
@@ -606,8 +619,8 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
             btnNotif.addEventListener('click', () => {
                 showToast({
                     type: 'info',
-                    title: 'Central de notificações',
-                    message: 'Você tem 3 alertas: TCE-SP iminente, novo edital DNIT e prazo encerrando no INCRA.'
+                    title: 'Central de notificaÃ§Ãµes',
+                    message: 'VocÃª tem 3 alertas: TCE-SP iminente, novo edital DNIT e prazo encerrando no INCRA.'
                 });
             });
         }
@@ -630,7 +643,7 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
     }
 
     /* ============================================================
-       SUPABASE AUTH — Session check + dropdown
+       SUPABASE AUTH â Session check + dropdown
        ============================================================ */
     function buildUserDropdown(user) {
         const wrap = document.getElementById('user-greeting-wrap');
@@ -656,7 +669,7 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         <div style="position:relative;">
           <div id="ub" style="display:flex;align-items:center;gap:8px;background:rgba(26,46,74,0.06);border:1px solid #e2e8f0;border-radius:20px;padding:4px 12px 4px 6px;cursor:pointer;">
             ${av}
-            <span style="font-size:13px;font-weight:500;color:#1A2E4A;">Olá, ${primeiro} 👋</span>
+            <span style="font-size:13px;font-weight:500;color:#1A2E4A;">OlÃ¡, ${primeiro} ð</span>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
           </div>
           <div id="ud" style="display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);width:220px;z-index:9999;overflow:hidden;">
@@ -666,11 +679,11 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
             </div>
             <a href="controle.html" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#1A2E4A;text-decoration:none;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              Minha área
+              Minha Ã¡rea
             </a>
             <button id="btnConfigIndex" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#1A2E4A;background:none;border:none;width:100%;cursor:pointer;text-align:left;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background=''">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              Configurações da conta
+              ConfiguraÃ§Ãµes da conta
             </button>
             <hr style="border:none;border-top:1px solid #e2e8f0;margin:4px 0;">
             <button id="btnSairIndex" style="display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:13px;color:#b91c1c;background:none;border:none;width:100%;cursor:pointer;" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background=''">
@@ -693,13 +706,13 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
             if (dd) dd.style.display = 'none';
         }, { once: false });
 
-        // LOGOUT — limpa localStorage diretamente (signOut via rede falha no plano free)
+        // LOGOUT â limpa localStorage diretamente (signOut via rede falha no plano free)
         document.getElementById('btnSairIndex').addEventListener('click', () => {
             localStorage.clear();
             window.location.reload();
         });
 
-        // Listener Configurações da conta (index)
+        // Listener ConfiguraÃ§Ãµes da conta (index)
         const btnCfgIdx = document.getElementById('btnConfigIndex');
         if (btnCfgIdx) {
             btnCfgIdx.addEventListener('click', () => {
@@ -735,14 +748,14 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         if (p.get('login') === '1') {
             setTimeout(() => {
                 modal.open('login');
-                showToast({ type: 'info', title: 'Acesso restrito', message: 'Faça login para acessar sua área.' });
+                showToast({ type: 'info', title: 'Acesso restrito', message: 'FaÃ§a login para acessar sua Ã¡rea.' });
                 window.history.replaceState({}, '', window.location.pathname);
             }, 400);
         }
     })();
 
 
-/* ===== MODAL CONFIGURAÇÕES DA CONTA — PÁGINA INICIAL ===== */
+/* ===== MODAL CONFIGURAÃÃES DA CONTA â PÃGINA INICIAL ===== */
 (function() {
 
 function injectConfigModalStyles() {
@@ -807,7 +820,7 @@ function injectConfigModalHTML(user) {
     <div class="cfg-header">
       <span class="cfg-title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F4801A" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:6px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        Configurações da conta
+        ConfiguraÃ§Ãµes da conta
       </span>
       <button onclick="closeCfg()" style="background:none;border:none;font-size:18px;color:#94a3b8;cursor:pointer;padding:4px;">&#x2715;</button>
     </div>
@@ -816,7 +829,7 @@ function injectConfigModalHTML(user) {
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Dados pessoais
       </button>
       <button class="cfg-tab" data-cfg-tab="seguranca" onclick="switchCfgTab('seguranca')">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Segurança
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>SeguranÃ§a
       </button>
       <button class="cfg-tab" data-cfg-tab="pagamento" onclick="switchCfgTab('pagamento')">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Pagamento
@@ -832,30 +845,30 @@ function injectConfigModalHTML(user) {
           </label>
           <input type="file" id="cfgFotoInput" accept="image/*" style="display:none" onchange="handleCfgFoto(event)">
         </div>
-        <p class="cfg-section-title">Informações pessoais</p>
+        <p class="cfg-section-title">InformaÃ§Ãµes pessoais</p>
         <div class="cfg-field"><label>Nome completo</label><input type="text" id="cfgNome" value="${nome}" placeholder="Seu nome completo"></div>
-        <div class="cfg-field"><label>E-mail atual</label><input type="email" id="cfgEmailAtual" value="${user.email||''}" disabled><small>Para alterar o e-mail, acesse a aba Segurança.</small></div>
-        <div class="cfg-field"><label>Área de atuação</label><input type="text" id="cfgArea" value="${meta.area||''}" placeholder="Ex: Engenharia Civil"></div>
+        <div class="cfg-field"><label>E-mail atual</label><input type="email" id="cfgEmailAtual" value="${user.email||''}" disabled><small>Para alterar o e-mail, acesse a aba SeguranÃ§a.</small></div>
+        <div class="cfg-field"><label>Ãrea de atuaÃ§Ã£o</label><input type="text" id="cfgArea" value="${meta.area||''}" placeholder="Ex: Engenharia Civil"></div>
       </div>
       <div class="cfg-panel" id="cfg-panel-seguranca">
         <p class="cfg-section-title">Alterar e-mail</p>
-        <div class="cfg-field"><label>Novo e-mail</label><input type="email" id="cfgNovoEmail" placeholder="novo@email.com"><small>Um link de confirmação será enviado para o novo endereço.</small></div>
+        <div class="cfg-field"><label>Novo e-mail</label><input type="email" id="cfgNovoEmail" placeholder="novo@email.com"><small>Um link de confirmaÃ§Ã£o serÃ¡ enviado para o novo endereÃ§o.</small></div>
         <div style="margin-bottom:24px;"><button class="cfg-btn-save" onclick="cfgSalvarEmail()" style="width:100%;" id="cfgBtnEmail">Alterar e-mail</button></div>
         <hr style="border:none;border-top:1px solid #e2e8f0;margin-bottom:24px;">
         <p class="cfg-section-title">Alterar senha</p>
-        <div class="cfg-field"><label>Nova senha</label><input type="password" id="cfgNovaSenha" placeholder="Mínimo 6 caracteres" oninput="cfgPwdStrength(this.value)"><div class="cfg-pwd-strength"><div class="cfg-pwd-bar" id="cfgPwdBar"></div></div><small id="cfgPwdTxt" style="font-weight:500;margin-top:4px;"></small></div>
+        <div class="cfg-field"><label>Nova senha</label><input type="password" id="cfgNovaSenha" placeholder="MÃ­nimo 6 caracteres" oninput="cfgPwdStrength(this.value)"><div class="cfg-pwd-strength"><div class="cfg-pwd-bar" id="cfgPwdBar"></div></div><small id="cfgPwdTxt" style="font-weight:500;margin-top:4px;"></small></div>
         <div class="cfg-field"><label>Confirmar nova senha</label><input type="password" id="cfgConfSenha" placeholder="Repita a nova senha"></div>
         <div><button class="cfg-btn-save" onclick="cfgSalvarSenha()" style="width:100%;" id="cfgBtnSenha">Alterar senha</button></div>
       </div>
       <div class="cfg-panel" id="cfg-panel-pagamento">
-        <div class="cfg-plan-info"><div style="width:36px;height:36px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:18px;">🎓</div><div><strong style="display:block;font-size:13px;font-weight:700;color:#1A2E4A">Plano Gratuito</strong><span style="font-size:11px;color:#64748b">Acesso aos editais públicos e controle de concursos</span></div></div>
-        <div class="cfg-premium-box"><h4>✨ Engs Hub Premium — em breve</h4><p>Alertas instantâneos por e-mail, filtros avançados, histórico completo de bancas e muito mais.</p><button class="cfg-btn-premium" onclick="showToast({type:'success',title:'Em breve!',message:'Você será avisado quando o Premium for lançado.'})">⭐ Quero ser avisado</button></div>
-        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;"><p style="margin:0;font-size:12px;color:#92400e;line-height:1.5;"><strong>💳 Forma de pagamento</strong><br>A integração com plataforma de pagamento será disponibilizada em breve.</p></div>
+        <div class="cfg-plan-info"><div style="width:36px;height:36px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:18px;">ð</div><div><strong style="display:block;font-size:13px;font-weight:700;color:#1A2E4A">Plano Gratuito</strong><span style="font-size:11px;color:#64748b">Acesso aos editais pÃºblicos e controle de concursos</span></div></div>
+        <div class="cfg-premium-box"><h4>â¨ Engs Hub Premium â em breve</h4><p>Alertas instantÃ¢neos por e-mail, filtros avanÃ§ados, histÃ³rico completo de bancas e muito mais.</p><button class="cfg-btn-premium" onclick="showToast({type:'success',title:'Em breve!',message:'VocÃª serÃ¡ avisado quando o Premium for lanÃ§ado.'})">â­ Quero ser avisado</button></div>
+        <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;"><p style="margin:0;font-size:12px;color:#92400e;line-height:1.5;"><strong>ð³ Forma de pagamento</strong><br>A integraÃ§Ã£o com plataforma de pagamento serÃ¡ disponibilizada em breve.</p></div>
       </div>
     </div>
     <div class="cfg-footer" id="cfgFooter">
       <button class="cfg-btn-cancel" onclick="closeCfg()">Cancelar</button>
-      <button class="cfg-btn-save" id="cfgBtnSalvar" onclick="cfgSalvarPerfil()">Salvar alterações</button>
+      <button class="cfg-btn-save" id="cfgBtnSalvar" onclick="cfgSalvarPerfil()">Salvar alteraÃ§Ãµes</button>
     </div>
   </div>
 </div>`;
@@ -897,14 +910,14 @@ window.cfgPwdStrength = function(s) {
     if(!s){bar.style.width='0';txt.textContent='';return;}
     let sc=0;
     if(s.length>=6)sc++;if(s.length>=10)sc++;if(/[A-Z]/.test(s))sc++;if(/[0-9]/.test(s))sc++;if(/[^A-Za-z0-9]/.test(s))sc++;
-    const lv=[{w:'20%',c:'#ef4444',l:'Muito fraca'},{w:'40%',c:'#f97316',l:'Fraca'},{w:'60%',c:'#eab308',l:'Razoável'},{w:'80%',c:'#22c55e',l:'Forte'},{w:'100%',c:'#16a34a',l:'Muito forte'}][Math.max(0,sc-1)];
+    const lv=[{w:'20%',c:'#ef4444',l:'Muito fraca'},{w:'40%',c:'#f97316',l:'Fraca'},{w:'60%',c:'#eab308',l:'RazoÃ¡vel'},{w:'80%',c:'#22c55e',l:'Forte'},{w:'100%',c:'#16a34a',l:'Muito forte'}][Math.max(0,sc-1)];
     bar.style.width=lv.w;bar.style.background=lv.c;txt.textContent=lv.l;txt.style.color=lv.c;
 };
 
 window.handleCfgFoto = function(event) {
     const file = event.target.files[0];
     if (!file) return;
-    if (file.size > 2*1024*1024) { showToast({type:'warning',title:'Foto muito grande',message:'Máximo 2MB.'}); return; }
+    if (file.size > 2*1024*1024) { showToast({type:'warning',title:'Foto muito grande',message:'MÃ¡ximo 2MB.'}); return; }
     const reader = new FileReader();
     reader.onload = function(e) {
         const url = e.target.result;
@@ -937,44 +950,44 @@ window.cfgSalvarPerfil = async function() {
     if (!nome) { showToast({type:'warning',title:'Informe seu nome.'}); return; }
     btn.textContent = 'Salvando...'; btn.disabled = true;
     const res = await db.auth.updateUser({ data: { nome_completo: nome, area } });
-    btn.textContent = 'Salvar alterações'; btn.disabled = false;
+    btn.textContent = 'Salvar alteraÃ§Ãµes'; btn.disabled = false;
     if (res.error) { showToast({type:'warning',title:'Erro: '+res.error.message}); return; }
     if (window._cfgUser) { window._cfgUser.user_metadata.nome_completo = nome; window._cfgUser.user_metadata.area = area; }
     // Atualizar header
     const primeiro = nome.split(' ')[0];
     const nameEl = document.querySelector('#user-greeting-wrap span');
-    if (nameEl && nameEl.textContent.includes('Olá')) nameEl.textContent = 'Olá, '+primeiro+' 👋';
+    if (nameEl && nameEl.textContent.includes('OlÃ¡')) nameEl.textContent = 'OlÃ¡, '+primeiro+' ð';
     const ddName = document.getElementById('user-greeting-wrap');
     if (ddName) {
         const nameSpan = ddName.querySelector('span[style*="font-size:13px"]');
-        if (nameSpan) nameSpan.textContent = 'Olá, '+primeiro+' 👋';
+        if (nameSpan) nameSpan.textContent = 'OlÃ¡, '+primeiro+' ð';
     }
-    showToast({type:'success',title:'✅ Dados atualizados!'});
+    showToast({type:'success',title:'â Dados atualizados!'});
     closeCfg();
 };
 
 window.cfgSalvarEmail = async function() {
     const e = document.getElementById('cfgNovoEmail').value.trim();
     const btn = document.getElementById('cfgBtnEmail');
-    if (!e || !/^[^@]+@[^@]+.[^@]+$/.test(e)) { showToast({type:'warning',title:'E-mail inválido.'}); return; }
+    if (!e || !/^[^@]+@[^@]+.[^@]+$/.test(e)) { showToast({type:'warning',title:'E-mail invÃ¡lido.'}); return; }
     btn.textContent='Enviando...';btn.disabled=true;
     const res = await db.auth.updateUser({ email: e });
     btn.textContent='Alterar e-mail';btn.disabled=false;
     if(res.error){showToast({type:'warning',title:'Erro: '+res.error.message});return;}
-    showToast({type:'success',title:'✅ Confirmação enviada para '+e});
+    showToast({type:'success',title:'â ConfirmaÃ§Ã£o enviada para '+e});
     document.getElementById('cfgNovoEmail').value='';
 };
 
 window.cfgSalvarSenha = async function() {
     const nova=document.getElementById('cfgNovaSenha').value, conf=document.getElementById('cfgConfSenha').value;
     const btn=document.getElementById('cfgBtnSenha');
-    if(!nova||nova.length<6){showToast({type:'warning',title:'Senha mín. 6 caracteres.'});return;}
-    if(nova!==conf){showToast({type:'warning',title:'Senhas não coincidem.'});return;}
+    if(!nova||nova.length<6){showToast({type:'warning',title:'Senha mÃ­n. 6 caracteres.'});return;}
+    if(nova!==conf){showToast({type:'warning',title:'Senhas nÃ£o coincidem.'});return;}
     btn.textContent='Alterando...';btn.disabled=true;
     const res=await db.auth.updateUser({password:nova});
     btn.textContent='Alterar senha';btn.disabled=false;
     if(res.error){showToast({type:'warning',title:'Erro: '+res.error.message});return;}
-    showToast({type:'success',title:'✅ Senha alterada!'});
+    showToast({type:'success',title:'â Senha alterada!'});
     document.getElementById('cfgNovaSenha').value='';
     document.getElementById('cfgConfSenha').value='';
     const bar=document.getElementById('cfgPwdBar');if(bar)bar.style.width='0';
