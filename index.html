@@ -556,7 +556,7 @@
 
             try {
                 var result = await db.auth.resetPasswordForEmail(email, {
-                    redirectTo: 'https://engshub.com.br/controle.html'
+                    redirectTo: 'https://engshub.com.br/redefinir-senha.html'
                 });
                 if (result.error) throw result.error;
                 document.getElementById('form-reset').style.display = 'none';
