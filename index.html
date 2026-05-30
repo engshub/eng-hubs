@@ -817,5 +817,26 @@ btn.classList.add('is-active');
     }
   })();
   </script>
+  <script>
+    /* engshub-scroll-concursos: rola suavemente ate "Editais abertos" quando vindo do botao Adicionar concurso */
+    (function(){
+      if (window.location.hash !== '#concursos') return;
+      function goToConcursos(attempt){
+        var sec = document.getElementById('concursos');
+        if (sec) {
+          var grid = document.getElementById('cards-grid');
+          // espera os cards dinamicos carregarem para a posicao ser correta
+          if ((!grid || grid.children.length === 0) && attempt < 20) {
+            return setTimeout(function(){ goToConcursos(attempt+1); }, 200);
+          }
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (attempt < 20) {
+          setTimeout(function(){ goToConcursos(attempt+1); }, 200);
+        }
+      }
+      window.addEventListener('load', function(){ setTimeout(function(){ goToConcursos(0); }, 300); });
+    })();
+  </script>
+
 </body>
 </html>
