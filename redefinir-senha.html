@@ -106,7 +106,7 @@
         } catch(err) {
           btn.disabled = false; btn.textContent = 'Salvar nova senha';
           let m = (err && err.message) || 'Erro ao redefinir. Tente novamente.';
-          if (/expired|invalid|jwt|token/i.test(m)) m = 'O link expirou ou já foi usado. Solicite um novo em "Esqueci minha senha".';
+          if (/expired|invalid|jwt|token|session missing|missing/i.test(m)) m = 'O link expirou ou já foi usado. Solicite um novo em "Esqueci minha senha" na tela de login.';
           if (/same.?password|different from/i.test(m)) m = 'A nova senha precisa ser diferente da anterior.';
           showMsg(m, 'err');
         }
