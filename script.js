@@ -7,7 +7,7 @@
     const CONCURSOS = [
         {
             id: 'c1',
-            orgao: 'TCE-SP',
+            orgao: 'TCE-SP',h
             cargo: 'Auditor de Controle Externo — Engenharia',
             area: 'engenharia-civil',
             areaLabel: 'Engenharia Civil',
@@ -331,7 +331,20 @@
             if (btn) {
                 btn.classList.remove('is-active');
                 btn.querySelector('.btn-watch-label').textContent = 'Acompanhar';
-                btn.querySelector('i').setAttribute('data-lucide', 'bell-plus');
+                const iconBtn1 = btn.querySelector('i[data-lucide]') || btn.querySelector('svg');
+                if (iconBtn1 && iconBtn1.tagName === 'I') { iconBtn1.setAttribute('data-lucide', 'bell-plus'); }
+            }
+                        // Supabase: remove acompanhamento do banco
+            if (typeof db !== 'undefined') {
+                db.auth.getUser().then(function(res) {
+                    var user = res.data && res.data.user;
+                    if (user) {
+                        db.from('concursos_acompanhados')
+                            .delete()
+                            .match({ user_id: user.id, concurso_id: id })
+                            .then(function(r) { if (r.error) console.error('Erro ao remover acompanhamento:', r.error); });
+                    }
+                });
             }
             showToast({
                 type: 'info',
@@ -344,7 +357,19 @@
             if (btn) {
                 btn.classList.add('is-active');
                 btn.querySelector('.btn-watch-label').textContent = 'Acompanhando';
-                btn.querySelector('i').setAttribute('data-lucide', 'check');
+                const iconBtn2 = btn.querySelector('i[data-lucide]') || btn.querySelector('svg');
+                if (iconBtn2 && iconBtn2.tagName === 'I') { iconBtn2.setAttribute('data-lucide', 'check'); }
+            }
+                        // Supabase: salvar acompanhamento no banco
+            if (typeof db !== 'undefined') {
+                db.auth.getUser().then(function(res) {
+                    var user = res.data && res.data.user;
+                    if (user) {
+                        db.from('concursos_acompanhados')
+                            .upsert({ user_id: user.id, concurso_id: id })
+                            .then(function(r) { if (r.error) console.error('Erro ao salvar acompanhamento:', r.error); });
+                    }
+                });
             }
             showToast({
                 type: 'success',
@@ -358,9 +383,11 @@
         const fav = document.querySelector(`[data-fav-id="${id}"]`);
         if (fav) {
             fav.classList.toggle('is-active', state.acompanhando.has(id));
-            fav.querySelector('i').setAttribute('data-lucide',
-                state.acompanhando.has(id) ? 'bookmark-check' : 'bookmark');
-            refreshIcons();
+            const iconFav = fav.querySelector('i[data-lucide]') || fav.querySelector('svg');
+            if (iconFav && iconFav.tagName === 'I') {
+              iconFav.setAttribute('data-lucide', state.acompanhando.has(id) ? 'bookmark-check' : 'bookmark');
+              refreshIcons();
+            }
         }
     }
 
