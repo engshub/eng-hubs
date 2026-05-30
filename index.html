@@ -215,7 +215,7 @@
                     <h2>Não perca o próximo edital.</h2>
                     <p>Cadastre-se gratuitamente e receba alerta no e-mail e no celular assim que um concurso da sua área for publicado.</p>
                 </div>
-                <button class="btn btn-cta" data-modal-open="cadastro">
+                <button class="btn btn-cta" id="ctaAvisado" data-modal-open="cadastro">
                     <i data-lucide="bell-ring"></i> Quero ser avisado
                 </button>
             </div>
@@ -844,5 +844,19 @@ btn.classList.add('is-active');
     })();
   </script>
 
+  <!-- engshub-cta-avisado -->
+  <script>
+  (function(){
+    function isLogged(){try{var v=localStorage.getItem("sb-xyvsihpdfgnihgomdntb-auth-token");return !!(v && v.length>2);}catch(e){return false;}}
+    function wire(){
+      var btn=document.getElementById("ctaAvisado");
+      if(!btn) return;
+      btn.addEventListener("click",function(ev){
+        if(isLogged()){ ev.preventDefault(); ev.stopImmediatePropagation(); window.location.href="controle.html"; }
+      },true);
+    }
+    if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",wire);}else{wire();}
+  })();
+  </script>
 </body>
 </html>
