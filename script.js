@@ -7,7 +7,7 @@
     const CONCURSOS = [
         {
             id: 'c1',
-            orgao: 'TCE-SP',h
+            orgao: 'TCE-SP',
             cargo: 'Auditor de Controle Externo — Engenharia',
             area: 'engenharia-civil',
             areaLabel: 'Engenharia Civil',
