@@ -818,23 +818,29 @@ btn.classList.add('is-active');
   })();
   </script>
   <script>
-    /* engshub-scroll-concursos: rola suavemente ate "Editais abertos" quando vindo do botao Adicionar concurso */
+    /* engshub-scroll-concursos: rola ate "Editais abertos" quando vindo do botao Adicionar concurso */
     (function(){
       if (window.location.hash !== '#concursos') return;
-      function goToConcursos(attempt){
+      var done = false;
+      function doScroll(){
         var sec = document.getElementById('concursos');
-        if (sec) {
-          var grid = document.getElementById('cards-grid');
-          // espera os cards dinamicos carregarem para a posicao ser correta
-          if ((!grid || grid.children.length === 0) && attempt < 20) {
-            return setTimeout(function(){ goToConcursos(attempt+1); }, 200);
-          }
-          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else if (attempt < 20) {
-          setTimeout(function(){ goToConcursos(attempt+1); }, 200);
-        }
+        if (!sec) return false;
+        if (typeof sec.scrollIntoView === 'function') sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var y = sec.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop || 0);
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        return true;
       }
-      window.addEventListener('load', function(){ setTimeout(function(){ goToConcursos(0); }, 300); });
+      function attempt(n){
+        if (done) return;
+        var grid = document.getElementById('cards-grid');
+        var ready = grid && grid.children.length > 0;
+        if (ready || n >= 25) { done = true; doScroll(); return; }
+        setTimeout(function(){ attempt(n+1); }, 200);
+      }
+      function start(){ setTimeout(function(){ attempt(0); }, 150); }
+      if (document.readyState === 'complete' || document.readyState === 'interactive') start();
+      else window.addEventListener('DOMContentLoaded', start);
+      window.addEventListener('load', start);
     })();
   </script>
 
