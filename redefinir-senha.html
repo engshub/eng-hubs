@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redefinir senha — Engs Hub</title>
+  <link rel="icon" type="image/jpeg" href="logo1.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',sans-serif;background:#F5F5F5;color:#1A2E4A;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .card{background:#fff;border-radius:16px;box-shadow:0 10px 40px rgba(26,46,74,.12);max-width:440px;width:100%;padding:40px 36px}
+    .brand{display:flex;align-items:center;gap:10px;margin-bottom:24px}
+    .brand img{height:40px;border-radius:8px}
+    .brand span{font-family:'Montserrat',sans-serif;font-weight:800;font-size:20px;color:#1A2E4A}
+    h1{font-family:'Montserrat',sans-serif;font-size:24px;margin-bottom:8px}
+    .sub{color:#64748B;font-size:14px;margin-bottom:24px;line-height:1.5}
+    label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;margin-top:16px}
+    input{width:100%;padding:13px 14px;border:1px solid #E2E8F0;border-radius:10px;font-size:15px;font-family:inherit;transition:border .15s}
+    input:focus{outline:none;border-color:#F4801A}
+    .btn{width:100%;margin-top:24px;padding:14px;background:#F4801A;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:opacity .15s}
+    .btn:hover{opacity:.92}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .msg{margin-top:16px;padding:12px 14px;border-radius:10px;font-size:14px;display:none;line-height:1.45}
+    .msg.err{background:#FEF2F2;color:#B91C1C;display:block}
+    .msg.ok{background:#F0FDF4;color:#15803D;display:block}
+    .hint{font-size:12px;color:#94A3B8;margin-top:6px}
+    #loading{text-align:center;color:#64748B;font-size:14px;padding:20px 0}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand"><img src="logo1.jpeg" alt="Engs Hub"><span>Engs Hub</span></div>
+    <div id="loading">Verificando link de recuperação...</div>
+    <div id="content" style="display:none">
+      <h1>Redefinir senha</h1>
+      <p class="sub">Escolha uma nova senha para a sua conta. Ela deve ter pelo menos 6 caracteres.</p>
+      <form id="form-redefinir" autocomplete="off">
+        <label for="pw1">Nova senha</label>
+        <input type="password" id="pw1" placeholder="Digite a nova senha" minlength="6" required>
+        <label for="pw2">Confirmar nova senha</label>
+        <input type="password" id="pw2" placeholder="Repita a nova senha" minlength="6" required>
+        <p class="hint">Use uma senha forte que você ainda não usou.</p>
+        <button type="submit" class="btn" id="btn-salvar">Salvar nova senha</button>
+      </form>
+      <div class="msg" id="msg"></div>
+    </div>
+    <div id="invalid" style="display:none">
+      <h1>Link inválido</h1>
+      <p class="sub">Este link de redefinição é inválido ou expirou. Solicite um novo em "Esqueci minha senha" na tela de login.</p>
+      <button class="btn" onclick="location.href='index.html?login=1'">Voltar para o login</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const db = window.supabase.createClient('https://xyvsihpdfgnihgomdntb.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnNpaHBkZmduaWhnb21kbnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NDE3MjMsImV4cCI6MjA5NDAxNzcyM30.k5-B3_7ZtZoXMYU8RNax7_6JHA4Z_O2ZGn7whlQd_IM');
+      const $ = id => document.getElementById(id);
+      const loading = $('loading'), content = $('content'), invalid = $('invalid'), msg = $('msg');
+      let recoveryReady = false;
+      function showMsg(text, type){ msg.className = 'msg ' + type; msg.textContent = text; }
+      db.auth.onAuthStateChange((event, session) => {
+        if (event === 'PASSWORD_RECOVERY' || (event === 'SIGNED_IN' && session)) {
+          recoveryReady = true;
+          loading.style.display = 'none';
+          content.style.display = 'block';
+        }
+      });
+      setTimeout(async () => {
+        if (recoveryReady) return;
+        const hash = window.location.hash || '';
+        const hasRecovery = hash.includes('type=recovery') || hash.includes('access_token') || window.location.search.includes('code=');
+        try {
+          const { data } = await db.auth.getSession();
+          if (data && data.session) {
+            recoveryReady = true;
+            loading.style.display = 'none';
+            content.style.display = 'block';
+            return;
+          }
+        } catch(e){}
+        if (!hasRecovery) {
+          loading.style.display = 'none';
+          invalid.style.display = 'block';
+        } else {
+          loading.style.display = 'none';
+          content.style.display = 'block';
+        }
+      }, 1500);
+      $('form-redefinir').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const pw1 = $('pw1').value, pw2 = $('pw2').value;
+        const btn = $('btn-salvar');
+        if (pw1.length < 6){ showMsg('A senha deve ter pelo menos 6 caracteres.', 'err'); return; }
+        if (pw1 !== pw2){ showMsg('As senhas não coincidem. Tente novamente.', 'err'); return; }
+        btn.disabled = true; btn.textContent = 'Salvando...';
+        try {
+          const { error } = await db.auth.updateUser({ password: pw1 });
+          if (error) throw error;
+          showMsg('Senha redefinida com sucesso! Redirecionando para o login...', 'ok');
+          $('form-redefinir').style.display = 'none';
+          await db.auth.signOut().catch(()=>{});
+          setTimeout(() => { location.href = 'index.html?redefinida=1'; }, 2200);
+        } catch(err) {
+          btn.disabled = false; btn.textContent = 'Salvar nova senha';
+          let m = (err && err.message) || 'Erro ao redefinir. Tente novamente.';
+          if (/expired|invalid|jwt|token/i.test(m)) m = 'O link expirou ou já foi usado. Solicite um novo em "Esqueci minha senha".';
+          if (/same.?password|different from/i.test(m)) m = 'A nova senha precisa ser diferente da anterior.';
+          showMsg(m, 'err');
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
