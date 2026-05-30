@@ -501,7 +501,7 @@
         document.addEventListener('click', (e) => {
             const watchBtn = e.target.closest('[data-watch-id]');
             if (watchBtn) {
-                toggleAcompanhar(watchBtn.getAttribute('data-watch-id'), watchBtn);
+if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getAttribute('data-watch-id'), watchBtn); }
                 return;
             }
             const favBtn = e.target.closest('[data-fav-id]');
