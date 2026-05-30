@@ -1301,6 +1301,7 @@ async function loadData() {
   const { data: rows, error } = await db
     .from('controle_concursos')
     .select('*')
+    .eq('user_id', currentUser.id)
     .order('created_at', { ascending: false });
 
   if (error) {
