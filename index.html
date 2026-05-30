@@ -8,7 +8,7 @@
  
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;h600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
  
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -455,7 +455,7 @@
     const SUPABASE_URL = 'https://xyvsihpdfgnihgomdntb.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnNpaHBkZmduaWhnb21kbnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NDE3MjMsImV4cCI6MjA5NDAxNzcyM30.k5-B3_7ZtZoXMYU8RNax7_6JHA4Z_O2ZGn7whlQd_IM';
     const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY); window._engDb = db;
     async function getUser() {
       try { const { data: { user } } = await db.auth.getUser(); return user; } catch(e) { return null; }
     }
@@ -697,7 +697,7 @@ async function loadDynamic(){
           if(m) key = m[0];
         }catch(e){}
         if(!key) return;
-        db = window.supabase.createClient(SUPABASE_URL, key);
+        db = window._engDb || window.supabase.createClient(SUPABASE_URL, key); if(!window._engDb) window._engDb = db;
         var r = await db.from('concursos').select('*').order('created_at', {ascending:false});
         if(r.error || !r.data || !r.data.length) return;
         var grid = document.getElementById('cards-grid');
@@ -808,7 +808,7 @@ btn.classList.add('is-active');
       try{
         var t = await fetch('controle.html', {cache:'no-store'}).then(function(r){return r.text();});
         var m = t.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
-        if(m && window.supabase){ db = window.supabase.createClient(SUPABASE_URL, m[0]); }
+        db = window._engDb || (window.supabase ? window.supabase.createClient(SUPABASE_URL, m[0]) : null); if(db && !window._engDb) window._engDb = db;
       }catch(e){}
     }
         if(document.readyState === 'loading'){
