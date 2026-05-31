@@ -589,23 +589,129 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         });
     }
 
-    function initBoasVindas() {
+    function buildNotifPanel() {
+        const existing = document.getElementById('notif-dropdown');
+        if (existing) { existing.remove(); return null; }
+
+        const cards = Array.from(document.querySelectorAll('.card'));
+        const followed = cards
+            .filter(card => card.textContent.includes('Acompanhando'))
+            .map(card => {
+                const orgao = card.querySelector('.card-org') ? card.querySelector('.card-org').textContent.trim() : '';
+                const cargo = card.querySelector('.card-title') ? card.querySelector('.card-title').textContent.trim() : '';
+                const deadline = card.querySelector('.card-deadline') ? card.querySelector('.card-deadline').textContent.trim() : '';
+                const statusBadge = card.querySelector('.badge');
+                const status = statusBadge ? statusBadge.textContent.trim() : '';
+                const daysMatch = deadline.match(/(\d+)\s+dias?/);
+                const daysLeft = daysMatch ? parseInt(daysMatch[1]) : null;
+                const encerrada = deadline.includes('encerradas');
+                return { orgao, cargo, deadline, status, daysLeft, encerrada };
+            })
+            .filter(c => !c.encerrada)
+            .sort((a, b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
+
+        const items = followed.map(c => {
+            let icon, cls, text;
+            if (c.daysLeft !== null && c.daysLeft <= 7) {
+                icon = '\u26a0\ufe0f';
+                cls = 'notif-item-urgent';
+                text = `<strong>${c.orgao}</strong> &mdash; prazo encerrando em ${c.daysLeft} dia${c.daysLeft === 1 ? '' : 's'}!`;
+            } else if (c.status === 'Novo') {
+                icon = '\ud83c\udd95';
+                cls = 'notif-item-new';
+                text = `<strong>${c.orgao}</strong> &mdash; novo edital: ${c.cargo}.`;
+            } else {
+                icon = '\u2139\ufe0f';
+                cls = 'notif-item-info';
+                text = `<strong>${c.orgao}</strong> &mdash; ${c.deadline}.`;
+            }
+            const urgentStyle = cls === 'notif-item-urgent' ? 'background:#fff7ed;border-left:3px solid #f97316;' : '';
+            const newStyle = cls === 'notif-item-new' ? 'background:#f0fdf4;border-left:3px solid #22c55e;' : '';
+            return `<div class="notif-item ${cls}" style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid #f3f4f6;font-size:14px;line-height:1.4;${urgentStyle}${newStyle}">
+                <span>${icon}</span><span>${text}</span>
+            </div>`;
+        }).join('');
+
+        const emptyMsg = followed.length === 0
+            ? '<div style="padding:24px 16px;color:#6b7280;font-size:14px;text-align:center;">Voc\u00ea n\u00e3o est\u00e1 acompanhando nenhum concurso. Clique em \ud83d\udd14 nos cards para acompanhar.</div>'
+            : '';
+
+        const panel = document.createElement('div');
+        panel.id = 'notif-dropdown';
+        panel.style.cssText = 'position:fixed;top:60px;right:16px;width:340px;max-width:calc(100vw - 32px);background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:9999;font-family:inherit;overflow:hidden;';
+        panel.innerHTML =
+            `<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #e5e7eb;background:#1e2a3a;color:#fff;">
+                <strong>Seus concursos (${followed.length} ativo${followed.length !== 1 ? 's' : ''})</strong>
+                <button id="notif-close-btn" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;padding:0 4px;line-height:1;" aria-label="Fechar">&times;</button>
+            </div>
+            <div style="max-height:360px;overflow-y:auto;">${items || emptyMsg}</div>`;
+
+        document.body.appendChild(panel);
+
+        panel.querySelector('#notif-close-btn').addEventListener('click', e => {
+            e.stopPropagation();
+            panel.remove();
+        });
+
         setTimeout(() => {
-            showToast({
-                type: 'default',
-                title: '3 novos editais publicados',
-                message: 'Confira as oportunidades atualizadas hoje.',
-                duration: 6000
-            });
-        }, 1500);
+            const outsideHandler = e => {
+                if (!panel.contains(e.target) && !e.target.closest('#btn-notif')) {
+                    panel.remove();
+                    document.removeEventListener('click', outsideHandler);
+                }
+            };
+            document.addEventListener('click', outsideHandler);
+        }, 100);
+
+        return panel;
+    }
+
+    function updateNotifBadge() {
+        const badge = document.querySelector('.notif-badge');
+        if (!badge) return;
+        const cards = Array.from(document.querySelectorAll('.card'));
+        const followed = cards.filter(card => card.textContent.includes('Acompanhando'));
+        const urgent = followed.filter(card => {
+            const deadline = card.querySelector('.card-deadline') ? card.querySelector('.card-deadline').textContent : '';
+            const m = deadline.match(/(\d+)\s+dias?/);
+            return m && parseInt(m[1]) <= 7;
+        });
+        badge.textContent = urgent.length > 0 ? urgent.length : followed.length;
+        badge.style.background = urgent.length > 0 ? '#f97316' : '#6b7280';
+    }
+
+    function initBoasVindas() {
+        updateNotifBadge();
+
+        const cards = Array.from(document.querySelectorAll('.card'));
+        const urgentFollowed = cards.filter(card => {
+            if (!card.textContent.includes('Acompanhando')) return false;
+            const deadline = card.querySelector('.card-deadline') ? card.querySelector('.card-deadline').textContent : '';
+            const m = deadline.match(/(\d+)\s+dias?/);
+            return m && parseInt(m[1]) <= 7;
+        });
+
+        if (urgentFollowed.length > 0) {
+            setTimeout(() => {
+                const orgao = urgentFollowed[0].querySelector('.card-org') ? urgentFollowed[0].querySelector('.card-org').textContent.trim() : '';
+                const deadline = urgentFollowed[0].querySelector('.card-deadline') ? urgentFollowed[0].querySelector('.card-deadline').textContent.trim() : '';
+                const m = deadline.match(/(\d+)\s+dias?/);
+                const dias = m ? m[1] : '?';
+                showToast({
+                    type: 'warning',
+                    title: 'Prazo se encerrando!',
+                    message: `${orgao} — inscrições encerram em ${dias} dia${dias === '1' ? '' : 's'}.`,
+                    duration: 6000
+                });
+            }, 1500);
+        }
+
         const btnNotif = $('#btn-notif');
         if (btnNotif) {
-            btnNotif.addEventListener('click', () => {
-                showToast({
-                    type: 'info',
-                    title: 'Central de notificaÃÂÃÂ§ÃÂÃÂµes',
-                    message: 'VocÃÂÃÂª tem 3 alertas: TCE-SP iminente, novo edital DNIT e prazo encerrando no INCRA.'
-                });
+            btnNotif.addEventListener('click', e => {
+                e.stopPropagation();
+                buildNotifPanel();
+                updateNotifBadge();
             });
         }
     }
