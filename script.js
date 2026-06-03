@@ -522,6 +522,23 @@
         });
     }
 
+        function syncAcompanhandoFromDB() {
+        const _ls = JSON.parse(localStorage.getItem('sb-xyvsihpdfgnihgomdntb-auth-token') || 'null');
+        if (!_ls || !_ls.user) return;
+        fetch(db.supabaseUrl + '/rest/v1/controle_concursos?select=concurso_id&user_id=eq.' + _ls.user.id, {
+            headers: {
+                'Authorization': 'Bearer ' + _ls.access_token,
+                'apikey': db.supabaseKey
+            }
+        }).then(r => r.json()).then(rows => {
+            if (!Array.isArray(rows)) return;
+            const ids = rows.map(r => r.concurso_id).filter(Boolean);
+            state.acompanhando = new Set(ids);
+            localStorage.setItem('eng_acompanhando', JSON.stringify(ids));
+            renderGrid();
+        }).catch(() => {});
+    }
+
     function initDelegation() {
         document.addEventListener('click', (e) => {
             const watchBtn = e.target.closest('[data-watch-id]');
@@ -824,7 +841,9 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
     }
 
     if (typeof getUser === 'function') {
-        getUser().then(user => { if (user) buildUserDropdown(user); });
+        getUser().then(user => { if (user) buildUserDropdown(user);
+                // Sync estado acompanhando com o banco
+                syncAcompanhandoFromDB(); });
     }
 
     if (typeof onAuthChange === 'function') {
