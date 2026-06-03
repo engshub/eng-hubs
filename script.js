@@ -338,9 +338,9 @@
             (function() {
               var _ls = (function(){ try { var s=JSON.parse(localStorage.getItem('sb-xyvsihpdfgnihgomdntb-auth-token')); return (s&&s.access_token&&s.user)?s:null; } catch(e){return null;} })();
               if (!_ls) return;
-              fetch(db.supabaseUrl+'/rest/v1/controle_concursos?user_id=eq.'+_ls.user.id+'&concurso_id=eq.'+encodeURIComponent(id), {
+              fetch(_engDb.supabaseUrl+'/rest/v1/controle_concursos?user_id=eq.'+_ls.user.id+'&concurso_id=eq.'+encodeURIComponent(id), {
                 method: 'DELETE',
-                headers: { 'Authorization': 'Bearer '+_ls.access_token, 'apikey': db.supabaseKey }
+                headers: { 'Authorization': 'Bearer '+_ls.access_token, 'apikey': _engDb.supabaseKey }
               }).catch(function(e){ console.error('Erro ao remover de controle_concursos:', e); });
             })();
             showToast({
@@ -361,9 +361,9 @@
             if (concurso) {
               var _ls2 = (function(){ try { var s=JSON.parse(localStorage.getItem('sb-xyvsihpdfgnihgomdntb-auth-token')); return (s&&s.access_token&&s.user)?s:null; } catch(e){return null;} })();
               if (_ls2) {
-                fetch(db.supabaseUrl+'/rest/v1/controle_concursos', {
+                fetch(_engDb.supabaseUrl+'/rest/v1/controle_concursos', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+_ls2.access_token, 'apikey': db.supabaseKey, 'Prefer': 'return=minimal,resolution=merge-duplicates' },
+                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+_ls2.access_token, 'apikey': _engDb.supabaseKey, 'Prefer': 'return=minimal,resolution=merge-duplicates' },
                   body: JSON.stringify({ user_id: _ls2.user.id, concurso_id: id, banca: concurso.banca, orgao: concurso.orgao, cargo: concurso.cargo, vagas: concurso.vagas, salario: String(concurso.salario), data_inscricao: concurso.inscricoesAte, situacao: 'nao', data_prova: null, data_isencao: null, gabarito: null })
                 }).catch(function(e){ console.error('Erro ao salvar em controle_concursos:', e); });
               }
@@ -525,10 +525,10 @@
         function syncAcompanhandoFromDB() {
         const _ls = JSON.parse(localStorage.getItem('sb-xyvsihpdfgnihgomdntb-auth-token') || 'null');
         if (!_ls || !_ls.user) return;
-        fetch(db.supabaseUrl + '/rest/v1/controle_concursos?select=concurso_id&user_id=eq.' + _ls.user.id, {
+        fetch(_engDb.supabaseUrl + '/rest/v1/controle_concursos?select=concurso_id&user_id=eq.' + _ls.user.id, {
             headers: {
                 'Authorization': 'Bearer ' + _ls.access_token,
-                'apikey': db.supabaseKey
+                'apikey': _engDb.supabaseKey
             }
         }).then(r => r.json()).then(rows => {
             if (!Array.isArray(rows)) return;
