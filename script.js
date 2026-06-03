@@ -375,6 +375,7 @@
                     ? `Você receberá alertas sobre ${concurso.orgao} — ${concurso.cargo}.`
                     : 'Você receberá notificações sobre este concurso.'
             });
+            setTimeout(() => { window.location.href = 'controle.html'; }, 1200);
         }
         refreshIcons();
         const fav = document.querySelector(`[data-fav-id="${id}"]`);
