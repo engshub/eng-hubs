@@ -1156,8 +1156,11 @@ async function init() {
         if (!key) continue;
         try {
           const val = JSON.parse(localStorage.getItem(key));
+          if (val && val.access_token && val.user) {
+            try { await db.auth.setSession({ access_token: val.access_token, refresh_token: val.refresh_token || '' }); } catch(e3) {}
+            currentUser = val.user; break;
+          }
           if (val && val.user && val.user.email) { currentUser = val.user; break; }
-          if (val && val.access_token && val.user) { currentUser = val.user; break; }
         } catch(e2) {}
       }
     } catch(e) {}
