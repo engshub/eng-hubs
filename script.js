@@ -4,135 +4,7 @@
 (function () {
     'use strict';
 
-    const CONCURSOS = [
-        {
-            id: 'c1',
-            orgao: 'TCE-SP',
-            cargo: 'Auditor de Controle Externo — Engenharia',
-            area: 'engenharia-civil',
-            areaLabel: 'Engenharia Civil',
-            banca: 'VUNESP',
-            estado: 'SP',
-            vagas: 12,
-            salario: 23110,
-            inscricoesAte: '2026-07-15',
-            statusBadge: 'novo',
-            statusLabel: 'Novo',
-            isHighlight: true
-        },
-        {
-            id: 'c2',
-            orgao: 'Prefeitura de Camboriú/SC',
-            cargo: 'Engenheiro Civil',
-            area: 'engenharia-civil',
-            areaLabel: 'Engenharia Civil',
-            banca: 'FEPESE',
-            estado: 'SC',
-            vagas: 4,
-            salario: 8940,
-            inscricoesAte: '2026-05-28',
-            statusBadge: 'encerrando',
-            statusLabel: 'Encerrando'
-        },
-        {
-            id: 'c3',
-            orgao: 'TCM-SP',
-            cargo: 'Auditor de Controle Externo — Arquitetura',
-            area: 'arquitetura',
-            areaLabel: 'Arquitetura',
-            banca: 'FGV',
-            estado: 'SP',
-            vagas: 6,
-            salario: 21500,
-            inscricoesAte: '2026-06-30',
-            statusBadge: 'aberto',
-            statusLabel: 'Aberto'
-        },
-        {
-            id: 'c4',
-            orgao: 'CREA-PR',
-            cargo: 'Engenheiro Eletricista',
-            area: 'eletrica',
-            areaLabel: 'Engenharia Elétrica',
-            banca: 'IBFC',
-            estado: 'PR',
-            vagas: 3,
-            salario: 9870,
-            inscricoesAte: '2026-06-10',
-            statusBadge: 'aberto',
-            statusLabel: 'Aberto'
-        },
-        {
-            id: 'c5',
-            orgao: 'IBAMA',
-            cargo: 'Analista Ambiental — Engenharia',
-            area: 'ambiental',
-            areaLabel: 'Engenharia Ambiental',
-            banca: 'CEBRASPE',
-            estado: 'Nacional',
-            vagas: 40,
-            salario: 11070,
-            inscricoesAte: '2026-08-20',
-            statusBadge: 'aberto',
-            statusLabel: 'Aberto'
-        },
-        {
-            id: 'c6',
-            orgao: 'INCRA',
-            cargo: 'Engenheiro Agrônomo',
-            area: 'agronomia',
-            areaLabel: 'Agronomia',
-            banca: 'CEBRASPE',
-            estado: 'Nacional',
-            vagas: 25,
-            salario: 14560,
-            inscricoesAte: '2026-06-05',
-            statusBadge: 'encerrando',
-            statusLabel: 'Encerrando'
-        },
-        {
-            id: 'c7',
-            orgao: 'Prefeitura de Curitiba/PR',
-            cargo: 'Arquiteto e Urbanista',
-            area: 'arquitetura',
-            areaLabel: 'Arquitetura',
-            banca: 'FAFIPA',
-            estado: 'PR',
-            vagas: 8,
-            salario: 9230,
-            inscricoesAte: '2026-07-02',
-            statusBadge: 'novo',
-            statusLabel: 'Novo'
-        },
-        {
-            id: 'c8',
-            orgao: 'TJ-RS',
-            cargo: 'Analista Judiciário — Engenharia Civil',
-            area: 'engenharia-civil',
-            areaLabel: 'Engenharia Civil',
-            banca: 'FAURGS',
-            estado: 'RS',
-            vagas: 5,
-            salario: 13780,
-            inscricoesAte: '2026-07-25',
-            statusBadge: 'aberto',
-            statusLabel: 'Aberto'
-        },
-        {
-            id: 'c9',
-            orgao: 'CAU/BR',
-            cargo: 'Arquiteto e Urbanista — Fiscalização',
-            area: 'arquitetura',
-            areaLabel: 'Arquitetura',
-            banca: 'IADES',
-            estado: 'DF',
-            vagas: 10,
-            salario: 12450,
-            inscricoesAte: '2026-08-10',
-            statusBadge: 'aberto',
-            statusLabel: 'Aberto'
-        }
-    ];
+    let CONCURSOS = [];
 
     const state = {
         filtroArea: 'todos',
@@ -734,9 +606,47 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         }
     }
 
+    
+    async function loadConcursos() {
+        try {
+            const db = window._engDb;
+            if (!db) { renderGrid(); return; }
+            const { data, error } = await db
+                .from('concursos')
+                .select('*')
+                .eq('secao', 'aberto')
+                .neq('homologado', true)
+                .order('created_at', { ascending: false });
+            if (error || !data) { renderGrid(); return; }
+            CONCURSOS = data.map(function(c) {
+                var dias = c.inscricoes_ate ? Math.round((new Date(c.inscricoes_ate) - new Date()) / 86400000) : 999;
+                var badge = dias < 0 ? 'encerrado' : dias <= 7 ? 'encerrando' : c.fase === 'Inscrições abertas' ? 'aberto' : 'novo';
+                return {
+                    id: String(c.id),
+                    orgao: c.orgao || '',
+                    cargo: c.cargo || '',
+                    area: c.area || '',
+                    areaLabel: c.area_label || c.area || '',
+                    banca: c.banca || '',
+                    estado: c.uf || '',
+                    vagas: c.vagas || 0,
+                    salario: parseFloat(c.salario) || 0,
+                    inscricoesAte: c.inscricoes_ate || '',
+                    statusBadge: badge,
+                    statusLabel: badge === 'encerrando' ? 'Encerrando' : badge === 'encerrado' ? 'Encerrado' : badge === 'novo' ? 'Novo' : 'Aberto',
+                    link_edital: c.link_edital || '',
+                    isHighlight: c.destacar === true
+                };
+            });
+        } catch(e) {
+            console.error('Erro ao carregar concursos:', e);
+        }
+        renderGrid();
+    }
+
     function init() {
         if (window.lucide) window.lucide.createIcons();
-        renderGrid();
+        loadConcursos();
         modal.init();
         initMenuMobile();
         initDelegation();
