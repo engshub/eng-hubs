@@ -161,14 +161,15 @@
         const empty = $('#empty-state');
         if (!grid) return;
         let lista = CONCURSOS.filter(c => areaMatches(c, state.filtroArea));
-        const q = state.textoBusca.trim().toLowerCase();
+        const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const q = norm(state.textoBusca.trim());
         if (q) {
             lista = lista.filter(c =>
-                (c.cargo || '').toLowerCase().includes(q) ||
-                (c.orgao || '').toLowerCase().includes(q) ||
-                (c.banca || '').toLowerCase().includes(q) ||
-                (c.estado || '').toLowerCase().includes(q) ||
-                (c.areaLabel || '').toLowerCase().includes(q)
+                norm(c.cargo).includes(q) ||
+                norm(c.orgao).includes(q) ||
+                norm(c.banca).includes(q) ||
+                norm(c.estado).includes(q) ||
+                norm(c.areaLabel).includes(q)
             );
         }
         switch (state.ordenacao) {
