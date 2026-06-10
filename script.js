@@ -1237,10 +1237,21 @@ window.cfgPwdStrength = function(s) {
 window.handleCfgFoto = function(event) {
     const file = event.target.files[0];
     if (!file) return;
-    if (file.size > 2*1024*1024) { showToast({type:'warning',title:'Foto muito grande',message:'Máximo 2MB.'}); return; }
+    if (file.size > 5*1024*1024) { showToast({type:'warning',title:'Foto muito grande',message:'Máximo 5MB.'}); return; }
     const reader = new FileReader();
     reader.onload = function(e) {
-        const url = e.target.result;
+        // Comprime para miniatura: a foto vai dentro do token de login,
+        // e fotos grandes quebram todas as consultas da conta.
+        const imgSrc = new Image();
+        imgSrc.onload = function() {
+        const MAXLADO = 128;
+        const escala = Math.min(MAXLADO / imgSrc.width, MAXLADO / imgSrc.height, 1);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(imgSrc.width * escala));
+        canvas.height = Math.max(1, Math.round(imgSrc.height * escala));
+        canvas.getContext('2d').drawImage(imgSrc, 0, 0, canvas.width, canvas.height);
+        const url = canvas.toDataURL('image/jpeg', 0.85);
+        if (url.length > 25000) { showToast({type:'warning',title:'Não foi possível otimizar a foto',message:'Tente uma imagem mais simples.'}); return; }
         const preview = document.getElementById('cfgAvatarPreview');
         if (preview) preview.innerHTML = '<img src="'+url+'" alt="Foto">';
         // Atualizar avatar no header da index
@@ -1259,6 +1270,8 @@ window.handleCfgFoto = function(event) {
         if (typeof db !== 'undefined') db.auth.updateUser({ data: { foto_url: url } });
         if (window._cfgUser) { window._cfgUser.user_metadata = window._cfgUser.user_metadata || {}; window._cfgUser.user_metadata.foto_url = url; }
         showToast({type:'success',title:'Foto atualizada!'});
+        };
+        imgSrc.src = e.target.result;
     };
     reader.readAsDataURL(file);
 };

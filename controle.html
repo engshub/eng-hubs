@@ -2078,6 +2078,54 @@ document.addEventListener('keydown', function(e){
   atualizarHero();
 })();
 </script>
+<script>
+/* Compressao de foto de perfil - fotos grandes no token de login quebram as consultas da conta */
+(function(){
+  function comprimirFoto(file, cb) {
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var MAX = 128;
+        var esc = Math.min(MAX/img.width, MAX/img.height, 1);
+        var cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(img.width*esc));
+        cv.height = Math.max(1, Math.round(img.height*esc));
+        cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+        cb(cv.toDataURL('image/jpeg',0.85));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  window.handleFotoUpload = function(event){
+    var file = event.target.files[0];
+    if(!file) return;
+    if(file.size > 5*1024*1024){ showToast('Foto muito grande. Maximo 5MB.'); return; }
+    comprimirFoto(file, function(url){
+      if(url.length > 25000){ showToast('Nao foi possivel otimizar a foto. Tente outra imagem.'); return; }
+      var prev = document.getElementById('perfilAvatarPreview');
+      if(prev) prev.innerHTML = '<img src="'+url+'" alt="Foto de perfil">';
+      var av = document.getElementById('avatarEl');
+      if(av) av.innerHTML = '<img src="'+url+'" alt="Foto" class="avatar-img">';
+      db.auth.updateUser({ data: { foto_url: url } });
+      showToast('Foto atualizada!');
+    });
+  };
+  window.handleCfgFoto = function(event){
+    var file = event.target.files[0];
+    if(!file) return;
+    comprimirFoto(file, function(url){
+      if(url.length > 25000){ showToast('Nao foi possivel otimizar a foto. Tente outra imagem.'); return; }
+      var preview = document.getElementById('cfgAvatarPreview');
+      if(preview) preview.innerHTML = '<img src="'+url+'" alt="Foto">';
+      db.auth.updateUser({ data: { foto_url: url } });
+      if(window._cfgUser){ window._cfgUser.user_metadata = window._cfgUser.user_metadata || {}; window._cfgUser.user_metadata.foto_url = url; }
+      showToast('Foto atualizada!');
+    });
+  };
+})();
+</script>
 </body>
 </html>
 <!-- engshub: catalogo gerenciado apenas pelo admin -->
