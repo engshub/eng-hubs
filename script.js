@@ -623,7 +623,7 @@
                 };
             })
             .filter(c => !c.encerrada)
-            .sort((a, b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
+            .sort((a, b) => ((a.daysLeft != null ? a.daysLeft : 999) - (b.daysLeft != null ? b.daysLeft : 999)));
 
         const items = followed.map(c => {
             let icon, cls, text;

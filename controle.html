@@ -859,7 +859,7 @@ tbody td {
       try { const { data: { user } } = await db.auth.getUser(); return user; } catch(e) { return null; }
     }
     function onAuthChange(callback) {
-      db.auth.onAuthStateChange((_event, session) => { callback(session?.user ?? null); });
+      db.auth.onAuthStateChange((_event, session) => { callback(session && session.user ? session.user : null); });
     }
     </script>
 <style id="mh-upgrade">
@@ -1211,13 +1211,13 @@ async function init() {
   }
   // Atualiza nome do usuário no header
   const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || currentUser.email;
+  const nome = (meta && meta.nome_completo) || currentUser.email;
   const primeiroNome = nome.split(' ')[0];
   document.getElementById('userNameEl').textContent = 'Olá, ' + primeiroNome + ' 👋';
   const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
 
   // Avatar: foto ou iniciais
-  const fotoUrl = currentUser.user_metadata?.foto_url;
+  const fotoUrl = (currentUser.user_metadata && currentUser.user_metadata.foto_url);
   const avatarEl = document.getElementById('avatarEl');
   if (fotoUrl) {
     avatarEl.innerHTML = `<img src="${fotoUrl}" alt="Foto" class="avatar-img">`;
@@ -1258,15 +1258,15 @@ function openPerfil() {
   document.getElementById('userDropdown').classList.remove('open');
   // Preenche campos com dados atuais
   const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || '';
-  const area = meta?.area || '';
+  const nome = (meta && meta.nome_completo) || '';
+  const area = (meta && meta.area) || '';
   document.getElementById('perfilNome').value  = nome;
   document.getElementById('perfilEmail').value = currentUser.email;
   document.getElementById('perfilArea').value  = area;
   // Avatar preview
   const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
   document.getElementById('perfilAvatarInitials').textContent = iniciais;
-  const fotoUrl = meta?.foto_url;
+  const fotoUrl = (meta && meta.foto_url);
   const preview = document.getElementById('perfilAvatarPreview');
   if (fotoUrl) {
     preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
@@ -1618,15 +1618,15 @@ function openPerfil() {
   document.getElementById('userDropdown').classList.remove('open');
   // Preenche campos com dados atuais
   const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || '';
-  const area = meta?.area || '';
+  const nome = (meta && meta.nome_completo) || '';
+  const area = (meta && meta.area) || '';
   document.getElementById('perfilNome').value  = nome;
   document.getElementById('perfilEmail').value = currentUser.email;
   document.getElementById('perfilArea').value  = area;
   // Avatar preview
   const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
   document.getElementById('perfilAvatarInitials').textContent = iniciais;
-  const fotoUrl = meta?.foto_url;
+  const fotoUrl = (meta && meta.foto_url);
   const preview = document.getElementById('perfilAvatarPreview');
   if (fotoUrl) {
     preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;
@@ -1731,15 +1731,15 @@ function openPerfil() {
   document.getElementById('userDropdown').classList.remove('open');
   // Preenche campos com dados atuais
   const meta = currentUser.user_metadata;
-  const nome = meta?.nome_completo || '';
-  const area = meta?.area || '';
+  const nome = (meta && meta.nome_completo) || '';
+  const area = (meta && meta.area) || '';
   document.getElementById('perfilNome').value  = nome;
   document.getElementById('perfilEmail').value = currentUser.email;
   document.getElementById('perfilArea').value  = area;
   // Avatar preview
   const iniciais = nome.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
   document.getElementById('perfilAvatarInitials').textContent = iniciais;
-  const fotoUrl = meta?.foto_url;
+  const fotoUrl = (meta && meta.foto_url);
   const preview = document.getElementById('perfilAvatarPreview');
   if (fotoUrl) {
     preview.innerHTML = `<img src="${fotoUrl}" alt="Foto de perfil">`;

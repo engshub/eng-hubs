@@ -606,7 +606,7 @@
       try { const { data: { user } } = await db.auth.getUser(); return user; } catch(e) { return null; }
     }
     function onAuthChange(callback) {
-      db.auth.onAuthStateChange((_event, session) => { callback(session?.user ?? null); });
+      db.auth.onAuthStateChange(function(_event, session) { callback(session && session.user ? session.user : null); });
     }
     </script>
     <script src="script.js"></script>
