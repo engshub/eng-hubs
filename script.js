@@ -443,7 +443,7 @@
                 }
                 this.close();
                 showToast({ type: 'success', title: 'Bem-vindo de volta!', message: 'Login realizado com sucesso.' });
-                setTimeout(() => { window.location.href = 'controle.html'; }, 1200);
+                syncAcompanhandoFromDB();
             });
             $('#form-cadastro').addEventListener('submit', async (e) => {
                 e.preventDefault();
