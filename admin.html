@@ -85,18 +85,16 @@
         <div class="grid">
           <div class="field"><label>Órgão *</label><input id="f-orgao" required placeholder="Ex: TCE-SP"></div>
           <div class="field"><label>Cargo *</label><input id="f-cargo" required placeholder="Ex: Engenheiro Civil"></div>
-          <div class="field"><label>Área *</label>
-            <select id="f-area">
-              <option value="">Selecione...</option>
-              <option value="engenharia-civil">Engenharia Civil</option>
-              <option value="arquitetura">Arquitetura</option>
-              <option value="eletrica">Engenharia Elétrica</option>
-              <option value="ambiental">Engenharia Ambiental</option>
-              <option value="mecanica">Engenharia Mecânica</option>
-              <option value="agronomia">Agronomia</option>
-            </select>
+          <div class="field full"><label>Áreas * (marque uma ou mais)</label>
+            <div id="f-areas" style="display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px;border:1px solid var(--borda);border-radius:8px;background:#fff;">
+              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="engenharia-civil" data-label="Engenharia Civil" style="width:auto;"> Engenharia Civil</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="arquitetura" data-label="Arquitetura" style="width:auto;"> Arquitetura</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="eletrica" data-label="Engenharia Elétrica" style="width:auto;"> Engenharia Elétrica</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="ambiental" data-label="Engenharia Ambiental" style="width:auto;"> Engenharia Ambiental</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="mecanica" data-label="Engenharia Mecânica" style="width:auto;"> Engenharia Mecânica</label>
+              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="agronomia" data-label="Agronomia" style="width:auto;"> Agronomia</label>
+            </div>
           </div>
-          <div class="field"><label>Rótulo da área (preenchido automaticamente)</label><input id="f-area-label" placeholder="Ex: Engenharia Civil"></div>
           <div class="field"><label>Banca</label><input id="f-banca" placeholder="Ex: FGV"></div>
           <div class="field"><label>Estado (UF)</label><input id="f-estado" maxlength="2" placeholder="Ex: SP"></div>
           <div class="field"><label>Vagas</label><input id="f-vagas" type="number" min="0" placeholder="Ex: 10"></div>
@@ -256,13 +254,14 @@
   function coletar(){
     var vagas = $('f-vagas').value;
     var salario = $('f-salario').value;
-    var areaSlug = $('f-area').value;
-    var areaLabel = $('f-area-label').value.trim() || AREAS[areaSlug] || null;
+    var marcadas = Array.prototype.slice.call(document.querySelectorAll('#f-areas input:checked'));
+    var slugs = marcadas.map(function(c){ return c.value; });
+    var labels = marcadas.map(function(c){ return c.getAttribute('data-label'); });
     return {
       orgao: $('f-orgao').value.trim(),
       cargo: $('f-cargo').value.trim(),
-      area: areaSlug || null,
-      area_label: areaLabel,
+      area: slugs.join(',') || null,
+      area_label: labels.join(', ') || null,
       banca: $('f-banca').value.trim() || null,
       estado: $('f-estado').value.trim().toUpperCase() || null,
       vagas: vagas === '' ? null : parseInt(vagas, 10),
@@ -279,7 +278,7 @@
     };
   }
 
-  var FASES = {"aberto":["Inscrições abertas","Inscrições encerradas","Prova aplicada","Em fase de recursos","Resultado preliminar"],"previsto":["Sem banca contratada","Banca contratada","Edital iminente"]};
+  var FASES = {"aberto":["Inscrições em breve","Inscrições abertas","Inscrições encerradas","Prova aplicada","Em fase de recursos","Resultado preliminar"],"previsto":["Sem banca contratada","Banca contratada","Edital iminente"]};
   function preencherFases(selecionada){
     var secao = $('f-secao').value;
     var lista = FASES[secao] || [];
@@ -309,14 +308,16 @@
     $('f-id').value = c.id;
     $('f-orgao').value = c.orgao || '';
     $('f-cargo').value = c.cargo || '';
-    // tenta casar a área antiga com as opções padronizadas
-    var slug = c.area || '';
-    if(!AREAS[slug]){
-      var s = slugify(c.area_label || c.area || '');
-      slug = AREAS[s] ? s : (s.indexOf('civil') !== -1 ? 'engenharia-civil' : '');
+    // marca as áreas existentes (suporta múltiplas separadas por vírgula)
+    var slugsExist = String(c.area || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+    if(!slugsExist.some(function(s){ return AREAS[s]; })){
+      var s2 = slugify(c.area_label || c.area || '');
+      if(AREAS[s2]) slugsExist = [s2];
+      else if(s2.indexOf('civil') !== -1) slugsExist = ['engenharia-civil'];
     }
-    $('f-area').value = slug;
-    $('f-area-label').value = c.area_label || AREAS[slug] || '';
+    document.querySelectorAll('#f-areas input').forEach(function(cb){
+      cb.checked = slugsExist.indexOf(cb.value) !== -1;
+    });
     $('f-banca').value = c.banca || '';
     $('f-estado').value = c.estado || '';
     $('f-vagas').value = c.vagas != null ? c.vagas : '';
@@ -335,18 +336,12 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Preenche o rótulo automaticamente ao escolher a área
-  $('f-area').addEventListener('change', function(){
-    var slug = this.value;
-    if(AREAS[slug]) $('f-area-label').value = AREAS[slug];
-  });
-
   // ---- Criar / atualizar ----
   $('form-concurso').addEventListener('submit', async function(e){
     e.preventDefault();
     var dados = coletar();
     if(!dados.orgao || !dados.cargo){ toast('Órgão e Cargo são obrigatórios.', 'erro'); return; }
-    if(!dados.area){ toast('Selecione a Área do concurso.', 'erro'); return; }
+    if(!dados.area){ toast('Marque pelo menos uma Área do concurso.', 'erro'); return; }
     if(dados.inscricoes_de && dados.inscricoes_ate && dados.inscricoes_de > dados.inscricoes_ate){ toast('O início das inscrições não pode ser depois do fim.', 'erro'); return; }
     var id = $('f-id').value;
     var r;

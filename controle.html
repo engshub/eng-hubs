@@ -1449,7 +1449,7 @@ function filterTable() {
 // ===== MODAL =====
 function openModal(entry) {
   editId = entry ? entry.id : null;
-  document.getElementById('modalTitle').textContent = entry ? 'Editar concurso' : 'Adicionar concurso';
+  document.getElementById('modalTitle').textContent = 'Atualizar minha situação';
   document.getElementById('fBanca').value         = entry ? entry.banca          : '';
   document.getElementById('fOrgao').value         = entry ? entry.orgao          : '';
   document.getElementById('fCargo').value         = entry ? (entry.cargo  || '') : '';
@@ -1460,8 +1460,12 @@ function openModal(entry) {
   document.getElementById('fSituacao').value      = entry ? entry.situacao       : 'nao';
   document.getElementById('fDataIsencao').value   = entry ? (entry.dataIsencao || '') : '';
   document.getElementById('fGabarito').value      = entry ? (entry.gabarito     || '') : '';
+  // Dados do concurso são definidos pelo admin — o usuário edita apenas a própria situação
+  ['fBanca','fOrgao','fCargo','fDataProva','fVagas','fSalario','fDataInscricao'].forEach(function(id){
+    var el = document.getElementById(id); if (el) el.disabled = true;
+  });
   document.getElementById('modalBackdrop').classList.add('open');
-  setTimeout(() => document.getElementById('fBanca').focus(), 50);
+  setTimeout(() => document.getElementById('fSituacao').focus(), 50);
 }
 
 function closeModal() {
@@ -1496,6 +1500,25 @@ async function saveEntry() {
     data_isencao:   document.getElementById('fDataIsencao').value || null,
     gabarito:       document.getElementById('fGabarito').value.trim() || null,
   };
+
+  if (payload.situacao === 'inscrito' && editId) {
+    var entryAtual = data.find(function(r){ return r.id === editId; });
+    if (entryAtual && entryAtual.concursoId) {
+      try {
+        var rIni = await db.from('concursos').select('inscricoes_de').eq('id', entryAtual.concursoId).single();
+        var ini = rIni && rIni.data ? rIni.data.inscricoes_de : null;
+        if (ini) {
+          var hoje = new Date(); hoje.setHours(0,0,0,0);
+          var dtIni = new Date(ini + 'T00:00:00');
+          if (dtIni > hoje) {
+            var p = ini.split('-');
+            showToast('As inscrições ainda não abriram — começam em ' + p[2] + '/' + p[1] + '/' + p[0] + '. Quando a data chegar, você poderá marcar como inscrito.');
+            return;
+          }
+        }
+      } catch(e) {}
+    }
+  }
 
   const btn = document.querySelector('.btn-save');
   btn.textContent = 'Salvando...';

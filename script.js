@@ -52,15 +52,15 @@
             .replace(/^-+|-+$/g, '');
     }
 
-    // O concurso bate com o chip se o slug da área ou do rótulo
-    // for igual ao filtro, ou estiver contido nele (ex: "civil" ⊂ "engenharia-civil")
+    // O concurso bate com o chip se QUALQUER uma de suas áreas (separadas por vírgula)
+    // casar com o filtro — igual ou contida (ex: "civil" ⊂ "engenharia-civil")
     function areaMatches(c, filtro) {
         if (filtro === 'todos') return true;
-        const a = slugify(c.area);
-        const l = slugify(c.areaLabel);
-        return a === filtro || l === filtro ||
-               (a && filtro.indexOf(a) !== -1) || (l && filtro.indexOf(l) !== -1) ||
-               (a && a.indexOf(filtro) !== -1) || (l && l.indexOf(filtro) !== -1);
+        const partes = (String(c.area || '') + ',' + String(c.areaLabel || '')).split(',');
+        return partes.some(p => {
+            const s = slugify(p);
+            return s && (s === filtro || filtro.indexOf(s) !== -1 || s.indexOf(filtro) !== -1);
+        });
     }
 
     function esc(s) {
@@ -112,7 +112,7 @@
                         <span class="badge ${badgeClass}">
                             <i data-lucide="${iconStatus}"></i> ${esc(c.statusLabel)}
                         </span>
-                        <span class="badge badge-area">${esc(c.areaLabel)}</span>
+                        ${String(c.areaLabel || '').split(',').map(l => l.trim()).filter(Boolean).map(l => `<span class="badge badge-area">${esc(l)}</span>`).join('')}
                     </div>
                     <button
                         class="card-favorite ${isAcompanhando ? 'is-active' : ''}"
