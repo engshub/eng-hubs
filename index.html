@@ -96,6 +96,36 @@
             padding: 3px 7px;
         }
         .chip-active .chip-count { background: rgba(255,255,255,0.28); }
+        /* ===== Seções de editais por fase + grade 4-5 por linha ===== */
+        .cards-grid {
+            grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)) !important;
+            gap: 16px !important;
+        }
+        .subsec-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1A2E4A;
+            margin: 28px 0 14px;
+        }
+        #sec-proximas .subsec-title { margin-top: 4px; }
+        .subsec-title .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        .subsec-title.laranja .dot { background: #F4801A; box-shadow: 0 0 0 4px rgba(244,128,26,0.15); }
+        .subsec-title.verde .dot { background: #16a34a; box-shadow: 0 0 0 4px rgba(22,163,74,0.15); }
+        .subsec-title.cinza .dot { background: #94a3b8; box-shadow: 0 0 0 4px rgba(148,163,184,0.18); }
+        .subsec-count {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            background: #eef2f7;
+            padding: 3px 10px;
+            border-radius: 999px;
+        }
+        #sec-encerradas .card { opacity: 0.75; }
+        #sec-encerradas .card:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -212,8 +242,8 @@
             <div class="container">
                 <header class="section-header">
                     <div>
-                        <h2 class="section-title">Editais abertos</h2>
-                        <p class="section-subtitle">Inscrições em andamento. Atualizado em tempo real.</p>
+                        <h2 class="section-title">Editais</h2>
+                        <p class="section-subtitle">Acompanhe por fase: inscrições próximas, abertas e encerradas.</p>
                     </div>
                     <div class="section-actions">
                         <select class="select" id="sort-select" aria-label="Ordenar por">
@@ -225,7 +255,20 @@
                     </div>
                 </header>
 
-                <div class="cards-grid" id="cards-grid"></div>
+                <div id="sec-proximas" class="hidden">
+                    <h3 class="subsec-title laranja"><span class="dot"></span> Inscrições próximas <span class="subsec-count" id="count-proximas">0</span></h3>
+                    <div class="cards-grid" id="grid-proximas"></div>
+                </div>
+
+                <div id="sec-abertas" class="hidden">
+                    <h3 class="subsec-title verde"><span class="dot"></span> Inscrições abertas <span class="subsec-count" id="count-abertas">0</span></h3>
+                    <div class="cards-grid" id="cards-grid"></div>
+                </div>
+
+                <div id="sec-encerradas" class="hidden">
+                    <h3 class="subsec-title cinza"><span class="dot"></span> Inscrições encerradas <span class="subsec-count" id="count-encerradas">0</span></h3>
+                    <div class="cards-grid" id="grid-encerradas"></div>
+                </div>
 
                 <div class="empty-state hidden" id="empty-state">
                     <i data-lucide="search-x"></i>

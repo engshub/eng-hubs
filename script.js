@@ -91,10 +91,12 @@
         const isAcompanhando = state.acompanhando.has(c.id);
         const badgeClass =
             c.statusBadge === 'encerrando' ? 'badge-encerrando' :
+            c.statusBadge === 'encerrado' ? 'badge-encerrando' :
             c.statusBadge === 'novo' ? 'badge-novo' :
             'badge-aberto';
         const iconStatus =
             c.statusBadge === 'encerrando' ? 'alarm-clock' :
+            c.statusBadge === 'encerrado' ? 'lock' :
             c.statusBadge === 'novo' ? 'sparkles' :
             'check-circle-2';
         const diasInicio = diasRestantes(c.inscricoesDe);
@@ -206,7 +208,26 @@
                 lista.sort((a, b) => new Date(a.inscricoesAte || '2999-12-31') - new Date(b.inscricoesAte || '2999-12-31'));
                 break;
         }
-        if (lista.length === 0) {
+        const gProx = $('#grid-proximas');
+        const gEnc = $('#grid-encerradas');
+        if (gProx || gEnc) {
+            // Home segmentada por fase
+            const proximas = lista.filter(c => c.statusBadge === 'novo');
+            const encerradas = lista.filter(c => c.statusBadge === 'encerrado');
+            const abertas = lista.filter(c => c.statusBadge !== 'novo' && c.statusBadge !== 'encerrado');
+            const preenche = (secSel, g, itens, countSel) => {
+                if (!g) return;
+                g.innerHTML = itens.map(renderCard).join('');
+                const secEl = $(secSel);
+                if (secEl) secEl.classList.toggle('hidden', itens.length === 0);
+                const cEl = $(countSel);
+                if (cEl) cEl.textContent = itens.length;
+            };
+            preenche('#sec-proximas', gProx, proximas, '#count-proximas');
+            preenche('#sec-abertas', grid, abertas, '#count-abertas');
+            preenche('#sec-encerradas', gEnc, encerradas, '#count-encerradas');
+            if (empty) empty.classList.toggle('hidden', lista.length > 0);
+        } else if (lista.length === 0) {
             grid.innerHTML = '';
             if (empty) empty.classList.remove('hidden');
         } else {
@@ -257,19 +278,20 @@
 
     /* ===== Estatísticas reais no topo ===== */
     function updateHeroStats() {
+        const ativos = CONCURSOS.filter(c => c.statusBadge !== 'encerrado');
         const nums = $$('.hero-stats .stat-num');
         if (nums.length >= 4) {
-            const totalVagas = CONCURSOS.reduce((s, c) => s + (c.vagas || 0), 0);
-            const maiorSalario = CONCURSOS.concat(PREVISTOS).reduce((m, c) => Math.max(m, c.salario || 0), 0);
+            const totalVagas = ativos.reduce((s, c) => s + (c.vagas || 0), 0);
+            const maiorSalario = ativos.concat(PREVISTOS).reduce((m, c) => Math.max(m, c.salario || 0), 0);
             nums[0].textContent = totalVagas;
-            nums[1].textContent = CONCURSOS.length;
+            nums[1].textContent = ativos.length;
             nums[2].textContent = PREVISTOS.length;
             nums[3].textContent = maiorSalario > 0 ? formatBRL(maiorSalario) : '—';
         }
         const tag = $('.hero-tag');
         if (tag) {
             tag.innerHTML = '<i data-lucide="zap"></i> Atualizado hoje · ' +
-                CONCURSOS.length + ' ' + (CONCURSOS.length === 1 ? 'edital ativo' : 'editais ativos');
+                ativos.length + ' ' + (ativos.length === 1 ? 'edital ativo' : 'editais ativos');
             refreshIcons();
         }
     }
