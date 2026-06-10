@@ -693,6 +693,124 @@
         badge.style.background = urgent.length > 0 ? '#f97316' : '#6b7280';
     }
 
+    /* ===== Notificações v2 — novos concursos e alterações nos seguidos =====
+       (estas declarações substituem as versões antigas acima) */
+    function getNotifs() {
+        try { return JSON.parse(localStorage.getItem('eng_notifs') || '[]'); } catch (e) { return []; }
+    }
+    function setNotifs(lista) {
+        localStorage.setItem('eng_notifs', JSON.stringify(lista.slice(-30)));
+    }
+    function tempoRel(ts) {
+        const s = Math.floor((Date.now() - ts) / 1000);
+        if (s < 60) return 'agora';
+        if (s < 3600) return 'há ' + Math.floor(s / 60) + ' min';
+        if (s < 86400) return 'há ' + Math.floor(s / 3600) + ' h';
+        const d = Math.floor(s / 86400);
+        return 'há ' + d + ' dia' + (d > 1 ? 's' : '');
+    }
+    function computeNotifications(todos) {
+        let known = null;
+        try { known = JSON.parse(localStorage.getItem('eng_known_concursos')); } catch (e) {}
+        const snap = {};
+        todos.forEach(c => {
+            snap[c.id] = { fase: c.fase || '', ate: c.inscricoesAte || '', edital: c.linkEdital ? 1 : 0, hom: c.homologado ? 1 : 0 };
+        });
+        if (!known) {
+            localStorage.setItem('eng_known_concursos', JSON.stringify(snap));
+            updateNotifBadge();
+            return;
+        }
+        const notifs = getNotifs();
+        const existe = chave => notifs.some(n => n.chave === chave);
+        todos.forEach(c => {
+            const old = known[c.id];
+            if (!old) {
+                if (!c.homologado) {
+                    const chave = 'novo:' + c.id;
+                    if (!existe(chave)) notifs.push({ chave, tipo: 'novo', texto: `Novo concurso publicado: ${c.orgao} — ${c.cargo}`, ts: Date.now(), lida: false, id: c.id });
+                }
+                return;
+            }
+            if (state.acompanhando.has(c.id)) {
+                const mud = [];
+                if (old.fase !== snap[c.id].fase) mud.push('nova fase: ' + (c.fase || '—'));
+                if (old.ate !== snap[c.id].ate) mud.push('prazo alterado para ' + formatData(c.inscricoesAte));
+                if (!old.edital && snap[c.id].edital) mud.push('edital publicado');
+                if (!old.hom && snap[c.id].hom) mud.push('concurso homologado');
+                if (mud.length) {
+                    const chave = 'alt:' + c.id + ':' + mud.join('|');
+                    if (!existe(chave)) notifs.push({ chave, tipo: 'alteracao', texto: `${c.orgao} — ${c.cargo}: ${mud.join(' · ')}`, ts: Date.now(), lida: false, id: c.id });
+                }
+            }
+        });
+        setNotifs(notifs);
+        localStorage.setItem('eng_known_concursos', JSON.stringify(snap));
+        updateNotifBadge();
+    }
+    function updateNotifBadge() {
+        const badge = document.querySelector('.notif-badge');
+        if (!badge) return;
+        const naoLidas = getNotifs().filter(n => !n.lida).length;
+        badge.textContent = naoLidas;
+        badge.style.display = naoLidas > 0 ? 'flex' : 'none';
+    }
+    function buildNotifPanel() {
+        const existing = document.getElementById('notif-dropdown');
+        if (existing) { existing.remove(); return null; }
+        const notifs = getNotifs().slice().sort((a, b) => b.ts - a.ts);
+        const items = notifs.map(n => {
+            const icone = n.tipo === 'novo' ? '🆕' : '✏️';
+            const borda = n.tipo === 'novo' ? '#16a34a' : '#F4801A';
+            const opaco = n.lida ? 'opacity:.55;' : '';
+            return `<div class="notif-item" data-card-id="${esc(n.id || '')}" style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid #f3f4f6;font-size:13px;line-height:1.45;border-left:3px solid ${borda};cursor:pointer;${opaco}">
+                <span>${icone}</span>
+                <span>${esc(n.texto)}<br><span style="font-size:11px;color:#94a3b8;">${tempoRel(n.ts)}</span></span>
+            </div>`;
+        }).join('');
+        const emptyMsg = notifs.length === 0
+            ? '<div style="padding:28px 18px;color:#6b7280;font-size:13px;text-align:center;line-height:1.6;">🔕 Nenhuma notificação por enquanto.<br>Você será avisado quando um <strong>novo concurso</strong> for publicado ou quando um concurso que você <strong>acompanha</strong> for alterado.</div>'
+            : '';
+        const panel = document.createElement('div');
+        panel.id = 'notif-dropdown';
+        panel.style.cssText = 'position:fixed;top:64px;right:16px;width:360px;max-width:calc(100vw - 32px);background:#fff;border:1px solid #e5e7eb;border-radius:14px;box-shadow:0 12px 36px rgba(26,46,74,.18);z-index:9999;font-family:inherit;overflow:hidden;';
+        panel.innerHTML =
+            `<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #e5e7eb;background:#1A2E4A;color:#fff;">
+                <strong style="font-family:Montserrat,sans-serif;font-size:14px;">🔔 Notificações</strong>
+                <button id="notif-marcar-lidas" style="background:none;border:none;color:#F4801A;cursor:pointer;font-size:12px;font-weight:600;">Marcar como lidas</button>
+            </div>
+            <div style="max-height:380px;overflow-y:auto;">${items || emptyMsg}</div>`;
+        document.body.appendChild(panel);
+        panel.querySelector('#notif-marcar-lidas').addEventListener('click', e => {
+            e.stopPropagation();
+            setNotifs(getNotifs().map(n => Object.assign(n, { lida: true })));
+            updateNotifBadge();
+            panel.remove();
+        });
+        panel.querySelectorAll('.notif-item').forEach(el => {
+            el.addEventListener('click', () => {
+                const id = el.getAttribute('data-card-id');
+                const card = id ? document.querySelector(`.card[data-id="${id}"], .forecast-card[data-id="${id}"]`) : null;
+                panel.remove();
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    card.style.outline = '2px solid #F4801A';
+                    setTimeout(() => { card.style.outline = ''; }, 2500);
+                }
+            });
+        });
+        setTimeout(() => {
+            const outsideHandler = e => {
+                if (!panel.contains(e.target) && !e.target.closest('#btn-notif')) {
+                    panel.remove();
+                    document.removeEventListener('click', outsideHandler);
+                }
+            };
+            document.addEventListener('click', outsideHandler);
+        }, 100);
+        return panel;
+    }
+
     function initBoasVindas() {
         const btnNotif = $('#btn-notif');
         if (btnNotif) {
@@ -787,7 +905,9 @@
                 console.error('Erro ao carregar concursos:', error);
                 renderGrid(); renderPrevistos(); return;
             }
-            const todos = data.map(mapConcurso).filter(c => !c.homologado);
+            const mapeados = data.map(mapConcurso);
+            computeNotifications(mapeados);
+            const todos = mapeados.filter(c => !c.homologado);
             CONCURSOS = todos.filter(c => c.secao !== 'previsto');
             PREVISTOS = todos.filter(c => c.secao === 'previsto');
         } catch (e) {

@@ -102,8 +102,66 @@
         }
         /* ===== Seções de editais por fase + grade 4-5 por linha ===== */
         .cards-grid {
-            grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)) !important;
+            grid-template-columns: repeat(4, 1fr) !important;
             gap: 16px !important;
+        }
+        @media (max-width: 1200px) { .cards-grid { grid-template-columns: repeat(3, 1fr) !important; } }
+        @media (max-width: 900px)  { .cards-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+        @media (max-width: 580px)  { .cards-grid { grid-template-columns: 1fr !important; } }
+        /* ===== Header refinado ===== */
+        .header {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 1px 0 #e8ecf3, 0 6px 18px rgba(26,46,74,0.05);
+        }
+        .nav-desktop a:not(.nav-minha-area) {
+            position: relative;
+            padding-bottom: 4px;
+            transition: color .15s;
+        }
+        .nav-desktop a:not(.nav-minha-area)::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            border-radius: 2px;
+            background: #F4801A;
+            transition: width .2s ease;
+        }
+        .nav-desktop a:not(.nav-minha-area):hover { color: #F4801A; }
+        .nav-desktop a:not(.nav-minha-area):hover::after { width: 100%; }
+        #btn-notif {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: border-color .15s, background .15s, color .15s;
+        }
+        #btn-notif:hover { border-color: #F4801A; background: #fff7ef; color: #F4801A; }
+        #btn-notif .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 4px;
+            font-size: 10px;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: #F4801A;
+            color: #fff;
+            border: 2px solid #fff;
         }
         .subsec-title {
             display: flex;
