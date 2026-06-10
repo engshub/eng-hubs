@@ -897,13 +897,28 @@
         try {
             const cli = window._engDb || (typeof db !== 'undefined' ? db : null);
             if (!cli) { renderGrid(); renderPrevistos(); return; }
-            const { data, error } = await cli
+            let { data, error } = await cli
                 .from('concursos')
                 .select('*')
                 .order('created_at', { ascending: false });
             if (error || !data) {
-                console.error('Erro ao carregar concursos:', error);
-                renderGrid(); renderPrevistos(); return;
+                console.error('Erro ao carregar concursos (via sessão):', error);
+                // A vitrine é pública — refaz a consulta sem depender da sessão do usuário
+                try {
+                    const url = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL : 'https://xyvsihpdfgnihgomdntb.supabase.co';
+                    const key = (typeof SUPABASE_KEY !== 'undefined') ? SUPABASE_KEY : '';
+                    const resp = await fetch(url + '/rest/v1/concursos?select=*&order=created_at.desc', { headers: { apikey: key } });
+                    if (resp.ok) data = await resp.json();
+                } catch (e2) { console.error('Fallback público falhou:', e2); }
+                // Sessão revogada/expirada: limpa para o usuário poder entrar de novo
+                if (error && /jwt|token|refresh|expired|invalid|revoked/i.test(String(error.message || ''))) {
+                    try {
+                        Object.keys(localStorage).forEach(k => { if (k.indexOf('sb-') === 0) localStorage.removeItem(k); });
+                    } catch (e3) {}
+                    try { clearUserDropdown(); } catch (e4) {}
+                    showToast({ type: 'info', title: 'Sessão expirada', message: 'Entre novamente para acompanhar seus concursos.' });
+                }
+                if (!data) { renderGrid(); renderPrevistos(); return; }
             }
             const mapeados = data.map(mapConcurso);
             computeNotifications(mapeados);

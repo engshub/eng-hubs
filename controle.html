@@ -1184,6 +1184,7 @@ async function init() {
   try {
     const { data } = await db.auth.getSession();
     if (data.session) currentUser = data.session.user;
+    window._sessaoViva = !!data.session;
   } catch(e) {}
 
   // Fallback: lê localStorage diretamente
@@ -1346,7 +1347,18 @@ async function loadData() {
     .order('created_at', { ascending: false });
 
   if (error) {
+    if (/jwt|token|refresh|expired|invalid|revoked/i.test(String(error.message || ''))) {
+      try { Object.keys(localStorage).forEach(function(k){ if (k.indexOf('sb-') === 0) localStorage.removeItem(k); }); } catch(e) {}
+      window.location.href = 'index.html?login=1';
+      return;
+    }
     showToast('Erro ao carregar dados: ' + error.message);
+    return;
+  }
+  if ((!rows || !rows.length) && !window._sessaoViva) {
+    // sessao morta ressuscitada do localStorage: forca novo login
+    try { Object.keys(localStorage).forEach(function(k){ if (k.indexOf('sb-') === 0) localStorage.removeItem(k); }); } catch(e) {}
+    window.location.href = 'index.html?login=1';
     return;
   }
   const mapped = rows.map(r => ({
