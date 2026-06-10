@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Engs Hub - Portal de concursos públicos para Engenheiros e Arquitetos. Editais, prazos e notificações em um só lugar.">
     <title>Engs Hub — Concursos de Engenharia e Arquitetura</title>
- 
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;h600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
- 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
- 
-    <link rel="icon" type="image/jpeg" href="logo1.jpegh">
+
+    <link rel="icon" type="image/jpeg" href="logo1.jpeg">
     <link rel="stylesheet" href="style.css">
 
     <style>
@@ -58,10 +58,10 @@
     </style>
 </head>
 <body>
- 
+
     <header class="header" id="header">
         <div class="container header-inner">
- 
+
             <a href="#" class="logo" aria-label="Engs Hub - Página inicial">
                 <img src="logo1.jpeg" alt="Engs Hub" class="logo-mark" width="40" height="40" style="display:block;">
                 <div class="logo-text">
@@ -69,7 +69,7 @@
                     <span class="logo-subtitle">Concursos</span>
                 </div>
             </a>
- 
+
             <nav class="nav-desktop" aria-label="Navegação principal">
                 <a href="#concursos">Concursos</a>
                 <a href="#previstos">Previstos</a>
@@ -79,7 +79,7 @@
                     <i data-lucide="layout-dashboard"></i> Minha área
                 </a>
             </nav>
- 
+
             <div class="header-actions">
                 <div id="user-greeting-wrap" style="display:none; position:relative;"></div>
                 <button class="btn-icon" id="btn-notif" aria-label="Notificações">
@@ -88,13 +88,13 @@
                 </button>
                 <button class="btn btn-ghost" data-modal-open="login">Entrar</button>
                 <button class="btn btn-primary" data-modal-open="cadastro">Cadastrar</button>
- 
+
                 <button class="btn-icon btn-menu-mobile" id="btn-menu" aria-label="Abrir menu" aria-expanded="false">
                     <i data-lucide="menu"></i>
                 </button>
             </div>
         </div>
- 
+
         <nav class="nav-mobile" id="nav-mobile" aria-label="Navegação mobile">
             <a href="#concursos">Concursos</a>
             <a href="#previstos">Previstos</a>
@@ -108,12 +108,12 @@
             <button class="btn btn-primary btn-block" data-modal-open="cadastro">Cadastrar</button>
         </nav>
     </header>
- 
+
     <section class="hero">
         <div class="container hero-inner">
             <div class="hero-content">
                 <span class="hero-tag">
-                    <i data-lucide="zap"></i> Atualizado hoje · 12 editais ativos
+                    <i data-lucide="zap"></i> Atualizado hoje
                 </span>
                 <h1 class="hero-title">
                     Concursos de <span class="hl">Engenharia</span> e <span class="hl">Arquitetura</span>.<br>
@@ -123,7 +123,7 @@
                     Editais, prazos e jurisprudência reunidos em um só lugar.
                     Acompanhe os concursos que importam e receba notificação na hora da publicação.
                 </p>
- 
+
                 <form class="search-bar" id="search-form" role="search">
                     <i data-lucide="search" class="search-icon"></i>
                     <input
@@ -134,7 +134,7 @@
                     >
                     <button type="submit" class="btn btn-primary">Buscar</button>
                 </form>
- 
+
                 <div class="quick-filters" role="group" aria-label="Filtros rápidos">
                     <button class="chip chip-active" data-filter="todos">Todos</button>
                     <button class="chip" data-filter="engenharia-civil">Engenharia Civil</button>
@@ -144,28 +144,28 @@
                     <button class="chip" data-filter="agronomia">Agronomia</button>
                 </div>
             </div>
- 
+
             <aside class="hero-stats" aria-label="Estatísticas do portal">
                 <div class="stat">
-                    <span class="stat-num">147</span>
+                    <span class="stat-num">—</span>
                     <span class="stat-label">Vagas abertas</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-num">12</span>
+                    <span class="stat-num">—</span>
                     <span class="stat-label">Editais ativos</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-num">28</span>
+                    <span class="stat-num">—</span>
                     <span class="stat-label">Previstos 2026</span>
                 </div>
                 <div class="stat stat-highlight">
-                    <span class="stat-num">R$ 23.110</span>
+                    <span class="stat-num">—</span>
                     <span class="stat-label">Maior remuneração</span>
                 </div>
             </aside>
         </div>
     </section>
- 
+
     <main class="main">
         <section class="section" id="concursos">
             <div class="container">
@@ -183,9 +183,9 @@
                         </select>
                     </div>
                 </header>
- 
+
                 <div class="cards-grid" id="cards-grid"></div>
- 
+
                 <div class="empty-state hidden" id="empty-state">
                     <i data-lucide="search-x"></i>
                     <h3>Nenhum concurso encontrado</h3>
@@ -193,7 +193,7 @@
                 </div>
             </div>
         </section>
- 
+
         <section class="section section-alt" id="previstos">
             <div class="container">
                 <header class="section-header">
@@ -202,13 +202,13 @@
                         <p class="section-subtitle">Antecipe-se. Acompanhe e seja avisado quando o edital sair.</p>
                     </div>
                 </header>
- 
+
                 <div class="forecast-grid" id="forecast-grid">
 <div class="empty-state hidden" id="previstos-empty"><p>Nenhum concurso previsto no momento.</p></div>
                 </div>
             </div>
         </section>
- 
+
         <section class="cta-section">
             <div class="container cta-inner">
                 <div class="cta-content">
@@ -220,7 +220,7 @@
                 </button>
             </div>
         </section>
- 
+
         <section class="section" id="sobre">
             <div class="container">
                 <header class="section-header section-header-center">
@@ -229,7 +229,7 @@
                         <p class="section-subtitle">Direto. Técnico. Sem enrolação.</p>
                     </div>
                 </header>
- 
+
                 <div class="how-grid">
                     <div class="how-card">
                         <div class="how-icon"><i data-lucide="search"></i></div>
@@ -304,7 +304,7 @@
         </section>
 
     </main>
- 
+
     <footer class="footer">
         <div class="container footer-inner">
             <div class="footer-brand">
@@ -317,7 +317,7 @@
                 </a>
                 <p class="footer-tagline">O hub de concursos para quem constrói o Brasil.</p>
             </div>
- 
+
             <div class="footer-cols">
                 <div class="footer-col">
                     <h4>Navegação</h4>
@@ -350,23 +350,23 @@
             </div>
         </div>
     </footer>
- 
+
     <!-- MODAL Login / Cadastro -->
     <div class="modal-overlay" id="modal" aria-hidden="true">
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <button class="modal-close" id="modal-close" aria-label="Fechar">
                 <i data-lucide="x"></i>
             </button>
- 
+
             <div class="modal-tabs" role="tablist">
                 <button class="modal-tab" data-tab="login" role="tab">Entrar</button>
                 <button class="modal-tab" data-tab="cadastro" role="tab">Criar conta</button>
             </div>
- 
+
             <div class="modal-content" id="content-login">
                 <h2 id="modal-title-login" class="modal-title">Bem-vindo de volta</h2>
                 <p class="modal-subtitle">Acesse seus concursos acompanhados.</p>
- 
+
                 <form class="modal-form" id="form-login">
                     <label>
                         E-mail
@@ -380,11 +380,11 @@
                     <button type="submit" class="btn btn-primary btn-block">Entrar</button>
                 </form>
             </div>
- 
+
             <div class="modal-content hidden" id="content-cadastro">
                 <h2 id="modal-title-cadastro" class="modal-title">Crie sua conta gratuita</h2>
                 <p class="modal-subtitle">Receba notificações dos concursos da sua área.</p>
- 
+
                 <form class="modal-form" id="form-cadastro">
                     <label>
                         Nome completo
@@ -421,7 +421,7 @@
         </div>
     </div>
 
-    <!-- MODAL Recuperar Senha — SEM display:none inline (correção do bug) -->
+    <!-- MODAL Recuperar Senha -->
     <div class="modal-overlay" id="modal-reset" aria-hidden="true">
       <div class="modal" role="dialog" style="max-width:400px;">
         <button class="modal-close" id="modal-reset-close" aria-label="Fechar">
@@ -448,7 +448,7 @@
     </div>
 
     <div class="toast-container" id="toast-container" aria-live="polite" aria-atomic="true"></div>
- 
+
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -570,254 +570,6 @@
     })();
     </script>
 
-
-  <!-- ENGS HUB :: Concursos dinâmicos do Supabase (painel admin) -->
-  <script>
-  (function(){
-    'use strict';
-    var SUPABASE_URL = 'https://xyvsihpdfgnihgomdntb.supabase.co';
-    var db = null;
-
-    function fmtBRL(v){
-      if(v == null || v === '') return '—';
-      var n = Number(v);
-      if(isNaN(n)) return '—';
-      return 'R$ ' + n.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:2});
-    }
-    function diasRestantes(dateStr){
-      if(!dateStr) return null;
-      var hoje = new Date(); hoje.setHours(0,0,0,0);
-      var alvo = new Date(dateStr + 'T00:00:00');
-      return Math.round((alvo - hoje) / 86400000);
-    }
-    function fmtData(dateStr){
-      if(!dateStr) return '';
-      var p = String(dateStr).split('-');
-      return p.length === 3 ? (p[2]+'/'+p[1]+'/'+p[0]) : dateStr;
-    }
-    function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
-
-    function statusInfo(c){
-      var badge = (c.status_badge || '').toLowerCase();
-      var dias = diasRestantes(c.inscricoes_ate);
-      if(badge === 'encerrado') return {cls:'badge-encerrando', label:'Encerrado'};
-      if(dias != null && dias >= 0 && dias <= 7) return {cls:'badge-encerrando', label:'Encerrando'};
-      if(badge === 'previsto') return {cls:'badge-novo', label:'Novo'};
-      return {cls:'badge-aberto', label: c.status_label || 'Aberto'};
-    }
-    function deadlineText(c){
-      var dias = diasRestantes(c.inscricoes_ate);
-      if(c.inscricoes_ate == null) return 'Inscrições em breve';
-      if(dias != null && dias < 0) return 'Inscrições encerradas';
-      if(dias === 0) return 'Último dia para inscrição!';
-      return 'Inscrições até ' + fmtData(c.inscricoes_ate) + ' · ' + dias + (dias === 1 ? ' dia' : ' dias');
-    }
-
-    function buildCard(c){
-      var art = document.createElement('article');
-      art.className = 'card';
-      art.setAttribute('data-id', c.id);
-      art.setAttribute('data-area', c.area || '');
-      art.setAttribute('data-c', JSON.stringify({
-        orgao: c.orgao || '', cargo: c.cargo || '', banca: c.banca || '',
-        vagas: (c.vagas != null ? c.vagas : 0), salario: (c.salario != null ? String(c.salario) : ''),
-        data_inscricao: c.inscricoes_ate || null
-      }));
-      var st = statusInfo(c);
-      art.innerHTML =
-        '<div class="card-header">' +
-          '<div class="card-badges">' +
-            '<span class="badge ' + st.cls + '">' + esc(st.label) + '</span>' +
-            (c.area_label ? '<span class="badge badge-area">' + esc(c.area_label) + '</span>' : '') +
-          '</div>' +
-          '<button class="card-favorite" data-fav-id="' + esc(c.id) + '" aria-label="Favoritar" title="Favoritar">' +
-            '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="heart" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></svg>' +
-          '</button>' +
-        '</div>' +
-        '<p class="card-org">' + esc(c.orgao) + '</p>' +
-        '<h3 class="card-title">' + esc(c.cargo || '') + '</h3>' +
-        '<div class="card-info">' +
-          '<div class="card-info-item"><span class="card-info-label">Vagas</span><span class="card-info-value"><strong>' + (c.vagas != null ? c.vagas : '—') + '</strong></span></div>' +
-          '<div class="card-info-item"><span class="card-info-label">Remuneração</span><span class="card-info-value">' + fmtBRL(c.salario) + '</span></div>' +
-          '<div class="card-info-item"><span class="card-info-label">Banca</span><span class="card-info-value">' + esc(c.banca || '—') + '</span></div>' +
-        '</div>' +
-        '<div class="card-deadline">' +
-          '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar" aria-hidden="true"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>' +
-          '<span><strong>' + esc(deadlineText(c)) + '</strong></span>' +
-        '</div>' +
-        '<div class="card-actions">' +
-          '<button class="btn btn-outline btn-watch" data-watch-id="' + esc(c.id) + '">Acompanhar</button>' +
-          (c.link_edital ? '<a class="btn-details" href="' + esc(c.link_edital) + '" target="_blank" rel="noopener">Ver edital</a>' : '<button class="btn-details" data-details-id="' + esc(c.id) + '">Detalhes</button>') +
-        '</div>';
-      return art;
-    }
-
-    function buildForecastCard(c){
-  var art = document.createElement('article');
-  art.className = 'forecast-card';
-  art.setAttribute('data-id', c.id);
-  var fase = c.fase || 'Previsto';
-  var statusCls = (fase === 'Edital iminente') ? 'status-iminente' : 'status-andamento';
-  var icon = (fase === 'Edital iminente') ? 'alert-circle' : 'clock';
-  var meta = [];
-  if(c.area_label) meta.push(esc(c.area_label));
-  if(c.vagas != null) meta.push(esc(c.vagas) + ' vagas');
-  if(c.banca) meta.push('Banca: ' + esc(c.banca));
-  art.innerHTML =
-    '<div class="forecast-status ' + statusCls + '">' +
-      '<i data-lucide="' + icon + '"></i> ' + esc(fase) +
-    '</div>' +
-    '<h3>' + esc(c.orgao || '') + (c.cargo ? ' — ' + esc(c.cargo) : '') + '</h3>' +
-    '<p class="forecast-meta">' + meta.join(' · ') + '</p>' +
-    (c.link_edital ? '<a class="btn btn-outline btn-block" href="' + esc(c.link_edital) + '" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Mais informações</a>' : '<button class="btn btn-outline btn-block btn-watch" data-watch-id="' + esc(c.id) + '"><i data-lucide="bell-plus"></i> Avisar quando sair</button>');
-  return art;
-}
-function renderPrevistos(lista){
-  var grid = document.getElementById('forecast-grid');
-  if(!grid) return;
-  var empty = document.getElementById('previstos-empty');
-  grid.innerHTML = '';
-  if(!lista || !lista.length){
-    if(empty){ grid.appendChild(empty); empty.classList.remove('hidden'); }
-    return;
-  }
-  var frag = document.createDocumentFragment();
-  lista.forEach(function(c){ frag.appendChild(buildForecastCard(c)); });
-  grid.appendChild(frag);
-  if(window.lucide && window.lucide.createIcons){ try{ window.lucide.createIcons(); }catch(e){} }
-}
-async function loadDynamic(){
-      try{
-        if(!window.supabase) return;
-        // reaproveita a anon key pública já presente em controle.html
-        var key = null;
-        try{
-          var t = await fetch('controle.html', {cache:'no-store'}).then(function(r){return r.text();});
-          var m = t.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
-          if(m) key = m[0];
-        }catch(e){}
-        if(!key) return;
-        db = window._engDb || window.supabase.createClient(SUPABASE_URL, key); if(!window._engDb) window._engDb = db;
-        var r = await db.from('concursos').select('*').order('created_at', {ascending:false});
-        if(r.error || !r.data || !r.data.length) return;
-        var grid = document.getElementById('cards-grid');
-        if(!grid) return;
-        // Home passa a exibir SOMENTE os concursos do banco (sem duplicar os estáticos)
-        grid.innerHTML = '';
-// separa por seção: 'aberto' vai para Editais abertos; 'previsto' vai para Previstos. Homologados saem da home.
-var abertos = [], previstos = [];
-r.data.forEach(function(c){
-  if(c.homologado) return;
-  if((c.secao||'aberto') === 'previsto') previstos.push(c); else abertos.push(c);
-});
-var frag = document.createDocumentFragment();
-abertos.forEach(function(c){ frag.appendChild(buildCard(c)); });
-grid.appendChild(frag);
-// Renderiza a seção Previstos
-renderPrevistos(previstos);
-        // Liga o botão 'Acompanhar' à Minha área (controle_concursos)
-        if(!grid.__watchBound){
-          grid.__watchBound = true;
-          grid.addEventListener('click', function(ev){
-            var btn = ev.target.closest('.btn-watch');
-            if(!btn) return;
-            ev.preventDefault();
-              ev.stopPropagation();
-            acompanhar(btn);
-          });
-        }
-        if(window.lucide && window.lucide.createIcons){ try{ window.lucide.createIcons(); }catch(e){} }
-marcarAcompanhados();
-      }catch(e){ /* silencioso: mantém os cards estáticos */ }
-    }
-
-    function showAviso(msg, tipo){
-      var d = document.createElement('div');
-      d.textContent = msg;
-      d.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'+(tipo==='erro'?'#d9483b':(tipo==='ok'?'#1f9d57':'#1A2E4A'))+';color:#fff;padding:13px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:99999;';
-      document.body.appendChild(d);
-      setTimeout(function(){ d.style.transition='opacity .3s'; d.style.opacity='0'; setTimeout(function(){ d.remove(); }, 320); }, 2600);
-    }
-    async function acompanhar(btn){
-      try{
-        await getDbReady();
-        if(!db){ showAviso('Não foi possível conectar. Tente novamente.', 'erro'); return; }
-        var sess = await db.auth.getUser();
-        var user = sess && sess.data ? sess.data.user : null;
-        if(!user){
-          showAviso('Faça login para acompanhar este concurso.', 'erro');
-          setTimeout(function(){ location.href = 'controle.html'; }, 1200);
-          return;
-        }
-        var card = btn.closest('.card');
-        var data = {};
-        try{ data = JSON.parse(card.getAttribute('data-c') || '{}'); }catch(e){}
-        // Evita duplicar: verifica se já acompanha esse órgão+cargo
-        var ex = await db.from('controle_concursos').select('id').eq('user_id', user.id).eq('orgao', data.orgao).eq('cargo', data.cargo).limit(1);
-        if(ex.data && ex.data.length){ btn.disabled=true; var delR=await db.from('controle_concursos').delete().eq('id',ex.data[0].id); btn.disabled=false; if(delR.error){ showAviso('Erro ao deixar de acompanhar.','erro'); return; } btn.classList.remove('is-active'); btn.innerHTML='Acompanhar'; showAviso('Você deixou de acompanhar este concurso.','ok'); return; }
-        var registro = {
-          user_id: user.id,
-          orgao: data.orgao || '',
-          cargo: data.cargo || '',
-          banca: data.banca || '',
-          vagas: data.vagas || 0,
-          salario: data.salario || '',
-          data_inscricao: data.data_inscricao || null,
-          situacao: 'nao'
-        };
-        btn.disabled = true;
-        var r = await db.from('controle_concursos').insert([registro]);
-        btn.disabled = false;
-        if(r.error){ showAviso('Erro ao acompanhar: ' + r.error.message, 'erro'); return; }
-        btn.innerHTML = '<span class="btn-watch-label">Acompanhando ✓</span>';
-        btn.classList.add('is-active');
-        showAviso('Adicionado à sua Minha área!', 'ok');
-      }catch(e){ showAviso('Erro inesperado ao acompanhar.', 'erro'); }
-    }
-    // Marca como 'Acompanhando ✓' os concursos que o usuário logado já segue
-async function marcarAcompanhados(){
-try{
-await getDbReady();
-if(!db) return;
-var sess = await db.auth.getUser();
-var user = sess && sess.data ? sess.data.user : null;
-if(!user) return;
-var r = await db.from('controle_concursos').select('orgao,cargo').eq('user_id', user.id);
-if(r.error || !r.data) return;
-var seguidos = {};
-r.data.forEach(function(x){ seguidos[((x.orgao||'')+'||'+(x.cargo||'')).toLowerCase()] = true; });
-var grid = document.getElementById('cards-grid');
-if(!grid) return;
-var btns = grid.querySelectorAll('.btn-watch');
-btns.forEach(function(btn){
-var card = btn.closest('.card');
-if(!card) return;
-var data = {};
-try{ data = JSON.parse(card.getAttribute('data-c') || '{}'); }catch(e){}
-var chave = ((data.orgao||'')+'||'+(data.cargo||'')).toLowerCase();
-if(seguidos[chave]){
-btn.innerHTML = '<span class="btn-watch-label">Acompanhando ✓</span>';
-btn.classList.add('is-active');
-}
-});
-}catch(e){}
-}
-// garante que o db (anon) está pronto, reaproveitando a key pública
-    async function getDbReady(){
-      if(db) return;
-      try{
-        var t = await fetch('controle.html', {cache:'no-store'}).then(function(r){return r.text();});
-        var m = t.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
-        db = window._engDb || (window.supabase ? window.supabase.createClient(SUPABASE_URL, m[0]) : null); if(db && !window._engDb) window._engDb = db;
-      }catch(e){}
-    }
-        if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', function(){ setTimeout(loadDynamic, 300); });
-    } else {
-      setTimeout(loadDynamic, 300);
-    }
-  })();
-  </script>
   <script>
     /* engshub-scroll-concursos: rola ate "Editais abertos" quando vindo do botao Adicionar concurso */
     (function(){

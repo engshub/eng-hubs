@@ -1,10 +1,14 @@
 /* ============================================================
    ENG HUBS — Script principal (Vanilla JS)
+   Versão corrigida: um único carregador de dados (Supabase),
+   filtros tolerantes a acentos, previstos dinâmicos e
+   estatísticas reais no topo.
    ============================================================ */
 (function () {
     'use strict';
 
-    let CONCURSOS = [];
+    let CONCURSOS = [];   // seção "Editais abertos"
+    let PREVISTOS = [];   // seção "Previstos"
 
     const state = {
         filtroArea: 'todos',
@@ -14,7 +18,9 @@
     };
 
     function formatBRL(valor) {
-        return valor.toLocaleString('pt-BR', {
+        const n = Number(valor);
+        if (valor == null || valor === '' || isNaN(n)) return '—';
+        return n.toLocaleString('pt-BR', {
             style: 'currency',
             currency: 'BRL',
             minimumFractionDigits: 0,
@@ -23,16 +29,44 @@
     }
 
     function diasRestantes(dataISO) {
+        if (!dataISO) return null;
         const hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
         const alvo = new Date(dataISO + 'T00:00:00');
-        const diff = Math.ceil((alvo - hoje) / (1000 * 60 * 60 * 24));
-        return diff;
+        if (isNaN(alvo)) return null;
+        return Math.ceil((alvo - hoje) / (1000 * 60 * 60 * 24));
     }
 
     function formatData(dataISO) {
-        const d = new Date(dataISO + 'T00:00:00');
-        return d.toLocaleDateString('pt-BR');
+        if (!dataISO) return '—';
+        const p = String(dataISO).split('-');
+        return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : dataISO;
+    }
+
+    // "Engenharia Civil" -> "engenharia-civil" (sem acentos, minúsculo)
+    function slugify(txt) {
+        return String(txt || '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase().trim()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    // O concurso bate com o chip se o slug da área ou do rótulo
+    // for igual ao filtro, ou estiver contido nele (ex: "civil" ⊂ "engenharia-civil")
+    function areaMatches(c, filtro) {
+        if (filtro === 'todos') return true;
+        const a = slugify(c.area);
+        const l = slugify(c.areaLabel);
+        return a === filtro || l === filtro ||
+               (a && filtro.indexOf(a) !== -1) || (l && filtro.indexOf(l) !== -1) ||
+               (a && a.indexOf(filtro) !== -1) || (l && l.indexOf(filtro) !== -1);
+    }
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"]/g, function (ch) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[ch];
+        });
     }
 
     function $(sel, ctx = document) { return ctx.querySelector(sel); }
@@ -54,37 +88,42 @@
             c.statusBadge === 'novo' ? 'sparkles' :
             'check-circle-2';
         let textoPrazo;
-        if (dias < 0) {
+        if (dias == null) {
+            textoPrazo = 'Inscrições em breve';
+        } else if (dias < 0) {
             textoPrazo = `Encerrado em <strong>${formatData(c.inscricoesAte)}</strong>`;
         } else if (dias === 0) {
             textoPrazo = `<strong>Último dia para inscrição!</strong>`;
         } else {
             textoPrazo = `Inscrições até <strong>${formatData(c.inscricoesAte)}</strong> · ${dias} dia${dias > 1 ? 's' : ''}`;
         }
+        const detalhes = c.linkEdital
+            ? `<a class="btn-details" href="${esc(c.linkEdital)}" target="_blank" rel="noopener">Ver edital</a>`
+            : `<button class="btn-details" data-details-id="${esc(c.id)}">Detalhes</button>`;
         return `
-            <article class="card" data-id="${c.id}" data-area="${c.area}">
+            <article class="card" data-id="${esc(c.id)}" data-area="${esc(c.area)}">
                 <div class="card-header">
                     <div class="card-badges">
                         <span class="badge ${badgeClass}">
-                            <i data-lucide="${iconStatus}"></i> ${c.statusLabel}
+                            <i data-lucide="${iconStatus}"></i> ${esc(c.statusLabel)}
                         </span>
-                        <span class="badge badge-area">${c.areaLabel}</span>
+                        <span class="badge badge-area">${esc(c.areaLabel)}</span>
                     </div>
                     <button
                         class="card-favorite ${isAcompanhando ? 'is-active' : ''}"
-                        data-fav-id="${c.id}"
+                        data-fav-id="${esc(c.id)}"
                         aria-label="${isAcompanhando ? 'Remover dos favoritos' : 'Favoritar'}"
                         title="${isAcompanhando ? 'Remover dos favoritos' : 'Favoritar'}"
                     >
                         <i data-lucide="${isAcompanhando ? 'bookmark-check' : 'bookmark'}"></i>
                     </button>
                 </div>
-                <p class="card-org">${c.orgao}</p>
-                <h3 class="card-title">${c.cargo}</h3>
+                <p class="card-org">${esc(c.orgao)}</p>
+                <h3 class="card-title">${esc(c.cargo)}</h3>
                 <div class="card-info">
                     <div class="card-info-item">
                         <span class="card-info-label">Vagas</span>
-                        <span class="card-info-value"><strong>${c.vagas}</strong></span>
+                        <span class="card-info-value"><strong>${c.vagas != null ? c.vagas : '—'}</strong></span>
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">Remuneração</span>
@@ -92,11 +131,11 @@
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">Banca</span>
-                        <span class="card-info-value">${c.banca}</span>
+                        <span class="card-info-value">${esc(c.banca || '—')}</span>
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">UF</span>
-                        <span class="card-info-value">${c.estado}</span>
+                        <span class="card-info-value">${esc(c.estado || '—')}</span>
                     </div>
                 </div>
                 <div class="card-deadline">
@@ -106,14 +145,12 @@
                 <div class="card-actions">
                     <button
                         class="btn btn-outline btn-watch ${isAcompanhando ? 'is-active' : ''}"
-                        data-watch-id="${c.id}"
+                        data-watch-id="${esc(c.id)}"
                     >
                         <i data-lucide="${isAcompanhando ? 'check' : 'bell-plus'}"></i>
                         <span class="btn-watch-label">${isAcompanhando ? 'Acompanhando' : 'Acompanhar'}</span>
                     </button>
-                    <button class="btn-details" data-details-id="${c.id}">
-                        Detalhes
-                    </button>
+                    ${detalhes}
                 </div>
             </article>
         `;
@@ -123,42 +160,98 @@
         const grid = $('#cards-grid');
         const empty = $('#empty-state');
         if (!grid) return;
-        let lista = state.filtroArea === 'todos'
-            ? CONCURSOS.slice()
-            : CONCURSOS.filter(c => c.area === state.filtroArea);
+        let lista = CONCURSOS.filter(c => areaMatches(c, state.filtroArea));
         const q = state.textoBusca.trim().toLowerCase();
         if (q) {
             lista = lista.filter(c =>
-                c.cargo.toLowerCase().includes(q) ||
-                c.orgao.toLowerCase().includes(q) ||
-                c.banca.toLowerCase().includes(q) ||
-                c.estado.toLowerCase().includes(q) ||
-                c.areaLabel.toLowerCase().includes(q)
+                (c.cargo || '').toLowerCase().includes(q) ||
+                (c.orgao || '').toLowerCase().includes(q) ||
+                (c.banca || '').toLowerCase().includes(q) ||
+                (c.estado || '').toLowerCase().includes(q) ||
+                (c.areaLabel || '').toLowerCase().includes(q)
             );
         }
         switch (state.ordenacao) {
             case 'salario':
-                lista.sort((a, b) => b.salario - a.salario);
+                lista.sort((a, b) => (b.salario || 0) - (a.salario || 0));
                 break;
             case 'vagas':
-                lista.sort((a, b) => b.vagas - a.vagas);
+                lista.sort((a, b) => (b.vagas || 0) - (a.vagas || 0));
                 break;
             case 'recentes':
-                lista.sort((a, b) => (b.statusBadge === 'novo' ? 1 : 0) - (a.statusBadge === 'novo' ? 1 : 0));
+                lista.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
                 break;
             case 'prazo':
             default:
-                lista.sort((a, b) => new Date(a.inscricoesAte) - new Date(b.inscricoesAte));
+                lista.sort((a, b) => new Date(a.inscricoesAte || '2999-12-31') - new Date(b.inscricoesAte || '2999-12-31'));
                 break;
         }
         if (lista.length === 0) {
             grid.innerHTML = '';
-            empty.classList.remove('hidden');
+            if (empty) empty.classList.remove('hidden');
         } else {
-            empty.classList.add('hidden');
+            if (empty) empty.classList.add('hidden');
             grid.innerHTML = lista.map(renderCard).join('');
         }
         refreshIcons();
+        updateNotifBadge();
+    }
+
+    /* ===== Seção "Previstos" ===== */
+    function buildForecastCard(c) {
+        const fase = c.fase || 'Previsto';
+        const statusCls = (fase === 'Edital iminente') ? 'status-iminente' : 'status-andamento';
+        const icon = (fase === 'Edital iminente') ? 'alert-circle' : 'clock';
+        const meta = [];
+        if (c.areaLabel) meta.push(esc(c.areaLabel));
+        if (c.vagas != null) meta.push(esc(c.vagas) + ' vagas');
+        if (c.banca) meta.push('Banca: ' + esc(c.banca));
+        const acao = c.linkEdital
+            ? `<a class="btn btn-outline btn-block" href="${esc(c.linkEdital)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Mais informações</a>`
+            : `<button class="btn btn-outline btn-block btn-watch" data-watch-id="${esc(c.id)}"><i data-lucide="bell-plus"></i> <span class="btn-watch-label">Avisar quando sair</span></button>`;
+        return `
+            <article class="forecast-card" data-id="${esc(c.id)}">
+                <div class="forecast-status ${statusCls}">
+                    <i data-lucide="${icon}"></i> ${esc(fase)}
+                </div>
+                <h3>${esc(c.orgao)}${c.cargo ? ' — ' + esc(c.cargo) : ''}</h3>
+                <p class="forecast-meta">${meta.join(' · ')}</p>
+                ${acao}
+            </article>
+        `;
+    }
+
+    function renderPrevistos() {
+        const grid = $('#forecast-grid');
+        if (!grid) return;
+        const empty = $('#previstos-empty');
+        if (!PREVISTOS.length) {
+            grid.innerHTML = '';
+            if (empty) { grid.appendChild(empty); empty.classList.remove('hidden'); }
+            return;
+        }
+        if (empty) empty.classList.add('hidden');
+        grid.innerHTML = PREVISTOS.map(buildForecastCard).join('');
+        refreshIcons();
+    }
+
+    /* ===== Estatísticas reais no topo ===== */
+    function updateHeroStats() {
+        const nums = $$('.hero-stats .stat-num');
+        if (nums.length >= 4) {
+            const totalVagas = CONCURSOS.reduce((s, c) => s + (c.vagas || 0), 0);
+            const maiorSalario = CONCURSOS.concat(PREVISTOS).reduce((m, c) => Math.max(m, c.salario || 0), 0);
+            nums[0].textContent = totalVagas;
+            nums[1].textContent = CONCURSOS.length;
+            nums[2].textContent = PREVISTOS.length;
+            nums[3].textContent = maiorSalario > 0 ? formatBRL(maiorSalario) : '—';
+        }
+        const tag = $('.hero-tag');
+        if (tag) {
+            tag.innerHTML = '<i data-lucide="zap"></i> Atualizado hoje · ' +
+                CONCURSOS.length + ' ' + (CONCURSOS.length === 1 ? 'edital ativo' : 'editais ativos');
+            refreshIcons();
+        }
     }
 
     function showToast({ title, message, type = 'default', duration = 4500 } = {}) {
@@ -168,7 +261,8 @@
             default: 'bell-ring',
             success: 'check-circle-2',
             info: 'info',
-            warning: 'alert-triangle'
+            warning: 'alert-triangle',
+            error: 'alert-triangle'
         };
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
@@ -194,27 +288,41 @@
         setTimeout(remove, duration);
     }
 
-    function toggleAcompanhar(id, btn) {
-        const concurso = CONCURSOS.find(c => c.id === id);
+    function findConcurso(id) {
+        return CONCURSOS.find(c => c.id === id) || PREVISTOS.find(c => c.id === id);
+    }
+
+    /* ===== Acompanhar (sincroniza com Minha área via Supabase) ===== */
+    async function getLoggedUser() {
+        try {
+            if (typeof db === 'undefined' || !db) return null;
+            const { data } = await db.auth.getSession();
+            return data && data.session ? data.session.user : null;
+        } catch (e) { return null; }
+    }
+
+    async function toggleAcompanhar(id, btn) {
+        const concurso = findConcurso(id);
         const isAtivo = state.acompanhando.has(id);
+        const user = await getLoggedUser();
+
+        if (!user) {
+            showToast({
+                type: 'info',
+                title: 'Faça login para acompanhar',
+                message: 'Crie sua conta gratuita ou entre para salvar seus concursos.'
+            });
+            modal.open('login');
+            return;
+        }
+
         if (isAtivo) {
             state.acompanhando.delete(id);
             localStorage.setItem('eng_acompanhando', JSON.stringify([...state.acompanhando]));
-            if (btn) {
-                btn.classList.remove('is-active');
-                btn.querySelector('.btn-watch-label').textContent = 'Acompanhar';
-                const iconBtn1 = btn.querySelector('i[data-lucide]') || btn.querySelector('svg');
-                if (iconBtn1 && iconBtn1.tagName === 'I') { iconBtn1.setAttribute('data-lucide', 'bell-plus'); }
-            }
-                        // Supabase: remove de controle_concursos (via fetch direto)
-            (function() {
-              var _ls = (function(){ try { var s=JSON.parse(localStorage.getItem('sb-xyvsihpdfgnihgomdntb-auth-token')); return (s&&s.access_token&&s.user)?s:null; } catch(e){return null;} })();
-              if (!_ls) return;
-              fetch(_engDb.supabaseUrl+'/rest/v1/controle_concursos?user_id=eq.'+_ls.user.id+'&concurso_id=eq.'+encodeURIComponent(id), {
-                method: 'DELETE',
-                headers: { 'Authorization': 'Bearer '+_ls.access_token, 'apikey': _engDb.supabaseKey }
-              }).catch(function(e){ console.error('Erro ao remover de controle_concursos:', e); });
-            })();
+            try {
+                await db.from('controle_concursos').delete()
+                    .eq('user_id', user.id).eq('concurso_id', id);
+            } catch (e) { console.error('Erro ao remover acompanhamento:', e); }
             showToast({
                 type: 'info',
                 title: 'Removido dos acompanhados',
@@ -223,22 +331,20 @@
         } else {
             state.acompanhando.add(id);
             localStorage.setItem('eng_acompanhando', JSON.stringify([...state.acompanhando]));
-            if (btn) {
-                btn.classList.add('is-active');
-                btn.querySelector('.btn-watch-label').textContent = 'Acompanhando';
-                const iconBtn2 = btn.querySelector('i[data-lucide]') || btn.querySelector('svg');
-                if (iconBtn2 && iconBtn2.tagName === 'I') { iconBtn2.setAttribute('data-lucide', 'check'); }
-            }
-                        // Supabase: salvar em controle_concursos (via fetch direto)
             if (concurso) {
-              var _ls2 = (function(){ try { var s=JSON.parse(localStorage.getItem('sb-xyvsihpdfgnihgomdntb-auth-token')); return (s&&s.access_token&&s.user)?s:null; } catch(e){return null;} })();
-              if (_ls2) {
-                fetch(_engDb.supabaseUrl+'/rest/v1/controle_concursos', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+_ls2.access_token, 'apikey': _engDb.supabaseKey, 'Prefer': 'return=minimal,resolution=merge-duplicates' },
-                  body: JSON.stringify({ user_id: _ls2.user.id, concurso_id: id, banca: concurso.banca, orgao: concurso.orgao, cargo: concurso.cargo, vagas: concurso.vagas, salario: String(concurso.salario), data_inscricao: concurso.inscricoesAte, situacao: 'nao', data_prova: null, data_isencao: null, gabarito: null })
-                }).catch(function(e){ console.error('Erro ao salvar em controle_concursos:', e); });
-              }
+                try {
+                    await db.from('controle_concursos').upsert({
+                        user_id: user.id,
+                        concurso_id: id,
+                        banca: concurso.banca || '',
+                        orgao: concurso.orgao || '',
+                        cargo: concurso.cargo || '',
+                        vagas: concurso.vagas || 0,
+                        salario: concurso.salario != null ? String(concurso.salario) : '',
+                        data_inscricao: concurso.inscricoesAte || null,
+                        situacao: 'nao'
+                    }, { onConflict: 'user_id,concurso_id', ignoreDuplicates: true });
+                } catch (e) { console.error('Erro ao salvar acompanhamento:', e); }
             }
             showToast({
                 type: 'success',
@@ -247,42 +353,9 @@
                     ? `Você receberá alertas sobre ${concurso.orgao} — ${concurso.cargo}.`
                     : 'Você receberá notificações sobre este concurso.'
             });
-            setTimeout(() => { window.location.href = 'controle.html'; }, 1200);
         }
-        refreshIcons();
-        const fav = document.querySelector(`[data-fav-id="${id}"]`);
-        if (fav) {
-            fav.classList.toggle('is-active', state.acompanhando.has(id));
-            const iconFav = fav.querySelector('i[data-lucide]') || fav.querySelector('svg');
-            if (iconFav && iconFav.tagName === 'I') {
-              iconFav.setAttribute('data-lucide', state.acompanhando.has(id) ? 'bookmark-check' : 'bookmark');
-              refreshIcons();
-            }
-        }
-    }
-
-    function toggleAvisar(id, btn) {
-        const isAtivo = btn.classList.toggle('is-active');
-        const label = btn.querySelector('.btn-watch-label');
-        const icon = btn.querySelector('i');
-        if (isAtivo) {
-            label.textContent = 'Aviso ativo';
-            icon.setAttribute('data-lucide', 'check');
-            showToast({
-                type: 'success',
-                title: 'Aviso ativado',
-                message: 'Você será notificado assim que o edital for publicado.'
-            });
-        } else {
-            label.textContent = 'Avisar quando sair';
-            icon.setAttribute('data-lucide', 'bell-plus');
-            showToast({
-                type: 'info',
-                title: 'Aviso desativado',
-                message: 'Você não receberá mais alertas sobre este edital.'
-            });
-        }
-        refreshIcons();
+        renderGrid();
+        renderPrevistos();
     }
 
     const modal = {
@@ -320,7 +393,10 @@
                 btn.textContent = 'Entrar';
                 btn.disabled = false;
                 if (error) {
-                    showToast({ type: 'error', title: 'Erro ao entrar', message: 'E-mail ou senha incorretos.' });
+                    const msg = /confirm/i.test(error.message || '')
+                        ? 'Confirme seu e-mail antes de entrar. Verifique sua caixa de entrada.'
+                        : 'E-mail ou senha incorretos.';
+                    showToast({ type: 'error', title: 'Erro ao entrar', message: msg });
                     return;
                 }
                 this.close();
@@ -333,11 +409,12 @@
                 const nome = e.target.nome.value.trim();
                 const email = e.target.email.value;
                 const senha = e.target.senha.value;
+                const area = e.target.area ? e.target.area.value : '';
                 btn.textContent = 'Criando conta...';
                 btn.disabled = true;
                 const { error } = await db.auth.signUp({
                     email, password: senha,
-                    options: { data: { nome_completo: nome } }
+                    options: { data: { nome_completo: nome, area: area } }
                 });
                 btn.textContent = 'Criar conta gratuita';
                 btn.disabled = false;
@@ -394,28 +471,26 @@
         });
     }
 
-        function syncAcompanhandoFromDB() {
-        const _ls = JSON.parse(localStorage.getItem('sb-xyvsihpdfgnihgomdntb-auth-token') || 'null');
-        if (!_ls || !_ls.user) return;
-        fetch(_engDb.supabaseUrl + '/rest/v1/controle_concursos?select=concurso_id&user_id=eq.' + _ls.user.id, {
-            headers: {
-                'Authorization': 'Bearer ' + _ls.access_token,
-                'apikey': _engDb.supabaseKey
-            }
-        }).then(r => r.json()).then(rows => {
-            if (!Array.isArray(rows)) return;
-            const ids = rows.map(r => r.concurso_id).filter(Boolean);
+    async function syncAcompanhandoFromDB() {
+        const user = await getLoggedUser();
+        if (!user) return;
+        try {
+            const { data: rows, error } = await db.from('controle_concursos')
+                .select('concurso_id').eq('user_id', user.id);
+            if (error || !Array.isArray(rows)) return;
+            const ids = rows.map(r => r.concurso_id).filter(Boolean).map(String);
             state.acompanhando = new Set(ids);
             localStorage.setItem('eng_acompanhando', JSON.stringify(ids));
             renderGrid();
-        }).catch(() => {});
+            renderPrevistos();
+        } catch (e) { /* mantém estado local */ }
     }
 
     function initDelegation() {
         document.addEventListener('click', (e) => {
             const watchBtn = e.target.closest('[data-watch-id]');
             if (watchBtn) {
-if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getAttribute('data-watch-id'), watchBtn); }
+                toggleAcompanhar(watchBtn.getAttribute('data-watch-id'), watchBtn);
                 return;
             }
             const favBtn = e.target.closest('[data-fav-id]');
@@ -428,17 +503,12 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
             const detailsBtn = e.target.closest('[data-details-id]');
             if (detailsBtn) {
                 const id = detailsBtn.getAttribute('data-details-id');
-                const concurso = CONCURSOS.find(c => c.id === id);
+                const concurso = findConcurso(id);
                 showToast({
                     type: 'info',
-                    title: 'Página de detalhes',
-                    message: concurso ? `Abrindo detalhes de ${concurso.orgao} — ${concurso.cargo}.` : 'Em breve.'
+                    title: 'Edital ainda não publicado',
+                    message: concurso ? `O link do edital de ${concurso.orgao} será adicionado em breve.` : 'Em breve.'
                 });
-                return;
-            }
-            const watchPrev = e.target.closest('.btn-watch[data-id]');
-            if (watchPrev) {
-                toggleAvisar(watchPrev.getAttribute('data-id'), watchPrev);
                 return;
             }
         });
@@ -459,43 +529,46 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         });
         const form = $('#search-form');
         const input = $('#search-input');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            state.textoBusca = input.value;
-            renderGrid();
-            $('#concursos').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-        let debounceTimer;
-        input.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => {
+        if (form && input) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
                 state.textoBusca = input.value;
                 renderGrid();
-            }, 300);
-        });
-        $('#sort-select').addEventListener('change', (e) => {
-            state.ordenacao = e.target.value;
-            renderGrid();
-        });
+                $('#concursos').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+            let debounceTimer;
+            input.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    state.textoBusca = input.value;
+                    renderGrid();
+                }, 300);
+            });
+        }
+        const sort = $('#sort-select');
+        if (sort) {
+            sort.addEventListener('change', (e) => {
+                state.ordenacao = e.target.value;
+                renderGrid();
+            });
+        }
     }
 
+    /* ===== Painel de notificações (sininho) ===== */
     function buildNotifPanel() {
         const existing = document.getElementById('notif-dropdown');
         if (existing) { existing.remove(); return null; }
 
-        const cards = Array.from(document.querySelectorAll('.card'));
-        const followed = cards
-            .filter(card => card.textContent.includes('Acompanhando'))
-            .map(card => {
-                const orgao = card.querySelector('.card-org') ? card.querySelector('.card-org').textContent.trim() : '';
-                const cargo = card.querySelector('.card-title') ? card.querySelector('.card-title').textContent.trim() : '';
-                const deadline = card.querySelector('.card-deadline') ? card.querySelector('.card-deadline').textContent.trim() : '';
-                const statusBadge = card.querySelector('.badge');
-                const status = statusBadge ? statusBadge.textContent.trim() : '';
-                const daysMatch = deadline.match(/(\d+)\s+dias?/);
-                const daysLeft = daysMatch ? parseInt(daysMatch[1]) : null;
-                const encerrada = deadline.includes('encerradas');
-                return { orgao, cargo, deadline, status, daysLeft, encerrada };
+        const followed = CONCURSOS
+            .filter(c => state.acompanhando.has(c.id))
+            .map(c => {
+                const dias = diasRestantes(c.inscricoesAte);
+                return {
+                    orgao: c.orgao, cargo: c.cargo,
+                    deadline: dias != null && dias >= 0 ? `Inscrições até ${formatData(c.inscricoesAte)}` : 'Inscrições encerradas',
+                    status: c.statusLabel, daysLeft: dias,
+                    encerrada: dias != null && dias < 0
+                };
             })
             .filter(c => !c.encerrada)
             .sort((a, b) => (a.daysLeft ?? 999) - (b.daysLeft ?? 999));
@@ -503,17 +576,17 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         const items = followed.map(c => {
             let icon, cls, text;
             if (c.daysLeft !== null && c.daysLeft <= 7) {
-                icon = '\u26a0\ufe0f';
+                icon = '⚠️';
                 cls = 'notif-item-urgent';
-                text = `<strong>${c.orgao}</strong> &mdash; prazo encerrando em ${c.daysLeft} dia${c.daysLeft === 1 ? '' : 's'}!`;
+                text = `<strong>${esc(c.orgao)}</strong> &mdash; prazo encerrando em ${c.daysLeft} dia${c.daysLeft === 1 ? '' : 's'}!`;
             } else if (c.status === 'Novo') {
-                icon = '\ud83c\udd95';
+                icon = '🆕';
                 cls = 'notif-item-new';
-                text = `<strong>${c.orgao}</strong> &mdash; novo edital: ${c.cargo}.`;
+                text = `<strong>${esc(c.orgao)}</strong> &mdash; novo edital: ${esc(c.cargo)}.`;
             } else {
-                icon = '\u2139\ufe0f';
+                icon = 'ℹ️';
                 cls = 'notif-item-info';
-                text = `<strong>${c.orgao}</strong> &mdash; ${c.deadline}.`;
+                text = `<strong>${esc(c.orgao)}</strong> &mdash; ${esc(c.deadline)}.`;
             }
             const urgentStyle = cls === 'notif-item-urgent' ? 'background:#fff7ed;border-left:3px solid #f97316;' : '';
             const newStyle = cls === 'notif-item-new' ? 'background:#f0fdf4;border-left:3px solid #22c55e;' : '';
@@ -523,7 +596,7 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         }).join('');
 
         const emptyMsg = followed.length === 0
-            ? '<div style="padding:24px 16px;color:#6b7280;font-size:14px;text-align:center;">Voc\u00ea n\u00e3o est\u00e1 acompanhando nenhum concurso. Clique em \ud83d\udd14 nos cards para acompanhar.</div>'
+            ? '<div style="padding:24px 16px;color:#6b7280;font-size:14px;text-align:center;">Você não está acompanhando nenhum concurso. Clique em 🔔 nos cards para acompanhar.</div>'
             : '';
 
         const panel = document.createElement('div');
@@ -559,43 +632,16 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
     function updateNotifBadge() {
         const badge = document.querySelector('.notif-badge');
         if (!badge) return;
-        const cards = Array.from(document.querySelectorAll('.card'));
-        const followed = cards.filter(card => card.textContent.includes('Acompanhando'));
-        const urgent = followed.filter(card => {
-            const deadline = card.querySelector('.card-deadline') ? card.querySelector('.card-deadline').textContent : '';
-            const m = deadline.match(/(\d+)\s+dias?/);
-            return m && parseInt(m[1]) <= 7;
+        const followed = CONCURSOS.filter(c => state.acompanhando.has(c.id));
+        const urgent = followed.filter(c => {
+            const dias = diasRestantes(c.inscricoesAte);
+            return dias != null && dias >= 0 && dias <= 7;
         });
         badge.textContent = urgent.length > 0 ? urgent.length : followed.length;
         badge.style.background = urgent.length > 0 ? '#f97316' : '#6b7280';
     }
 
     function initBoasVindas() {
-        updateNotifBadge();
-
-        const cards = Array.from(document.querySelectorAll('.card'));
-        const urgentFollowed = cards.filter(card => {
-            if (!card.textContent.includes('Acompanhando')) return false;
-            const deadline = card.querySelector('.card-deadline') ? card.querySelector('.card-deadline').textContent : '';
-            const m = deadline.match(/(\d+)\s+dias?/);
-            return m && parseInt(m[1]) <= 7;
-        });
-
-        if (urgentFollowed.length > 0) {
-            setTimeout(() => {
-                const orgao = urgentFollowed[0].querySelector('.card-org') ? urgentFollowed[0].querySelector('.card-org').textContent.trim() : '';
-                const deadline = urgentFollowed[0].querySelector('.card-deadline') ? urgentFollowed[0].querySelector('.card-deadline').textContent.trim() : '';
-                const m = deadline.match(/(\d+)\s+dias?/);
-                const dias = m ? m[1] : '?';
-                showToast({
-                    type: 'warning',
-                    title: 'Prazo se encerrando!',
-                    message: `${orgao}  inscri��es encerram em ${dias} dia${dias === '1' ? '' : 's'}.`,
-                    duration: 6000
-                });
-            }, 1500);
-        }
-
         const btnNotif = $('#btn-notif');
         if (btnNotif) {
             btnNotif.addEventListener('click', e => {
@@ -606,46 +652,60 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
         }
     }
 
-    
+    /* ===== Carregador único de concursos (Supabase) ===== */
+    function mapConcurso(c) {
+        const dias = diasRestantes(c.inscricoes_ate);
+        const badge =
+            dias != null && dias < 0 ? 'encerrado' :
+            dias != null && dias <= 7 ? 'encerrando' :
+            'aberto';
+        return {
+            id: String(c.id),
+            orgao: c.orgao || '',
+            cargo: c.cargo || '',
+            area: c.area || '',
+            areaLabel: c.area_label || c.area || '',
+            banca: c.banca || '',
+            estado: c.estado || '',
+            vagas: c.vagas != null ? c.vagas : null,
+            salario: c.salario != null ? parseFloat(c.salario) : null,
+            inscricoesAte: c.inscricoes_ate || '',
+            fase: c.fase || '',
+            statusBadge: badge,
+            statusLabel: badge === 'encerrando' ? 'Encerrando' : badge === 'encerrado' ? 'Encerrado' : 'Aberto',
+            linkEdital: c.link_edital || '',
+            isHighlight: c.is_highlight === true,
+            createdAt: c.created_at || null,
+            secao: c.secao || 'aberto',
+            homologado: c.homologado === true
+        };
+    }
+
     async function loadConcursos() {
         try {
-            const db = window._engDb;
-            if (!db) { renderGrid(); return; }
-            const { data, error } = await db
+            const cli = window._engDb || (typeof db !== 'undefined' ? db : null);
+            if (!cli) { renderGrid(); renderPrevistos(); return; }
+            const { data, error } = await cli
                 .from('concursos')
                 .select('*')
-                .eq('secao', 'aberto')
-                .neq('homologado', true)
                 .order('created_at', { ascending: false });
-            if (error || !data) { renderGrid(); return; }
-            CONCURSOS = data.map(function(c) {
-                var dias = c.inscricoes_ate ? Math.round((new Date(c.inscricoes_ate) - new Date()) / 86400000) : 999;
-                var badge = dias < 0 ? 'encerrado' : dias <= 7 ? 'encerrando' : c.fase === 'Inscrições abertas' ? 'aberto' : 'novo';
-                return {
-                    id: String(c.id),
-                    orgao: c.orgao || '',
-                    cargo: c.cargo || '',
-                    area: c.area || '',
-                    areaLabel: c.area_label || c.area || '',
-                    banca: c.banca || '',
-                    estado: c.uf || '',
-                    vagas: c.vagas || 0,
-                    salario: parseFloat(c.salario) || 0,
-                    inscricoesAte: c.inscricoes_ate || '',
-                    statusBadge: badge,
-                    statusLabel: badge === 'encerrando' ? 'Encerrando' : badge === 'encerrado' ? 'Encerrado' : badge === 'novo' ? 'Novo' : 'Aberto',
-                    link_edital: c.link_edital || '',
-                    isHighlight: c.destacar === true
-                };
-            });
-        } catch(e) {
+            if (error || !data) {
+                console.error('Erro ao carregar concursos:', error);
+                renderGrid(); renderPrevistos(); return;
+            }
+            const todos = data.map(mapConcurso).filter(c => !c.homologado);
+            CONCURSOS = todos.filter(c => c.secao !== 'previsto');
+            PREVISTOS = todos.filter(c => c.secao === 'previsto');
+        } catch (e) {
             console.error('Erro ao carregar concursos:', e);
         }
         renderGrid();
+        renderPrevistos();
+        updateHeroStats();
     }
 
     function init() {
-        if (window.lucide) window.lucide.createIcons();
+        refreshIcons();
         loadConcursos();
         modal.init();
         initMenuMobile();
@@ -724,9 +784,14 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
             if (dd) dd.style.display = 'none';
         }, { once: false });
 
-        // LOGOUT — limpa localStorage diretamente (signOut via rede falha no plano free)
-        document.getElementById('btnSairIndex').addEventListener('click', () => {
-            localStorage.clear();
+        // LOGOUT — encerra a sessão no Supabase e limpa apenas as chaves do app
+        document.getElementById('btnSairIndex').addEventListener('click', async () => {
+            try { await db.auth.signOut({ scope: 'local' }); } catch (e) { /* segue com limpeza local */ }
+            try {
+                Object.keys(localStorage).forEach(k => {
+                    if (k.indexOf('sb-') === 0 || k.indexOf('eng_') === 0) localStorage.removeItem(k);
+                });
+            } catch (e) { localStorage.clear(); }
             window.location.reload();
         });
 
@@ -751,9 +816,10 @@ if (watchBtn.querySelector('.btn-watch-label')) { toggleAcompanhar(watchBtn.getA
     }
 
     if (typeof getUser === 'function') {
-        getUser().then(user => { if (user) buildUserDropdown(user);
-                // Sync estado acompanhando com o banco
-                syncAcompanhandoFromDB(); });
+        getUser().then(user => {
+            if (user) buildUserDropdown(user);
+            syncAcompanhandoFromDB();
+        });
     }
 
     if (typeof onAuthChange === 'function') {
@@ -882,7 +948,7 @@ function injectConfigModalHTML(user) {
       </div>
       <div class="cfg-panel" id="cfg-panel-pagamento">
         <div class="cfg-plan-info"><div style="width:36px;height:36px;border-radius:50%;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:18px;">🎓</div><div><strong style="display:block;font-size:13px;font-weight:700;color:#1A2E4A">Plano Gratuito</strong><span style="font-size:11px;color:#64748b">Acesso aos editais públicos e controle de concursos</span></div></div>
-        <div class="cfg-premium-box"><h4>✨ Engs Hub Premium — em breve</h4><p>Alertas instantâneos por e-mail, filtros avançados, histórico completo de bancas e muito mais.</p><button class="cfg-btn-premium" onclick="showToast({type:'success',title:'Em breve!',message:'Você será avisado quando o Premium for lançado.'})">⭐ Quero ser avisado</button></div>
+        <div class="cfg-premium-box"><h4>✨ Engs Hub Premium — em breve</h4><p>Alertas instantâneos por e-mail, filtros avançados, histórico completo de bancas e muito mais.</p><button class="cfg-btn-premium" onclick="showToastCfg()">⭐ Quero ser avisado</button></div>
         <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;"><p style="margin:0;font-size:12px;color:#92400e;line-height:1.5;"><strong>💳 Forma de pagamento</strong><br>A integração com plataforma de pagamento será disponibilizada em breve.</p></div>
       </div>
     </div>
@@ -900,6 +966,10 @@ function injectConfigModalHTML(user) {
 }
 
 window._cfgUser = null;
+
+window.showToastCfg = function() {
+    showToast({type:'success',title:'Em breve!',message:'Você será avisado quando o Premium for lançado.'});
+};
 
 window.openConfigModal = function(tab) {
     if (!window._cfgUser) return;
@@ -975,8 +1045,6 @@ window.cfgSalvarPerfil = async function() {
     if (window._cfgUser) { window._cfgUser.user_metadata.nome_completo = nome; window._cfgUser.user_metadata.area = area; }
     // Atualizar header
     const primeiro = nome.split(' ')[0];
-    const nameEl = document.querySelector('#user-greeting-wrap span');
-    if (nameEl && nameEl.textContent.includes('Olá')) nameEl.textContent = 'Olá, '+primeiro+' 👋';
     const ddName = document.getElementById('user-greeting-wrap');
     if (ddName) {
         const nameSpan = ddName.querySelector('span[style*="font-size:13px"]');
@@ -989,7 +1057,7 @@ window.cfgSalvarPerfil = async function() {
 window.cfgSalvarEmail = async function() {
     const e = document.getElementById('cfgNovoEmail').value.trim();
     const btn = document.getElementById('cfgBtnEmail');
-    if (!e || !/^[^@]+@[^@]+.[^@]+$/.test(e)) { showToast({type:'warning',title:'E-mail inválido.'}); return; }
+    if (!e || !/^[^@]+@[^@]+\.[^@]+$/.test(e)) { showToast({type:'warning',title:'E-mail inválido.'}); return; }
     btn.textContent='Enviando...';btn.disabled=true;
     const res = await db.auth.updateUser({ email: e });
     btn.textContent='Alterar e-mail';btn.disabled=false;

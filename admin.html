@@ -11,7 +11,7 @@
 <style>
   :root{
     --azul:#1A2E4A; --laranja:#F4801A; --cinza:#F5F5F5;
-    --borda:#e3e7ee; --texto:#2b3banc; --ok:#1f9d57; --erro:#d9483b;
+    --borda:#e3e7ee; --ok:#1f9d57; --erro:#d9483b;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',system-ui,sans-serif;background:var(--cinza);color:#1f2937;}
@@ -85,8 +85,18 @@
         <div class="grid">
           <div class="field"><label>Órgão *</label><input id="f-orgao" required placeholder="Ex: TCE-SP"></div>
           <div class="field"><label>Cargo *</label><input id="f-cargo" required placeholder="Ex: Engenheiro Civil"></div>
-          <div class="field"><label>Área (slug)</label><input id="f-area" placeholder="Ex: civil"></div>
-          <div class="field"><label>Rótulo da área</label><input id="f-area-label" placeholder="Ex: Engenharia Civil"></div>
+          <div class="field"><label>Área *</label>
+            <select id="f-area">
+              <option value="">Selecione...</option>
+              <option value="engenharia-civil">Engenharia Civil</option>
+              <option value="arquitetura">Arquitetura</option>
+              <option value="eletrica">Engenharia Elétrica</option>
+              <option value="ambiental">Engenharia Ambiental</option>
+              <option value="mecanica">Engenharia Mecânica</option>
+              <option value="agronomia">Agronomia</option>
+            </select>
+          </div>
+          <div class="field"><label>Rótulo da área (preenchido automaticamente)</label><input id="f-area-label" placeholder="Ex: Engenharia Civil"></div>
           <div class="field"><label>Banca</label><input id="f-banca" placeholder="Ex: FGV"></div>
           <div class="field"><label>Estado (UF)</label><input id="f-estado" maxlength="2" placeholder="Ex: SP"></div>
           <div class="field"><label>Vagas</label><input id="f-vagas" type="number" min="0" placeholder="Ex: 10"></div>
@@ -132,32 +142,20 @@
 (function(){
   'use strict';
 
+  // A anon key é pública por design (a mesma usada no site).
   var SUPABASE_URL = 'https://xyvsihpdfgnihgomdntb.supabase.co';
-  var db = null;
+  var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnNpaHBkZmduaWhnb21kbnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NDE3MjMsImV4cCI6MjA5NDAxNzcyM30.k5-B3_7ZtZoXMYU8RNax7_6JHA4Z_O2ZGn7whlQd_IM';
+  var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // A anon key é pública; reaproveita a mesma que já está no site (controle.html)
-  // assim não precisa duplicar/colar a chave manualmente.
-  async function getDb(){
-    if(db) return db;
-    var key = null;
-    try{
-      var resp = await fetch('controle.html', { cache: 'no-store' });
-      var txt = await resp.text();
-      var m = txt.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
-      if(m) key = m[0];
-    }catch(e){}
-    if(!key){
-      try{
-        var r2 = await fetch('index.html', { cache: 'no-store' });
-        var t2 = await r2.text();
-        var m2 = t2.match(/eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+/);
-        if(m2) key = m2[0];
-      }catch(e){}
-    }
-    if(!key){ throw new Error('Não foi possível carregar a configuração do Supabase.'); }
-    db = window.supabase.createClient(SUPABASE_URL, key);
-    return db;
-  }
+  // Áreas padronizadas — os MESMOS valores dos filtros da página inicial.
+  var AREAS = {
+    'engenharia-civil': 'Engenharia Civil',
+    'arquitetura': 'Arquitetura',
+    'eletrica': 'Engenharia Elétrica',
+    'ambiental': 'Engenharia Ambiental',
+    'mecanica': 'Engenharia Mecânica',
+    'agronomia': 'Agronomia'
+  };
 
   var $ = function(id){ return document.getElementById(id); };
   var gate = $('gate'), painel = $('painel');
@@ -182,9 +180,16 @@
     return p.length === 3 ? (p[2] + '/' + p[1] + '/' + p[0]) : d;
   }
 
+  function slugify(txt){
+    return String(txt || '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
   // ---- Autenticação + checagem de admin ----
   async function init(){
-    try { await getDb(); } catch(err){ showGate('Erro de configuração', err.message); return; }
     var res = await db.auth.getUser();
     var user = res && res.data ? res.data.user : null;
     if(!user){
@@ -250,11 +255,13 @@
   function coletar(){
     var vagas = $('f-vagas').value;
     var salario = $('f-salario').value;
+    var areaSlug = $('f-area').value;
+    var areaLabel = $('f-area-label').value.trim() || AREAS[areaSlug] || null;
     return {
       orgao: $('f-orgao').value.trim(),
       cargo: $('f-cargo').value.trim(),
-      area: $('f-area').value.trim() || null,
-      area_label: $('f-area-label').value.trim() || null,
+      area: areaSlug || null,
+      area_label: areaLabel,
       banca: $('f-banca').value.trim() || null,
       estado: $('f-estado').value.trim().toUpperCase() || null,
       vagas: vagas === '' ? null : parseInt(vagas, 10),
@@ -271,23 +278,24 @@
   }
 
   var FASES = {"aberto":["Inscrições abertas","Inscrições encerradas","Prova aplicada","Em fase de recursos","Resultado preliminar"],"previsto":["Sem banca contratada","Banca contratada","Edital iminente"]};
-function preencherFases(selecionada){
-  var secao = $('f-secao').value;
-  var lista = FASES[secao] || [];
-  var sel = $('f-fase');
-  sel.innerHTML = '';
-  lista.forEach(function(f){
-    var o = document.createElement('option');
-    o.value = f; o.textContent = f;
-    if(f === selecionada) o.selected = true;
-    sel.appendChild(o);
-  });
-}
-function limpar(){
+  function preencherFases(selecionada){
+    var secao = $('f-secao').value;
+    var lista = FASES[secao] || [];
+    var sel = $('f-fase');
+    sel.innerHTML = '';
+    lista.forEach(function(f){
+      var o = document.createElement('option');
+      o.value = f; o.textContent = f;
+      if(f === selecionada) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+
+  function limpar(){
     $('form-concurso').reset();
-      $('f-secao').value = 'aberto';
-      preencherFases('');
-      $('f-homologado').checked = false;
+    $('f-secao').value = 'aberto';
+    preencherFases('');
+    $('f-homologado').checked = false;
     $('f-id').value = '';
     $('form-title').textContent = 'Cadastrar novo concurso';
     $('form-title').classList.remove('form-title-edit');
@@ -299,16 +307,22 @@ function limpar(){
     $('f-id').value = c.id;
     $('f-orgao').value = c.orgao || '';
     $('f-cargo').value = c.cargo || '';
-    $('f-area').value = c.area || '';
-    $('f-area-label').value = c.area_label || '';
+    // tenta casar a área antiga com as opções padronizadas
+    var slug = c.area || '';
+    if(!AREAS[slug]){
+      var s = slugify(c.area_label || c.area || '');
+      slug = AREAS[s] ? s : (s.indexOf('civil') !== -1 ? 'engenharia-civil' : '');
+    }
+    $('f-area').value = slug;
+    $('f-area-label').value = c.area_label || AREAS[slug] || '';
     $('f-banca').value = c.banca || '';
     $('f-estado').value = c.estado || '';
     $('f-vagas').value = c.vagas != null ? c.vagas : '';
     $('f-salario').value = c.salario != null ? c.salario : '';
     $('f-inscricoes').value = c.inscricoes_ate || '';
-      $('f-secao').value = c.secao || 'aberto';
-      preencherFases(c.fase || '');
-      $('f-homologado').checked = !!c.homologado;
+    $('f-secao').value = c.secao || 'aberto';
+    preencherFases(c.fase || '');
+    $('f-homologado').checked = !!c.homologado;
     $('f-link-edital').value = c.link_edital || '';
     $('f-highlight').checked = !!c.is_highlight;
     $('form-title').textContent = 'Editando: ' + (c.orgao || '');
@@ -318,11 +332,18 @@ function limpar(){
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // Preenche o rótulo automaticamente ao escolher a área
+  $('f-area').addEventListener('change', function(){
+    var slug = this.value;
+    if(AREAS[slug]) $('f-area-label').value = AREAS[slug];
+  });
+
   // ---- Criar / atualizar ----
   $('form-concurso').addEventListener('submit', async function(e){
     e.preventDefault();
     var dados = coletar();
     if(!dados.orgao || !dados.cargo){ toast('Órgão e Cargo são obrigatórios.', 'erro'); return; }
+    if(!dados.area){ toast('Selecione a Área do concurso.', 'erro'); return; }
     var id = $('f-id').value;
     var r;
     $('btn-salvar').disabled = true;
@@ -340,8 +361,8 @@ function limpar(){
 
   $('btn-cancelar').addEventListener('click', limpar);
 
-$('f-secao').addEventListener('change', function(){ preencherFases(''); });
-preencherFases('');
+  $('f-secao').addEventListener('change', function(){ preencherFases(''); });
+  preencherFases('');
 
   // ---- Excluir ----
   async function excluir(c){
@@ -354,7 +375,7 @@ preencherFases('');
 
   // ---- Logout ----
   $('btn-logout').addEventListener('click', async function(){
-    await db.auth.signOut();
+    try { await db.auth.signOut({ scope: 'local' }); } catch(e) {}
     location.href = 'index.html';
   });
 
