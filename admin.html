@@ -101,6 +101,7 @@
           <div class="field"><label>Estado (UF)</label><input id="f-estado" maxlength="2" placeholder="Ex: SP"></div>
           <div class="field"><label>Vagas</label><input id="f-vagas" type="number" min="0" placeholder="Ex: 10"></div>
           <div class="field"><label>Salário (R$)</label><input id="f-salario" type="number" step="0.01" min="0" placeholder="Ex: 23110.00"></div>
+          <div class="field"><label>Início das inscrições</label><input id="f-inscricoes-de" type="date"></div>
           <div class="field"><label>Inscrições até</label><input id="f-inscricoes" type="date"></div>
           <div class="field"><label>Seção *</label>
             <select id="f-secao">
@@ -127,7 +128,7 @@
       <div id="lista-wrap">
         <table>
           <thead>
-            <tr><th>Órgão / Cargo</th><th>UF</th><th>Banca</th><th>Vagas</th><th>Seção / Fase</th><th>Inscrições até</th><th>Edital</th><th></th></tr>
+            <tr><th>Órgão / Cargo</th><th>UF</th><th>Banca</th><th>Vagas</th><th>Seção / Fase</th><th>Inscrições</th><th>Edital</th><th></th></tr>
           </thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -230,7 +231,7 @@
         '<td>' + esc(c.banca || '—') + '</td>' +
         '<td>' + (c.vagas != null ? c.vagas : '—') + '</td>' +
         '<td><span class="badge ' + statusClass + '">' + esc(secaoLabel) + '</span>' + homTag + '<br><span class="muted">' + esc(c.fase || '—') + '</span></td>' +
-        '<td>' + fmtData(c.inscricoes_ate) + '</td>' +
+        '<td>' + (c.inscricoes_de ? fmtData(c.inscricoes_de) + ' a ' : '') + fmtData(c.inscricoes_ate) + '</td>' +
         '<td>' + (c.link_edital ? '<a href="' + esc(c.link_edital) + '" target="_blank" rel="noopener" style="color:#F4801A;font-weight:600;">edital</a>' : '<span class="muted">—</span>') + '</td>';
       var tdAct = document.createElement('td');
       tdAct.className = 'row-actions';
@@ -266,6 +267,7 @@
       estado: $('f-estado').value.trim().toUpperCase() || null,
       vagas: vagas === '' ? null : parseInt(vagas, 10),
       salario: salario === '' ? null : parseFloat(salario),
+      inscricoes_de: $('f-inscricoes-de').value || null,
       inscricoes_ate: $('f-inscricoes').value || null,
       secao: $('f-secao').value,
       fase: $('f-fase').value || null,
@@ -319,6 +321,7 @@
     $('f-estado').value = c.estado || '';
     $('f-vagas').value = c.vagas != null ? c.vagas : '';
     $('f-salario').value = c.salario != null ? c.salario : '';
+    $('f-inscricoes-de').value = c.inscricoes_de || '';
     $('f-inscricoes').value = c.inscricoes_ate || '';
     $('f-secao').value = c.secao || 'aberto';
     preencherFases(c.fase || '');
@@ -344,6 +347,7 @@
     var dados = coletar();
     if(!dados.orgao || !dados.cargo){ toast('Órgão e Cargo são obrigatórios.', 'erro'); return; }
     if(!dados.area){ toast('Selecione a Área do concurso.', 'erro'); return; }
+    if(dados.inscricoes_de && dados.inscricoes_ate && dados.inscricoes_de > dados.inscricoes_ate){ toast('O início das inscrições não pode ser depois do fim.', 'erro'); return; }
     var id = $('f-id').value;
     var r;
     $('btn-salvar').disabled = true;

@@ -87,8 +87,13 @@
             c.statusBadge === 'encerrando' ? 'alarm-clock' :
             c.statusBadge === 'novo' ? 'sparkles' :
             'check-circle-2';
+        const diasInicio = diasRestantes(c.inscricoesDe);
         let textoPrazo;
-        if (dias == null) {
+        if (diasInicio != null && diasInicio > 0) {
+            textoPrazo = `Inscrições de <strong>${formatData(c.inscricoesDe)}</strong>` +
+                (c.inscricoesAte ? ` até <strong>${formatData(c.inscricoesAte)}</strong>` : '') +
+                ` · abrem em ${diasInicio} dia${diasInicio > 1 ? 's' : ''}`;
+        } else if (dias == null) {
             textoPrazo = 'Inscrições em breve';
         } else if (dias < 0) {
             textoPrazo = `Encerrado em <strong>${formatData(c.inscricoesAte)}</strong>`;
@@ -656,7 +661,9 @@
     /* ===== Carregador único de concursos (Supabase) ===== */
     function mapConcurso(c) {
         const dias = diasRestantes(c.inscricoes_ate);
+        const diasInicio = diasRestantes(c.inscricoes_de);
         const badge =
+            diasInicio != null && diasInicio > 0 ? 'novo' :
             dias != null && dias < 0 ? 'encerrado' :
             dias != null && dias <= 7 ? 'encerrando' :
             'aberto';
@@ -671,9 +678,10 @@
             vagas: c.vagas != null ? c.vagas : null,
             salario: c.salario != null ? parseFloat(c.salario) : null,
             inscricoesAte: c.inscricoes_ate || '',
+            inscricoesDe: c.inscricoes_de || '',
             fase: c.fase || '',
             statusBadge: badge,
-            statusLabel: badge === 'encerrando' ? 'Encerrando' : badge === 'encerrado' ? 'Encerrado' : 'Aberto',
+            statusLabel: badge === 'novo' ? 'Em breve' : badge === 'encerrando' ? 'Encerrando' : badge === 'encerrado' ? 'Encerrado' : 'Aberto',
             linkEdital: c.link_edital || '',
             isHighlight: c.is_highlight === true,
             createdAt: c.created_at || null,
