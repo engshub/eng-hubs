@@ -891,6 +891,13 @@ tbody tr:hover{background:#eef4fb !important;}
 .empty-state h3{font-family:'Montserrat',sans-serif;font-size:15px;color:#1A2E4A;margin-bottom:4px;}
 .btn-explorar{display:inline-flex;align-items:center;gap:8px;margin-top:14px;background:#F4801A;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;text-decoration:none;transition:background .15s;}
 .btn-explorar:hover{background:#d96e12;}
+/* ===== Topbar remodelada ===== */
+.topbar{background:linear-gradient(90deg,#152538 0%,#1A2E4A 45%,#223a5c 100%);border-bottom:1px solid rgba(255,255,255,0.07);height:60px;box-shadow:0 2px 12px rgba(0,0,0,0.25);}
+.brand img.brand-logo{border-radius:50%;background:#fff;padding:2px;box-shadow:0 0 0 2px rgba(255,255,255,0.14),0 0 0 4px rgba(244,128,26,0.30),0 2px 10px rgba(0,0,0,0.30);}
+.brand:hover img.brand-logo{box-shadow:0 0 0 2px rgba(255,255,255,0.22),0 0 0 4px rgba(244,128,26,0.55),0 2px 10px rgba(0,0,0,0.30);transition:box-shadow .2s;}
+.btn-editais{display:inline-flex;align-items:center;gap:7px;color:#fff;font-size:13px;font-weight:600;text-decoration:none;border:1.5px solid rgba(244,128,26,0.65);background:rgba(244,128,26,0.12);border-radius:20px;padding:7px 16px;transition:background .15s,border-color .15s,transform .1s;}
+.btn-editais:hover{background:#F4801A;border-color:#F4801A;}
+.btn-editais:active{transform:scale(0.97);}
 </style>
 </head>
 <body>
@@ -910,7 +917,7 @@ tbody tr:hover{background:#eef4fb !important;}
     </a>
   </div>
   <div class="topbar-right">
-    <a href="index.html" class="topbar-link">Editais</a>
+    <a href="index.html" class="btn-editais"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> Editais abertos</a>
     <div class="user-menu-wrap" id="userMenuWrap">
       <div class="user-badge" id="userBadge" onclick="toggleDropdown()">
         <div class="avatar" id="avatarEl">GS</div>
