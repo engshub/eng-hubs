@@ -86,19 +86,23 @@
           <div class="field"><label>Órgão *</label><input id="f-orgao" required placeholder="Ex: TCE-SP"></div>
           <div class="field"><label>Cargo *</label><input id="f-cargo" required placeholder="Ex: Engenheiro Civil"></div>
           <div class="field full"><label>Áreas * (marque uma ou mais)</label>
-            <div id="f-areas" style="display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px;border:1px solid var(--borda);border-radius:8px;background:#fff;">
-              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="engenharia-civil" data-label="Engenharia Civil" style="width:auto;"> Engenharia Civil</label>
-              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="arquitetura" data-label="Arquitetura" style="width:auto;"> Arquitetura</label>
-              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="eletrica" data-label="Engenharia Elétrica" style="width:auto;"> Engenharia Elétrica</label>
-              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="ambiental" data-label="Engenharia Ambiental" style="width:auto;"> Engenharia Ambiental</label>
-              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="mecanica" data-label="Engenharia Mecânica" style="width:auto;"> Engenharia Mecânica</label>
-              <label style="display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;"><input type="checkbox" value="agronomia" data-label="Agronomia" style="width:auto;"> Agronomia</label>
-            </div>
+            <div id="f-areas" style="display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px;border:1px solid var(--borda);border-radius:8px;background:#fff;"></div>
           </div>
           <div class="field"><label>Banca</label><input id="f-banca" placeholder="Ex: FGV"></div>
           <div class="field"><label>Estado (UF)</label><input id="f-estado" maxlength="2" placeholder="Ex: SP"></div>
-          <div class="field"><label>Vagas</label><input id="f-vagas" type="number" min="0" placeholder="Ex: 10"></div>
+          <div class="field"><label>Vagas (total)</label><input id="f-vagas" type="number" min="0" placeholder="Ex: 10"></div>
           <div class="field"><label>Salário (R$)</label><input id="f-salario" type="number" step="0.01" min="0" placeholder="Ex: 23110.00"></div>
+          <div class="field full"><label>Vagas por concorrência (opcional — preencha só as que o edital oferecer)</label>
+            <div id="f-cotas" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px;border:1px solid var(--borda);border-radius:8px;background:#fff;">
+              <div class="field"><label style="font-weight:500;">Ampla concorrência (AC)</label><input type="number" min="0" data-cota="ac" placeholder="0"></div>
+              <div class="field"><label style="font-weight:500;">PcD</label><input type="number" min="0" data-cota="pcd" placeholder="0"></div>
+              <div class="field"><label style="font-weight:500;">Negros (cota racial)</label><input type="number" min="0" data-cota="negros" placeholder="0"></div>
+              <div class="field"><label style="font-weight:500;">Indígenas</label><input type="number" min="0" data-cota="indigenas" placeholder="0"></div>
+              <div class="field"><label style="font-weight:500;">Hipossuficientes</label><input type="number" min="0" data-cota="hipo" placeholder="0"></div>
+              <div class="field"><label style="font-weight:500;">Trans</label><input type="number" min="0" data-cota="trans" placeholder="0"></div>
+            </div>
+            <span class="muted">Ao preencher qualquer cota, o total de vagas é somado automaticamente.</span>
+          </div>
           <div class="field"><label>Início das inscrições</label><input id="f-inscricoes-de" type="date"></div>
           <div class="field"><label>Inscrições até</label><input id="f-inscricoes" type="date"></div>
           <div class="field"><label>Seção *</label>
@@ -146,18 +150,71 @@
   var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh5dnNpaHBkZmduaWhnb21kbnRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NDE3MjMsImV4cCI6MjA5NDAxNzcyM30.k5-B3_7ZtZoXMYU8RNax7_6JHA4Z_O2ZGn7whlQd_IM';
   var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  // Áreas padronizadas — os MESMOS valores dos filtros da página inicial.
+  // Áreas padronizadas — os slugs casam com os filtros da página inicial.
   var AREAS = {
     'engenharia-civil': 'Engenharia Civil',
-    'arquitetura': 'Arquitetura',
+    'arquitetura': 'Arquitetura e Urbanismo',
     'eletrica': 'Engenharia Elétrica',
-    'ambiental': 'Engenharia Ambiental',
     'mecanica': 'Engenharia Mecânica',
-    'agronomia': 'Agronomia'
+    'ambiental': 'Engenharia Ambiental',
+    'seguranca-trabalho': 'Engenharia de Segurança do Trabalho',
+    'sanitaria': 'Engenharia Sanitária',
+    'quimica': 'Engenharia Química',
+    'producao': 'Engenharia de Produção',
+    'eletronica': 'Engenharia Eletrônica',
+    'telecomunicacoes': 'Engenharia de Telecomunicações',
+    'computacao': 'Engenharia da Computação',
+    'cartografica': 'Engenharia Cartográfica e Agrimensura',
+    'florestal': 'Engenharia Florestal',
+    'agricola': 'Engenharia Agrícola',
+    'agronomia': 'Agronomia',
+    'minas': 'Engenharia de Minas',
+    'metalurgica': 'Engenharia Metalúrgica',
+    'naval': 'Engenharia Naval',
+    'petroleo': 'Engenharia de Petróleo',
+    'mecatronica': 'Engenharia Mecatrônica'
   };
+  // monta os checkboxes de área a partir do mapa acima
+  (function(){
+    var box = document.getElementById('f-areas');
+    Object.keys(AREAS).forEach(function(slug){
+      var lab = document.createElement('label');
+      lab.style.cssText = 'display:flex;align-items:center;gap:6px;font-weight:500;cursor:pointer;';
+      lab.innerHTML = '<input type="checkbox" value="' + slug + '" data-label="' + AREAS[slug] + '" style="width:auto;"> ' + AREAS[slug];
+      box.appendChild(lab);
+    });
+  })();
 
   var $ = function(id){ return document.getElementById(id); };
   var gate = $('gate'), painel = $('painel');
+
+  // ---- Cotas ----
+  function coletarCotas(){
+    var obj = {};
+    document.querySelectorAll('#f-cotas input').forEach(function(inp){
+      var v = inp.value === '' ? NaN : parseInt(inp.value, 10);
+      if(!isNaN(v) && v > 0) obj[inp.getAttribute('data-cota')] = v;
+    });
+    return Object.keys(obj).length ? obj : null;
+  }
+  function preencherCotas(cotas){
+    cotas = cotas || {};
+    document.querySelectorAll('#f-cotas input').forEach(function(inp){
+      var k = inp.getAttribute('data-cota');
+      inp.value = (cotas[k] != null) ? cotas[k] : '';
+    });
+  }
+  // soma automática do total quando cotas são preenchidas
+  document.querySelectorAll('#f-cotas input').forEach(function(inp){
+    inp.addEventListener('input', function(){
+      var c = coletarCotas();
+      if(c){
+        var tot = 0;
+        Object.keys(c).forEach(function(k){ tot += c[k]; });
+        $('f-vagas').value = tot;
+      }
+    });
+  });
 
   function toast(msg, tipo){
     var t = $('toast');
@@ -265,6 +322,7 @@
       banca: $('f-banca').value.trim() || null,
       estado: $('f-estado').value.trim().toUpperCase() || null,
       vagas: vagas === '' ? null : parseInt(vagas, 10),
+      vagas_cotas: coletarCotas(),
       salario: salario === '' ? null : parseFloat(salario),
       inscricoes_de: $('f-inscricoes-de').value || null,
       inscricoes_ate: $('f-inscricoes').value || null,
@@ -321,6 +379,7 @@
     $('f-banca').value = c.banca || '';
     $('f-estado').value = c.estado || '';
     $('f-vagas').value = c.vagas != null ? c.vagas : '';
+    preencherCotas(c.vagas_cotas);
     $('f-salario').value = c.salario != null ? c.salario : '';
     $('f-inscricoes-de').value = c.inscricoes_de || '';
     $('f-inscricoes').value = c.inscricoes_ate || '';

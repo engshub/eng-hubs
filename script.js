@@ -69,6 +69,15 @@
         });
     }
 
+    const COTAS_LABELS = { ac: 'AC', pcd: 'PcD', negros: 'Negros', indigenas: 'Indígenas', hipo: 'Hipossuf.', trans: 'Trans' };
+    function cotasLine(c) {
+        const v = c.vagasCotas;
+        if (!v || typeof v !== 'object') return '';
+        const partes = Object.keys(COTAS_LABELS).filter(k => v[k] > 0).map(k => `${COTAS_LABELS[k]} <strong>${v[k]}</strong>`);
+        if (!partes.length) return '';
+        return `<div class="card-cotas" style="font-size:12px;color:#64748b;margin-top:2px;">Vagas: ${partes.join(' · ')}</div>`;
+    }
+
     function $(sel, ctx = document) { return ctx.querySelector(sel); }
     function $$(sel, ctx = document) { return Array.from(ctx.querySelectorAll(sel)); }
 
@@ -143,6 +152,7 @@
                         <span class="card-info-value">${esc(c.estado || '—')}</span>
                     </div>
                 </div>
+                ${cotasLine(c)}
                 <div class="card-deadline">
                     <i data-lucide="calendar-clock"></i>
                     <span>${textoPrazo}</span>
@@ -676,6 +686,7 @@
             banca: c.banca || '',
             estado: c.estado || '',
             vagas: c.vagas != null ? c.vagas : null,
+            vagasCotas: c.vagas_cotas || null,
             salario: c.salario != null ? parseFloat(c.salario) : null,
             inscricoesAte: c.inscricoes_ate || '',
             inscricoesDe: c.inscricoes_de || '',
