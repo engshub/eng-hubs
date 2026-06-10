@@ -188,6 +188,125 @@
         }
         #sec-encerradas .card { opacity: 0.75; }
         #sec-encerradas .card:hover { opacity: 1; }
+        /* ===== Previstos: estado vazio ===== */
+        .previstos-vazio {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 48px 24px;
+            background: #fff;
+            border: 1.5px dashed #cfd8e3;
+            border-radius: 16px;
+        }
+        .previstos-vazio .pv-icon {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: #fff3e8; color: #F4801A;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 14px;
+        }
+        .previstos-vazio h3 { font-family: 'Montserrat', sans-serif; color: #1A2E4A; font-size: 16px; margin-bottom: 6px; }
+        .previstos-vazio p { color: #64748b; font-size: 14px; max-width: 440px; margin: 0 auto; line-height: 1.6; }
+        .btn-ver-abertos {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 18px; border: 1.5px solid #F4801A; color: #F4801A;
+            border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 600;
+            text-decoration: none; transition: background .15s, color .15s;
+        }
+        .btn-ver-abertos:hover { background: #F4801A; color: #fff; }
+        /* ===== CTA "Não perca o próximo edital" ===== */
+        .cta-section { background: linear-gradient(120deg, #152538 0%, #1A2E4A 50%, #2d4a7a 100%) !important; position: relative; overflow: hidden; }
+        .cta-section::before { content: ''; position: absolute; right: -60px; top: -90px; width: 280px; height: 280px; border-radius: 50%; background: rgba(244,128,26,0.14); }
+        .cta-section::after { content: ''; position: absolute; left: 28%; bottom: -110px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,0.05); }
+        .cta-inner { position: relative; z-index: 1; }
+        .cta-action { display: flex; flex-direction: column; align-items: center; gap: 0; }
+        .btn-cta {
+            background: #F4801A !important; color: #fff !important;
+            padding: 14px 30px !important; border-radius: 12px !important;
+            font-size: 15px !important; font-weight: 700 !important;
+            box-shadow: 0 10px 26px rgba(244,128,26,0.38);
+            transition: transform .15s, box-shadow .15s !important;
+        }
+        .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(244,128,26,0.5); }
+        .cta-note { display: block; margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.65); text-align: center; }
+        /* ===== Como o Engs Hub funciona ===== */
+        .how-card {
+            position: relative; overflow: hidden;
+            border-radius: 16px; border: 1px solid #e8ecf3;
+            transition: transform .18s, box-shadow .18s;
+        }
+        .how-card::before {
+            content: attr(data-passo);
+            position: absolute; top: -14px; right: 10px;
+            font-family: 'Montserrat', sans-serif; font-size: 76px; font-weight: 800;
+            color: rgba(26,46,74,0.05); line-height: 1; pointer-events: none;
+        }
+        .how-card:hover { transform: translateY(-5px); box-shadow: 0 16px 32px rgba(26,46,74,0.12); }
+        .how-card .how-icon {
+            background: linear-gradient(135deg, #F4801A, #ffa75c) !important;
+            color: #fff !important; border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(244,128,26,0.3);
+            transition: transform .18s;
+        }
+        .how-card .how-icon svg { color: #fff; }
+        .how-card:hover .how-icon { transform: scale(1.1) rotate(-4deg); }
+        /* ===== Fale com a gente ===== */
+        .contato-card {
+            display: grid; grid-template-columns: 340px 1fr;
+            max-width: 880px; margin: 0 auto;
+            background: #fff; border-radius: 18px; overflow: hidden;
+            box-shadow: 0 10px 36px rgba(26,46,74,0.10);
+            border: 1px solid #e8ecf3;
+        }
+        .contato-info {
+            background: linear-gradient(160deg, #1A2E4A 0%, #2d4a7a 100%);
+            color: #fff; padding: 34px 28px;
+            display: flex; flex-direction: column; gap: 14px;
+            position: relative; overflow: hidden;
+        }
+        .contato-info::after { content: ''; position: absolute; right: -60px; bottom: -60px; width: 170px; height: 170px; border-radius: 50%; background: rgba(244,128,26,0.16); }
+        .contato-info h3 { font-family: 'Montserrat', sans-serif; font-size: 18px; }
+        .contato-info p { font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.6; }
+        .ci-lista { display: flex; flex-direction: column; gap: 12px; margin-top: auto; position: relative; z-index: 1; }
+        .ci-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.88); }
+        .ci-item svg { color: #F4801A; flex-shrink: 0; }
+        .contato-form { padding: 30px 28px; display: flex; flex-direction: column; gap: 16px; }
+        .cf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .cf-group { display: flex; flex-direction: column; gap: 6px; }
+        .cf-group label { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .cf-group input, .cf-group select, .cf-group textarea {
+            padding: 11px 14px; font-size: 14px; font-family: 'Inter', sans-serif;
+            border: 1.5px solid #e2e8f0; border-radius: 10px; color: #1A2E4A;
+            outline: none; background: #fff; resize: vertical;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .cf-group input:focus, .cf-group select:focus, .cf-group textarea:focus {
+            border-color: #F4801A; box-shadow: 0 0 0 3px rgba(244,128,26,0.12);
+        }
+        .btn-enviar {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 28px; background: #F4801A; color: #fff;
+            border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer; align-self: flex-end;
+            transition: background .15s, transform .1s;
+        }
+        .btn-enviar:hover { background: #d96e12; }
+        .btn-enviar:active { transform: scale(0.98); }
+        @media (max-width: 760px) {
+            .contato-card { grid-template-columns: 1fr; }
+            .cf-row { grid-template-columns: 1fr; }
+        }
+        /* ===== Rodapé ===== */
+        .footer { background: linear-gradient(180deg, #152538 0%, #1A2E4A 100%) !important; }
+        .footer-col h4 { color: #F4801A !important; letter-spacing: 0.8px; }
+        .footer-col a { transition: color .15s, padding-left .15s; }
+        .footer-col a:hover { color: #F4801A !important; padding-left: 4px; }
+        .footer-social a {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.18);
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: background .15s, border-color .15s, transform .15s;
+        }
+        .footer-social a:hover { background: #F4801A; border-color: #F4801A; color: #fff; transform: translateY(-2px); }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.08); }
     </style>
 </head>
 <body>
@@ -350,7 +469,12 @@
                 </header>
 
                 <div class="forecast-grid" id="forecast-grid">
-<div class="empty-state hidden" id="previstos-empty"><p>Nenhum concurso previsto no momento.</p></div>
+<div class="empty-state hidden previstos-vazio" id="previstos-empty">
+    <div class="pv-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 2"/></svg></div>
+    <h3>Radar ligado</h3>
+    <p>Nenhum concurso previsto neste momento. Assim que houver sinal de um novo edital, ele aparece aqui primeiro — e quem acompanha é avisado.</p>
+    <a href="#concursos" class="btn-ver-abertos"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Ver editais abertos</a>
+</div>
                 </div>
             </div>
         </section>
@@ -361,9 +485,12 @@
                     <h2>Não perca o próximo edital.</h2>
                     <p>Cadastre-se gratuitamente e receba alerta no e-mail e no celular assim que um concurso da sua área for publicado.</p>
                 </div>
-                <button class="btn btn-cta" id="ctaAvisado" data-modal-open="cadastro">
-                    <i data-lucide="bell-ring"></i> Quero ser avisado
-                </button>
+                <div class="cta-action">
+                    <button class="btn btn-cta" id="ctaAvisado" data-modal-open="cadastro">
+                        <i data-lucide="bell-ring"></i> Quero ser avisado
+                    </button>
+                    <span class="cta-note">100% gratuito · sem spam</span>
+                </div>
             </div>
         </section>
 
@@ -377,17 +504,17 @@
                 </header>
 
                 <div class="how-grid">
-                    <div class="how-card">
+                    <div class="how-card" data-passo="01">
                         <div class="how-icon"><i data-lucide="search"></i></div>
                         <h3>1. Encontre</h3>
                         <p>Editais filtrados por cargo, banca, estado e remuneração. Apenas o que importa para Engenharia e Arquitetura.</p>
                     </div>
-                    <div class="how-card">
+                    <div class="how-card" data-passo="02">
                         <div class="how-icon"><i data-lucide="bookmark-plus"></i></div>
                         <h3>2. Acompanhe</h3>
                         <p>Marque os concursos do seu interesse. Receba atualizações de prazo, retificações e gabaritos.</p>
                     </div>
-                    <div class="how-card">
+                    <div class="how-card" data-passo="03">
                         <div class="how-icon"><i data-lucide="bell-ring"></i></div>
                         <h3>3. Seja avisado</h3>
                         <p>Notificações por e-mail no momento da publicação do edital. Sem você precisar conferir o diário oficial.</p>
@@ -404,46 +531,52 @@
                         <p class="section-subtitle">Dúvidas, sugestões ou feedback — estamos ouvindo.</p>
                     </div>
                 </header>
-                <div style="max-width:560px;margin:0 auto;">
-                    <form id="form-contato" style="display:flex;flex-direction:column;gap:16px;">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-                            <div style="display:flex;flex-direction:column;gap:6px;">
-                                <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Nome</label>
-                                <input type="text" name="name" id="contato-nome" placeholder="Seu nome" required
-                                    style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;">
+                <div class="contato-card">
+                    <div class="contato-info">
+                        <h3>Vamos conversar 👋</h3>
+                        <p>Dúvidas, sugestões, parcerias ou algum problema no site? Manda pra gente.</p>
+                        <div class="ci-lista">
+                            <div class="ci-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/></svg> engshubcontato@gmail.com</div>
+                            <div class="ci-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> @engs.hub</div>
+                            <div class="ci-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 2"/></svg> Resposta em até 48h úteis</div>
+                        </div>
+                    </div>
+                    <div class="contato-form-wrap">
+                        <form id="form-contato" class="contato-form">
+                            <div class="cf-row">
+                                <div class="cf-group">
+                                    <label>Nome</label>
+                                    <input type="text" name="name" id="contato-nome" placeholder="Seu nome" required>
+                                </div>
+                                <div class="cf-group">
+                                    <label>E-mail</label>
+                                    <input type="email" name="email" id="contato-email" placeholder="seu@email.com" required>
+                                </div>
                             </div>
-                            <div style="display:flex;flex-direction:column;gap:6px;">
-                                <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">E-mail</label>
-                                <input type="email" name="email" id="contato-email" placeholder="seu@email.com" required
-                                    style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;">
+                            <div class="cf-group">
+                                <label>Assunto</label>
+                                <select name="title" id="contato-assunto">
+                                    <option value="Dúvida">Dúvida</option>
+                                    <option value="Sugestão">Sugestão</option>
+                                    <option value="Feedback">Feedback</option>
+                                    <option value="Reportar problema">Reportar problema</option>
+                                    <option value="Parceria">Parceria</option>
+                                    <option value="Outro">Outro</option>
+                                </select>
                             </div>
+                            <div class="cf-group">
+                                <label>Mensagem</label>
+                                <textarea name="mensagem" id="contato-mensagem" placeholder="Escreva sua mensagem aqui..." required rows="5"></textarea>
+                            </div>
+                            <button type="submit" id="btn-contato-submit" class="btn-enviar">
+                                <i data-lucide="send"></i> Enviar mensagem
+                            </button>
+                        </form>
+                        <div id="contato-sucesso" style="display:none;text-align:center;padding:48px 28px;">
+                            <i data-lucide="check-circle" style="color:#16a34a;"></i>
+                            <h3 style="color:#15803d;margin:12px 0 6px;font-family:Montserrat,sans-serif;">Mensagem enviada!</h3>
+                            <p style="color:#166534;font-size:14px;">Recebemos sua mensagem e responderemos em breve no e-mail informado.</p>
                         </div>
-                        <div style="display:flex;flex-direction:column;gap:6px;">
-                            <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Assunto</label>
-                            <select name="title" id="contato-assunto"
-                                style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;background:#fff;cursor:pointer;">
-                                <option value="Dúvida">Dúvida</option>
-                                <option value="Sugestão">Sugestão</option>
-                                <option value="Feedback">Feedback</option>
-                                <option value="Reportar problema">Reportar problema</option>
-                                <option value="Parceria">Parceria</option>
-                                <option value="Outro">Outro</option>
-                            </select>
-                        </div>
-                        <div style="display:flex;flex-direction:column;gap:6px;">
-                            <label style="font-size:12px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px;">Mensagem</label>
-                            <textarea name="mensagem" id="contato-mensagem" placeholder="Escreva sua mensagem aqui..." required rows="5"
-                                style="padding:10px 14px;font-size:14px;font-family:Inter,sans-serif;border:1.5px solid #e2e8f0;border-radius:8px;color:#1A2E4A;outline:none;resize:vertical;"></textarea>
-                        </div>
-                        <button type="submit" id="btn-contato-submit"
-                            style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 28px;background:#F4801A;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;align-self:flex-end;">
-                            <i data-lucide="send"></i> Enviar mensagem
-                        </button>
-                    </form>
-                    <div id="contato-sucesso" style="display:none;text-align:center;padding:32px;background:#EAF3DE;border-radius:12px;">
-                        <i data-lucide="check-circle" style="color:#16a34a;"></i>
-                        <h3 style="color:#15803d;margin:12px 0 6px;font-family:Montserrat,sans-serif;">Mensagem enviada!</h3>
-                        <p style="color:#166534;font-size:14px;">Recebemos sua mensagem e responderemos em breve no e-mail informado.</p>
                     </div>
                 </div>
             </div>
