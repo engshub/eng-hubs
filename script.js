@@ -12,6 +12,7 @@
 
     const state = {
         filtroArea: 'todos',
+        filtroUF: 'todas',
         textoBusca: '',
         ordenacao: 'prazo',
         acompanhando: new Set(JSON.parse(localStorage.getItem('eng_acompanhando') || '[]'))
@@ -176,6 +177,9 @@
         const empty = $('#empty-state');
         if (!grid) return;
         let lista = CONCURSOS.filter(c => areaMatches(c, state.filtroArea));
+        if (state.filtroUF && state.filtroUF !== 'todas') {
+            lista = lista.filter(c => (c.estado || '') === state.filtroUF);
+        }
         const norm = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         const q = norm(state.textoBusca.trim());
         if (q) {
@@ -531,9 +535,12 @@
     }
 
     function initFilters() {
-        $$('.chip').forEach(chip => {
-            chip.addEventListener('click', () => {
-                $$('.chip').forEach(c => c.classList.remove('chip-active'));
+        const chipsBox = $('#quick-filters') || $('.quick-filters');
+        if (chipsBox) {
+            chipsBox.addEventListener('click', (e) => {
+                const chip = e.target.closest('.chip');
+                if (!chip) return;
+                $$('.chip', chipsBox).forEach(c => c.classList.remove('chip-active'));
                 chip.classList.add('chip-active');
                 state.filtroArea = chip.getAttribute('data-filter');
                 renderGrid();
@@ -542,7 +549,14 @@
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
-        });
+        }
+        const ufSel = $('#uf-select');
+        if (ufSel) {
+            ufSel.addEventListener('change', () => {
+                state.filtroUF = ufSel.value;
+                renderGrid();
+            });
+        }
         const form = $('#search-form');
         const input = $('#search-input');
         if (form && input) {
@@ -668,6 +682,44 @@
         }
     }
 
+    /* ===== Barra de filtros dinâmica (áreas com contador + UF) ===== */
+    function buildFilterBar() {
+        const chipsBox = $('#quick-filters');
+        if (chipsBox) {
+            const mapa = new Map();
+            CONCURSOS.forEach(c => {
+                const slugs = String(c.area || '').split(',').map(s => slugify(s)).filter(Boolean);
+                const labels = String(c.areaLabel || '').split(',').map(s => s.trim());
+                slugs.forEach((s, i) => {
+                    if (!mapa.has(s)) mapa.set(s, { label: labels[i] || s, count: 0 });
+                    mapa.get(s).count++;
+                });
+            });
+            const atual = state.filtroArea;
+            const entradas = [...mapa.entries()].sort((a, b) => b[1].count - a[1].count || a[1].label.localeCompare(b[1].label));
+            let html = `<button class="chip" data-filter="todos">Todos <span class="chip-count">${CONCURSOS.length}</span></button>`;
+            entradas.forEach(([slug, info]) => {
+                html += `<button class="chip" data-filter="${esc(slug)}">${esc(info.label)} <span class="chip-count">${info.count}</span></button>`;
+            });
+            chipsBox.innerHTML = html;
+            let alvo = chipsBox.querySelector(`[data-filter="${atual}"]`);
+            if (!alvo) { state.filtroArea = 'todos'; alvo = chipsBox.querySelector('[data-filter="todos"]'); }
+            if (alvo) alvo.classList.add('chip-active');
+        }
+        const ufSel = $('#uf-select');
+        if (ufSel) {
+            const contagem = {};
+            CONCURSOS.forEach(c => { if (c.estado) contagem[c.estado] = (contagem[c.estado] || 0) + 1; });
+            let html = `<option value="todas">📍 Todas as UFs</option>`;
+            Object.keys(contagem).sort().forEach(e => {
+                html += `<option value="${esc(e)}">${esc(e)} (${contagem[e]})</option>`;
+            });
+            ufSel.innerHTML = html;
+            if (state.filtroUF !== 'todas' && !contagem[state.filtroUF]) state.filtroUF = 'todas';
+            ufSel.value = state.filtroUF;
+        }
+    }
+
     /* ===== Carregador único de concursos (Supabase) ===== */
     function mapConcurso(c) {
         const dias = diasRestantes(c.inscricoes_ate);
@@ -719,6 +771,7 @@
         } catch (e) {
             console.error('Erro ao carregar concursos:', e);
         }
+        buildFilterBar();
         renderGrid();
         renderPrevistos();
         updateHeroStats();
