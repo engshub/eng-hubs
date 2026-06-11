@@ -106,7 +106,7 @@
                 (c.inscricoesAte ? ` até <strong>${formatData(c.inscricoesAte)}</strong>` : '') +
                 ` · abrem em ${diasInicio} dia${diasInicio > 1 ? 's' : ''}`;
         } else if (dias == null) {
-            textoPrazo = 'Inscrições em breve';
+            textoPrazo = 'Prazo não informado — consulte o edital';
         } else if (dias < 0) {
             textoPrazo = `Encerrado em <strong>${formatData(c.inscricoesAte)}</strong>`;
         } else if (dias === 0) {
