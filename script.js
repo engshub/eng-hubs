@@ -140,15 +140,15 @@
                 <div class="card-info">
                     <div class="card-info-item">
                         <span class="card-info-label">Vagas</span>
-                        <span class="card-info-value"><strong>${c.vagas != null ? c.vagas : '—'}</strong></span>
+                        <span class="card-info-value"><strong>${c.vagas != null ? c.vagas : 'Ver edital'}</strong></span>
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">Remuneração</span>
-                        <span class="card-info-value">${formatBRL(c.salario)}</span>
+                        <span class="card-info-value">${c.salario != null ? formatBRL(c.salario) : 'A divulgar'}</span>
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">Banca</span>
-                        <span class="card-info-value">${esc(c.banca || '—')}</span>
+                        <span class="card-info-value">${esc(c.banca || 'Não divulgada')}</span>
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">UF</span>
