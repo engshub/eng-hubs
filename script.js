@@ -148,7 +148,7 @@
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">Banca</span>
-                        <span class="card-info-value">${esc(c.banca || 'Ver edital')}</span>
+                        <span class="card-info-value">${esc(c.banca || 'A divulgar')}</span>
                     </div>
                     <div class="card-info-item">
                         <span class="card-info-label">UF</span>
